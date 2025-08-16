@@ -1,0 +1,75 @@
+---
+import PaginationButtons from '@/components/astro-components/PaginationButtons.astro';
+import Section from '@/components/astro-components/Section.astro';
+import { BlogGallery } from '@/components/partials/BlogGallery';
+import { IBlogFrontmatter, IBlogMarkdownInstance } from '@/components/types';
+import { BlogConfig } from '@/shared/config/blog';
+import { GlobalTranslation } from '@/locales/global';
+import Base from '@/templates/Base.astro';
+import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
+import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
+
+const translation = getTranslation(
+	cGetUserLanguage(Astro) || defaultLanguageCode
+);
+if (!translation) {
+	if (cGetUserLanguage(Astro) === null) {
+		throw new Error('Could not load translations.');
+	} else {
+		cSetUserLanguage(null);
+	}
+}
+const config = BlogConfig(translation);
+
+const getPageUrl = (page: number) => {
+	const urlBase = '/blog/';
+	return page === 1 ? urlBase : urlBase + page + '/';
+};
+
+const { page = 1 } = Astro.params;
+const pageSize = config.pageSize;
+const startIndex = (Number(page) - 1) * pageSize;
+const endIndex = startIndex + pageSize;
+
+const { getSortedBlogs } = await import('@/backend/blogs');
+const posts: IBlogMarkdownInstance<IBlogFrontmatter>[] = getSortedBlogs();
+const paginatedPosts: IBlogMarkdownInstance<IBlogFrontmatter>[] = posts.slice(
+	startIndex,
+	endIndex
+);
+const pageCount = Math.ceil(posts.length / pageSize);
+
+const prevUrl: string | undefined =
+	page === 1 ? undefined : getPageUrl(Number(page) - 1); // this is why I fu**ing hate js
+const nextUrl: string | undefined =
+	endIndex < posts.length ?
+		getPageUrl(Number(page) + 1) // this as well
+	:	undefined;
+
+const title = `${config.title}${Number(page) > 1 ? ` ${translation.pagination.pageWord} ${page}` : ''} - ${GlobalTranslation.siteName}`;
+const description = config.description;
+---
+
+<Base head={{ title, description }} translation={translation}>
+	<Section title={config.title}>
+		<div class="w-full text-center mt-2">
+			{description}
+		</div>
+	</Section>
+
+	<Section>
+		<BlogGallery
+			blogFileList={paginatedPosts}
+			cutRemainder={false}
+			client:only="react"
+		/>
+	</Section>
+
+	<Section>
+		<PaginationButtons
+			currentPageText={`${translation.pagination.pageWord} ${page} / ${pageCount}`}
+			prevHref={prevUrl}
+			nextHref={nextUrl}
+		/>
+	</Section>
+</Base>

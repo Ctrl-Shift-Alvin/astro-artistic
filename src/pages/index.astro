@@ -1,0 +1,74 @@
+---
+import Banner from '@/components/astro-components/Banner.astro';
+import Card from '@/components/astro-components/Card.astro';
+import Hero from '@/components/astro-components/Hero.astro';
+import Section from '@/components/astro-components/Section.astro';
+import { ContactCard } from '@/components/partials/ContactCard';
+import { RecentBlogs } from '@/components/partials/RecentBlogs';
+import { BlogConfig } from '@/shared/config/blog';
+import { ContactConfig } from '@/shared/config/contact';
+import { GlobalTranslation } from '@/locales/global';
+import Base from '@/templates/Base.astro';
+import { getSortedBlogsSliced } from '@/backend/blogs';
+import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
+import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
+
+const translation = getTranslation(
+	cGetUserLanguage(Astro) || defaultLanguageCode
+);
+if (!translation) {
+	if (cGetUserLanguage(Astro) === null) {
+		throw new Error('Could not load translations.');
+	} else {
+		cSetUserLanguage(null);
+	}
+}
+
+const blogConfig = BlogConfig(translation);
+const recentBlogs = getSortedBlogsSliced(
+	0,
+	blogConfig.recentBlogsCard.maxCardCount
+);
+
+---
+
+<Base
+	head={{
+		title: translation.meta.title,
+		description: translation.meta.description
+	}}
+	noTopPadding={true}
+	translation={translation}
+>
+	<Banner title={GlobalTranslation.siteName} imageUrl="/images/banner.png" />
+	<Section
+		className="flex flex-col items-center lg:flex-row lg:justify-between lg:gap-x-24"
+	>
+		<Hero translation={translation} />
+	</Section>
+	<Section>
+		<Card
+			title={translation.card1.title}
+			description={translation.card1.description}
+			imageSource="/images/piano-hands.png"
+			alternate={true}
+			buttonText={translation.card1.buttonText}
+			buttonUrl="/button/"
+		/>
+	</Section>
+	<Section>
+		<Card
+			title={translation.card2.title}
+			description={translation.card2.description}
+			imageSource="/images/piano-hands.png"
+			buttonText={translation.card2.buttonText}
+			buttonUrl="/lessons/"
+		/>
+	</Section>
+	<Section title={blogConfig.recentBlogsCard.title}>
+		<RecentBlogs recentBlogFiles={recentBlogs} client:only="react" />
+	</Section>
+	<Section>
+		<ContactCard contactData={ContactConfig.contacts.default!.contact(translation)} client:only="react" />
+	</Section>
+</Base>

@@ -1,0 +1,58 @@
+---
+import Card from '@/components/astro-components/Card.astro';
+import Section from '@/components/astro-components/Section.astro';
+import { A } from '@/components/components/A';
+import { GlobalTranslation } from '@/locales/global';
+import Base from '@/templates/Base.astro';
+import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
+import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
+
+const translation = getTranslation(
+	cGetUserLanguage(Astro) || defaultLanguageCode
+);
+if (!translation) {
+	if (cGetUserLanguage(Astro) === null) {
+		throw new Error('Could not load translations.');
+	} else {
+		cSetUserLanguage(null);
+	}
+}
+---
+
+<Base
+	head={{
+		title: translation.siteInfo.title,
+		description: translation.siteInfo.title
+	}}
+	translation={translation}
+>
+	<Section>
+		<Card title={translation.siteInfo.title}>
+			<p class="mt-6 text-justify text-xl leading-9">
+				{translation.siteInfo.madeUsing[0]}
+				<A
+					href="https://astro.build/"
+					target="_blank"
+					className="text-xl underline decoration-1"
+					client:only="react">Astro</A
+				>{translation.siteInfo.madeUsing[1]}
+			</p>
+			<p class="mt-6 text-justify text-xl leading-9">
+				{translation.siteInfo.basedOn[0]}
+				<A
+					href="https://github.com/Ctrl-Shift-Alvin/astro-artistic/"
+					target="_blank"
+					className="text-xl underline decoration-1"
+					client:only="react">astro-artistic</A
+				>
+				{translation.siteInfo.basedOn[1]}
+				<A>Alvin Raul Szöke</A>
+			</p>
+			<p class="mt-6 text-justify text-xl leading-9">
+				{translation.siteInfo.madeBy[0]}{GlobalTranslation.author}{
+					translation.siteInfo.madeBy[1]
+				}
+			</p>
+		</Card>
+	</Section>
+</Base>

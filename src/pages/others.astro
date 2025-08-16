@@ -1,0 +1,68 @@
+---
+import Card from '@/components/astro-components/Card.astro';
+import Section from '@/components/astro-components/Section.astro';
+import { ContactCard } from '@/components/partials/ContactCard';
+import { ContactConfig } from '@/shared/config/contact';
+import '@/styles/global.css';
+import Base from '@/templates/Base.astro';
+import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
+import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
+
+const translation = getTranslation(
+	cGetUserLanguage(Astro) || defaultLanguageCode
+);
+if (!translation) {
+	if (cGetUserLanguage(Astro) === null) {
+		throw new Error('Could not load translations.');
+	} else {
+		cSetUserLanguage(null);
+	}
+}
+---
+
+<Base
+	head={{
+		title: translation.others.title,
+		description: translation.others.description
+	}}
+	translation={translation}
+>
+	<Section title={translation.others.title} center={true} />
+	<Section>
+		<Card
+			title={translation.others.card1.title}
+			description={translation.others.card1.description}
+			imageSource="/images/piano-hands.png"
+		/>
+	</Section>
+	<Section>
+		<Card
+			title={translation.others.card2.title}
+			description={translation.others.card2.description}
+			alternate={true}
+			imageSource="/images/piano-hands.png"
+		/>
+	</Section>
+	<Section>
+		<Card
+			title={translation.others.card3.title}
+			description={translation.others.card3.description}
+			imageSource="/images/piano-hands.png"
+		/>
+	</Section>
+	<Section>
+		<Card title={translation.others.card4.title} />
+		<div class="mt-5 flex justify-center">
+			<ol class="max-w-2/3 min-w-1/3 list-disc">
+				{
+					(translation.others.card4.points as string[]).map((str) => (
+						<li class="my-2 text-center text-xl">{str}</li>
+					))
+				}
+			</ol>
+		</div>
+	</Section>
+	<Section>
+		<ContactCard contactData={ContactConfig.contacts.default!.contact(translation)} client:only="react" />
+	</Section>
+</Base>

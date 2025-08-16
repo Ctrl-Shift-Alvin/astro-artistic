@@ -1,0 +1,63 @@
+---
+import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
+import { getTranslation, defaultLanguageCode } from '@/backend/i18n';
+import { GlobalTranslation, type ITranslation } from '@/locales/global';
+
+import '@/styles/global.css';
+
+const translation: ITranslation = getTranslation(
+	cGetUserLanguage(Astro) || defaultLanguageCode
+);
+if (!translation) {
+	if (cGetUserLanguage(Astro) === null) {
+		throw new Error('Could not load translations.');
+	} else {
+		cSetUserLanguage(null);
+	}
+}
+---
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>{translation.offline.title}</title>
+	<meta name="description" content={translation.offline.description} />
+	<meta name="author" content={GlobalTranslation.author} />
+	<meta name="theme-color" content="#000000" />
+	<link rel="stylesheet" href="/offline.css" />
+
+	<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+	<script>
+		if (navigator.onLine) {
+			window.location.href = '/';
+		} else {
+			window.addEventListener('online', () => {
+				window.location.href = '/';
+			});
+
+			// ReactInit is not added, so play the transition manually
+			document.body.classList.add('opacity-100');
+		}
+	</script>
+	<script is:inline define:vars={{ translation }}>
+		window.__TRANSLATION__ = translation;
+	</script>
+</head>
+<body
+	class="flex h-dvh flex-col items-center bg-gradient-to-b from-black via-black to-gray-900 text-gray-100 transition-opacity duration-750 opacity-0 alvins-class"
+>
+	<h1 class="mt-5 w-10/12 text-center text-4xl font-bold">
+		{translation.offline.title}
+	</h1>
+	<p class="newlines mt-3 w-10/12 text-center text-lg">
+		{translation.offline.body}
+	</p>
+
+	<div
+		class="h-sm:hidden fixed bottom-0 w-full max-w-screen-lg border-t border-gray-600 px-3 py-6"
+	>
+		<p class="text-center">
+			© Copyright {new Date().getFullYear()}. {GlobalTranslation.siteName}.
+		</p>
+	</div>
+</body>

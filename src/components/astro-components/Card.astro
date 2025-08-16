@@ -1,0 +1,58 @@
+---
+import { Button } from '../components/Button'
+
+export interface Props {
+	title: string
+	description?: string
+	imageSource?: string
+	alternate?: boolean
+	buttonText?: string
+	buttonUrl?: string
+}
+
+const { title, description, imageSource, alternate, buttonText, buttonUrl }
+	= Astro.props;
+---
+
+<div
+  class:list={["flex flex-col items-center lg:justify-between lg:gap-x-24", {"lg:flex-row-reverse": alternate, "lg:flex-row": !alternate}]}
+>
+	<div class="w-full">
+		<h1 class="w-full text-center text-3xl font-bold">
+			{title}
+		</h1>
+
+		{
+			description && (
+				<p
+  				class:list={["mt-6 text-justify text-xl newlines leading-9", {"lg:text-right": alternate, "lg:text-left": !alternate}]}
+				>
+					{description}
+				</p>
+			)
+		}
+
+		<slot />
+
+		{
+			buttonText && (
+				<div class="mt-4 flex justify-center">
+					<Button href={buttonUrl} client:only="react">
+						{buttonText}
+					</Button>
+				</div>
+			)
+		}
+	</div>
+
+	{
+		imageSource && (
+			<img
+				class="mt-5 h-80 rounded-md object-cover lg:w-64"
+				src={imageSource}
+				alt="Card image"
+				loading="lazy"
+			/>
+		)
+	}
+</div>

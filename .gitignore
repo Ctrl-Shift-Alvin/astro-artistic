@@ -1,0 +1,41 @@
+# build output
+dist/
+.output/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# environment variables
+.env
+.env*.local
+/src/env.d.ts
+
+# macOS-specific files
+.DS_Store
+
+# certificates
+.cert
+
+# misc
+*.pem
+Thumbs.db
+.history
+.astro
+
+# blog
+/src/pages/blog/*
+!/src/pages/blog/_formatting.md.example
+!/src/pages/blog/[...page].astro
+!/src/pages/blog/create-post.js
+
+# data
+/data
+
+# events
+/src/pages/events/*

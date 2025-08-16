@@ -1,0 +1,26 @@
+---
+import { GlobalTranslation, ITranslation } from '@/locales/global';
+import { A } from '../components/A';
+
+export interface Props {
+	translation: ITranslation;
+}
+
+const { translation } = Astro.props;
+---
+
+<div
+	class="mx-auto flex w-full max-w-screen-lg justify-between border-t border-gray-600 px-3 py-6"
+>
+	<div class="w-fit text-sm text-gray-200">
+		© Copyright {new Date().getFullYear()}. {GlobalTranslation.siteName}.
+	</div>
+	<div class="flex gap-x-5">
+		<A href="/admin/home/" className="text-sm" client:only="react">
+			{translation.footer.admin}
+		</A>
+		<A href="/websiteinfo/" className="text-sm" client:only="react">
+			{translation.footer.siteInfo}
+		</A>
+	</div>
+</div>

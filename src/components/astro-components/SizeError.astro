@@ -1,0 +1,61 @@
+---
+import { ITranslation } from '@/locales/global';
+import { Button } from '../components/Button';
+
+export interface Props {
+	translation: ITranslation;
+}
+
+const { translation } = Astro.props;
+---
+
+<div class="flex w-full flex-col items-center">
+	<p class="mb-5 text-center text-lg">{translation.sizeError.body}</p>
+	<Button onClickAction="sizeErrorIgnore" client:only="react">
+		{translation.sizeError.ignoreButton}
+	</Button>
+	<script>
+		import { cGetIgnoreSizeError } from '@/shared/cookies';
+
+		if (cGetIgnoreSizeError()) {
+			
+			// Make size-error-div invisible
+			const errorDiv = document.getElementById('size-error-div');
+			if (!errorDiv) throw new Error(`Cannot find 'size-error-div' in DOM!`);
+			if (errorDiv) {
+				errorDiv.style.display = 'none';
+			}
+
+		} else {
+			const contentDiv = document.getElementById('content-div');
+			const errorDiv = document.getElementById('size-error-div');
+			if (!contentDiv) throw new Error(`Cannot find 'content-div' in DOM!`);
+			if (!errorDiv) throw new Error(`Cannot find 'size-error-div' in DOM!`);
+			const content = Array.from(contentDiv.children);
+
+			const update = () => {
+				if (cGetIgnoreSizeError() === true) {
+					window.removeEventListener('resize', update);
+				}
+
+				if (window.innerHeight < 450 || window.innerWidth < 420) {
+					content.forEach((item) => {
+						const element = item as HTMLElement;
+						element.style.display = 'none';
+					});
+					errorDiv.style.display = '';
+				} else {
+					content.forEach((item) => {
+						const element = item as HTMLElement;
+						element.style.display = '';
+					});
+					errorDiv.style.display = 'none';
+				}
+			};
+
+			update();
+			window.addEventListener('resize', update);
+
+		}
+	</script>
+</div>

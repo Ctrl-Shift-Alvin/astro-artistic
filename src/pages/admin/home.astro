@@ -1,0 +1,59 @@
+---
+import Section from '@/components/astro-components/Section.astro';
+import { AdminBlogEditor } from '@/components/partials/admin/AdminBlogEditor';
+import { AdminContactSubmissionTable } from '@/components/partials/admin/AdminContactSubmissionTable';
+import { AdminEventsTable } from '@/components/partials/admin/AdminEventsTable';
+import { AdminLogout } from '@/components/partials/admin/AdminLogout';
+import Base from '@/templates/Base.astro';
+import {
+	cGetAuthToken,
+	cGetUserLanguage,
+	cSetUserLanguage
+} from '@/shared/cookies';
+import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
+import { jwtDecode, JwtPayload } from 'jwt-decode';
+
+const translation = getTranslation(
+	cGetUserLanguage(Astro) || defaultLanguageCode
+);
+if (!translation) {
+	if (cGetUserLanguage(Astro) === null) {
+		throw new Error('Could not load translations.');
+	} else {
+		cSetUserLanguage(null);
+	}
+}
+
+const token = cGetAuthToken(Astro);
+if (token) {
+	const tokenExpiry = ((await jwtDecode(token)) as JwtPayload).exp;
+	if (tokenExpiry) {
+		if (Date.now() - tokenExpiry * 1000 > 0) {
+			return Astro.redirect('/admin/login/');
+		}
+	}
+} else {
+	return Astro.redirect('/admin/login/');
+}
+---
+
+<Base
+	head={{
+		title: 'Admin',
+		description: 'Admin page'
+	}}
+	translation={translation}
+>
+	<Section center title="Contact Form Submissions">
+		<AdminContactSubmissionTable client:only="react" />
+	</Section>
+	<Section center title="Manage Events">
+		<AdminEventsTable client:only="react" />
+	</Section>
+	<Section title="Manage Blog">
+		<AdminBlogEditor client:only="react" />
+	</Section>
+	<Section center>
+		<AdminLogout client:only="react" />
+	</Section>
+</Base>

@@ -1,0 +1,43 @@
+---
+import Section from '@/components/astro-components/Section.astro';
+import { BlogPost } from '@/components/partials/BlogPost';
+import { GlobalTranslation } from '@/locales/global';
+import Base from '@/templates/Base.astro';
+import { getBlog } from '@/backend/blogs';
+import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
+import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
+import { marked } from 'marked';
+
+const { content: frontmatter } = Astro.props;
+const title = `${frontmatter.title} - ${GlobalTranslation.siteName}`;
+
+const translation = getTranslation(
+	cGetUserLanguage(Astro) || defaultLanguageCode
+);
+if (!translation) {
+	if (cGetUserLanguage(Astro) === null) {
+		throw new Error('Could not load translations.');
+	} else {
+		cSetUserLanguage(null);
+	}
+}
+
+// Fetch blog and parse to html
+const blogUrlName = Astro.originPathname.split('/').at(-2);
+if (!blogUrlName) throw new Error("Couldn't fetch blog URL!");
+const dynamicContent = getBlog(blogUrlName + '.md');
+if (!dynamicContent) throw new Error("Couldn't fetch blog!");
+const blogContent = marked.parse(dynamicContent.content);
+---
+
+<Base
+	head={{ title, description: frontmatter.description }}
+	translation={translation}
+>
+	<Section>
+		<BlogPost blogHeader={frontmatter}>
+			{/* eslint-disable-next-line astro/no-set-html-directive */}
+			<article set:html={blogContent} />
+		</BlogPost>
+	</Section>
+</Base>

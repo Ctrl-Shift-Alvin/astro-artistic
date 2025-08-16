@@ -1,0 +1,84 @@
+---
+import Section from '@/components/astro-components/Section.astro';
+import { A } from '@/components/components/A';
+import { Button } from '@/components/components/Button';
+import '@/styles/global.css';
+import Base from '@/templates/Base.astro';
+import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
+import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
+import { distance } from 'fastest-levenshtein';
+
+const translation = getTranslation(
+	cGetUserLanguage(Astro) || defaultLanguageCode
+);
+if (!translation) {
+	if (cGetUserLanguage(Astro) === null) {
+		throw new Error('Could not load translations.');
+	} else {
+		cSetUserLanguage(null);
+	}
+}
+
+const pageModules = import.meta.glob('./**/*.astro', { eager: true });
+const allRoutes = Object.keys(pageModules)
+	.map((path: string) => path.replace('./', '/').replace('.astro', '') + '/') // Remove trailing ./ and /, as well as .astro extension
+	.map((path: string) =>
+		path.includes('[...') ? path.substring(0, path.indexOf('[...')) : path
+	) // Include catch-all routes, but remove dynamic segments
+	.filter(
+		(path: string) =>
+			!path.includes('404') &&
+			!path.includes('index') &&
+			!path.includes('[') &&
+			!path.includes(']')
+	); // Filter out 404, index, and dynamic routes
+
+const url = new URL(Astro.request.url);
+const requestedPath = url.pathname.replace(/\/$/, '') || '/';
+
+function getSuggestions(
+	path: string,
+	routes: string[],
+	distanceThreashold: number = 6,
+	maxSuggestions: number = 3
+): string[] {
+	return routes
+		.map((route) => ({
+			route,
+			dist: distance(path, route)
+		})) // Calculate distance between requested path and each route
+		.filter((item) => item.dist <= distanceThreashold) // Filter routes withing the distance threshold
+		.sort((a, b) => a.dist - b.dist) // Sort by distance
+		.map((item) => item.route) // Extract the route from the sorted list
+		.slice(0, maxSuggestions);
+}
+const suggestions = getSuggestions(requestedPath, allRoutes);
+---
+
+<Base
+	head={{
+		title: translation.fourOfour.title,
+		description: translation.fourOfour.description
+	}}
+	translation={translation}
+>
+	<Section center={true} title={translation.fourOfour.title}>
+		<p class="newlines text-center">{translation.fourOfour.description}</p>
+		{
+			suggestions.length > 0 && (
+				<div class="mt-10">
+					<ul>
+						{suggestions.map((route) => (
+							<li>
+								<A href={route} client:only="react">
+									{url.host + route}
+								</A>
+							</li>
+						))}
+					</ul>
+				</div>
+			)
+		}
+		<Button href="/" className="mt-20">{translation.fourOfour.button}</Button>
+	</Section>
+</Base>

@@ -1,0 +1,55 @@
+---
+import Section from '@/components/astro-components/Section.astro';
+import { AdminContactSubmission } from '@/components/partials/admin/AdminContactSubmission';
+import { AdminLogout } from '@/components/partials/admin/AdminLogout';
+import Base from '@/templates/Base.astro';
+import {
+	cGetAuthToken,
+	cGetUserLanguage,
+	cSetUserLanguage
+} from '@/shared/cookies';
+import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
+import { jwtDecode, JwtPayload } from 'jwt-decode';
+
+import { isWindowDefined } from '@/frontend/windowTools';
+isWindowDefined();
+
+const { submissionId = '-1' } = Astro.params;
+
+const translation = getTranslation(
+	cGetUserLanguage(Astro) || defaultLanguageCode
+);
+if (!translation) {
+	if (cGetUserLanguage(Astro) === null) {
+		throw new Error('Could not load translations.');
+	} else {
+		cSetUserLanguage(null);
+	}
+}
+
+const token = cGetAuthToken(Astro);
+if (token) {
+	const tokenExpiry = ((await jwtDecode(token)) as JwtPayload).exp;
+	if (tokenExpiry) {
+		if (Date.now() - tokenExpiry * 1000 > 0) {
+			return Astro.redirect('/admin/login/');
+		}
+	}
+} else {
+	return Astro.redirect('/admin/login/');
+}
+---
+<Base
+	head={{
+		title: 'Submission ' + submissionId,
+		description: 'Seeing submission ' + submissionId
+	}}
+	translation={translation}
+>
+	<Section center>
+		<AdminContactSubmission submissionId={submissionId} client:only="react" />
+	</Section>
+	<Section center>
+		<AdminLogout client:only="react" />
+	</Section>
+</Base>

@@ -1,0 +1,97 @@
+---
+import { availableLanguages, defaultLanguageCode } from '@/backend/i18n';
+import { GlobalTranslation, ITranslation } from '@/locales/global';
+import '@/styles/global.css';
+import { DialogProvider } from '@/components/components/DialogProvider';
+import Loader from '@/components/astro-components/Loader.astro';
+import Footer from '@/components/astro-components/Footer.astro';
+import Section from '@/components/astro-components/Section.astro';
+import SizeError from '@/components/astro-components/SizeError.astro';
+import { ReactInit } from '@/components/components/ReactInit';
+import { ScrollUp } from '@/components/components/ScrollUp';
+import { Navbar } from '@/components/partials/Navbar';
+
+export interface Props {
+	head: { title: string; description: string };
+	translation: ITranslation;
+	className?: string;
+	noTopPadding?: boolean;
+}
+const { head, translation, noTopPadding } = Astro.props as Props;
+---
+
+<html class="bg-gradient-to-b from-black via-black to-gray-900 text-gray-100">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{head.title}</title>
+		<meta name="description" content={head.description} />
+		<meta name="author" content={GlobalTranslation.author} />
+		<meta name="theme-color" content="#000000" />
+
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+		<link
+			rel="alternate"
+			type="application/rss+xml"
+			title={GlobalTranslation.siteName}
+			href={new URL("rss/blog.xml", Astro.site)}
+		/>
+		<link
+			rel="alternate"
+			type="application/rss+xml"
+			title={GlobalTranslation.siteName}
+			href={new URL("rss/events.xml", Astro.site)}
+		/>
+		<script is:inline define:vars={{ translation }}>
+			window.__TRANSLATION__ = translation;
+		</script>
+		<script>
+			if ("serviceWorker" in navigator) {
+				window.addEventListener("load", () => {
+					navigator.serviceWorker
+						.register("/offline-sw.js")
+						.catch((err) => console.error("SW registration failed:", err));
+				});
+			}
+		</script>
+	</head>
+	<body
+		class:list={`bg-gradient-to-b from-black via-black to-gray-900 text-gray-100 alvins-class`}
+	>
+		<Loader />
+
+		{/* Content Div */}
+		<div
+			id="content-div"
+			class="windowtools-transition flex min-h-screen w-full flex-col opacity-0 transition-opacity"
+		>
+			<Navbar
+				availableLanguages={availableLanguages}
+				defaultLanguageCode={defaultLanguageCode}
+				client:only="react"
+			/>
+
+			<div class:list={[`grow pb-5 `,{"pt-26 sm:pt-36 lg:pt-26": !noTopPadding}]}>
+				<slot />
+			</div>
+			<ScrollUp scrollYThreshold={0} client:only="react" />
+
+			<Footer translation={translation} />
+
+			<Section id="size-error-div" center className="h-screen justify-center">
+				<SizeError translation={translation} />
+			</Section>
+			<ReactInit client:only="react" />
+			<DialogProvider client:only="react" />
+			<script>
+				// Initializes window animations
+				import { initWindowAnimations } from "@/frontend/windowTools";
+
+				window.addEventListener("react-hydrated", () => {
+					initWindowAnimations(800, 200);
+				});
+			</script>
+		</div>
+	</body>
+</html>

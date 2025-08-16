@@ -1,0 +1,21 @@
+---
+import { A } from '../components/A';
+
+export interface Props {
+	prevHref: string | undefined;
+	nextHref: string | undefined;
+	currentPageText: string | number;
+	className?: string;
+}
+const { prevHref, nextHref, currentPageText, className } = Astro.props;
+---
+
+<div class:list={["flex justify-center gap-25", className]}>
+	<A href={prevHref} className={prevHref ? '' : 'invisible'}
+		>← Newer Posts</A
+	>
+	<p>{currentPageText}</p>
+	<A href={nextHref} className={nextHref ? '' : 'invisible'}
+		>Older Posts →</A
+	>
+</div>

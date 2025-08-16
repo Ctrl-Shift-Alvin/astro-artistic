@@ -1,0 +1,13 @@
+@import 'tailwindcss';
+@plugin "@tailwindcss/typography";
+
+@theme {
+	--breakpoint-xs: 30rem;
+}
+
+.newlines {
+	white-space: pre-line;
+}
+
+.windowtools-transition {
+}
