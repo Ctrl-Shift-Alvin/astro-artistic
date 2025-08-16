@@ -8,5 +8,6 @@
   "editor.tabSize": 2,
   "search.exclude": {
     "package-lock.json": true
-  }
+  },
+	"files.eol": "\n"
 }
