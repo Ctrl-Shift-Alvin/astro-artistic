@@ -1,10 +1,10 @@
 ---
 import { GlobalTranslation } from '@/locales/global';
 import Base from '@/templates/Base.astro';
-import { cGetUserLanguage, cSetUserLanguage } from '@/utils/cookies';
-import { defaultLanguageCode, getTranslation } from '@/utils/i18n';
-import { events_getEntry } from '@/utils/backend/database/events';
-import { events_getEventContent } from '@/utils/events';
+import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
+import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
+import { events_getEntry } from '@/backend/database/events';
+import { events_getEventContent } from '@/backend/events';
 import { marked } from 'marked';
 import Section from '@/components/astro-components/Section.astro';
 import { EventsPost } from '@/components/partials/EventsPost';
