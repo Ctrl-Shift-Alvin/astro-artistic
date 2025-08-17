@@ -14,7 +14,7 @@ export function getAllBlogs(): IBlogMarkdownInstance<IBlogFrontmatter>[] {
 		.replace(
 			/\\/g,
 			'/'
-		);
+		) + '/';
 
 	const files = fs.readdirSync(BlogConfig.pagesPath);
 	const posts: IBlogMarkdownInstance<IBlogFrontmatter>[] = [];
@@ -35,7 +35,7 @@ export function getAllBlogs(): IBlogMarkdownInstance<IBlogFrontmatter>[] {
 		} = matter(raw);
 
 		posts.push({
-			url: `${blogUrlPath}/${file.replace(
+			url: `${blogUrlPath}${file.replace(
 				/\.md$/,
 				''
 			)}/`,
@@ -56,7 +56,7 @@ export function getBlog(fileName: string): IBlogMarkdownInstance<IBlogFrontmatte
 		.replace(
 			/\\/g,
 			'/'
-		);
+		) + '/';
 
 	const files = fs.readdirSync(BlogConfig.pagesPath);
 	for (const file of files) {
@@ -72,7 +72,7 @@ export function getBlog(fileName: string): IBlogMarkdownInstance<IBlogFrontmatte
 		const parsed = matter(raw);
 
 		return {
-			url: `${blogUrlPath}/${file.replace(
+			url: `${blogUrlPath}${file.replace(
 				/\.md$/,
 				''
 			)}/`,

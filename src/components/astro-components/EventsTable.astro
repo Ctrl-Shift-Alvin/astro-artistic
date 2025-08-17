@@ -3,6 +3,7 @@ import { ITranslation } from '@/locales/global';
 import { events_getAllRelevantEntries } from '@/backend/database/events';
 import { A } from '../components/A';
 import { defaultFormatDateTimeString } from '@/frontend/locale';
+import { EventsConfig } from '@/backend/config/events';
 
 export interface Props {
 	translation: ITranslation;
@@ -14,6 +15,13 @@ const eventEntries = events_getAllRelevantEntries().map((item) => {
 	const datePassed = date.getTime() - Date.now() < 0;
 	return { data: item, date, datePassed };
 });
+
+const eventPagesUrl = EventsConfig.pagesPath
+	.split(/src[/\\]pages/)[1]!
+	.replace(
+		/\\/g,
+		'/'
+	) + '/';
 ---
 
 <h1 class="mb-10 text-4xl font-bold">{translation.events.title}</h1>
@@ -38,7 +46,7 @@ const eventEntries = events_getAllRelevantEntries().map((item) => {
 						<td class:list={["py-3 px-2 text-center",{"line-through": entry.datePassed}]}>
 							{entry.data.enablePage
 								? (
-									<A href={`/events/${entry.data.id}/`} className={'underline'} client:only="react">
+									<A href={`${eventPagesUrl}${entry.data.id}/`} className={'underline'} client:only="react">
 										{entry.data.title}
 									</A>
 								)
