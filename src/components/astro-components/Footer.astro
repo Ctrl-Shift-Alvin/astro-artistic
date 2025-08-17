@@ -22,8 +22,10 @@ const { translation } = Astro.props;
 				{translation.footer.admin}
 			</A>
 		</div>
-		<A href="/websiteinfo/" className="text-sm" client:only="react">
-			{translation.footer.siteInfo}
-		</A>
+		<div>
+			<A href="/websiteinfo/" className="text-sm" client:only="react">
+				{translation.footer.siteInfo}
+			</A>
+		</div>
 	</div>
 </div>
