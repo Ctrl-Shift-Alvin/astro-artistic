@@ -8,13 +8,9 @@ import { BlogConfig } from '@/backend/config/blog';
 
 export function getAllBlogs(): IBlogMarkdownInstance<IBlogFrontmatter>[] {
 
-	const pagesRoot = path.join(
-		process.cwd(),
-		'src',
-		'pages'
-	);
 	const blogUrlPath = BlogConfig.pagesPath
-		.substring(pagesRoot.length)
+		.split(/src[/\\]pages/)[1]!
+		// eslint-disable-next-line custom/newline-per-chained-call
 		.replace(
 			/\\/g,
 			'/'
@@ -54,13 +50,9 @@ export function getAllBlogs(): IBlogMarkdownInstance<IBlogFrontmatter>[] {
 
 export function getBlog(fileName: string): IBlogMarkdownInstance<IBlogFrontmatter> | null {
 
-	const blogsRoot = path.join(
-		process.cwd(),
-		'src',
-		'pages'
-	);
 	const blogUrlPath = BlogConfig.pagesPath
-		.substring(blogsRoot.length)
+		.split(/src[/\\]pages/)[1]!
+		// eslint-disable-next-line custom/newline-per-chained-call
 		.replace(
 			/\\/g,
 			'/'
@@ -69,7 +61,7 @@ export function getBlog(fileName: string): IBlogMarkdownInstance<IBlogFrontmatte
 	const files = fs.readdirSync(BlogConfig.pagesPath);
 	for (const file of files) {
 
-		if (file === fileName)
+		if (file !== fileName)
 			continue;
 
 		const fullPath = path.join(

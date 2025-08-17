@@ -1,5 +1,5 @@
 import {
-	useEffect, useState
+	useEffect, useMemo, useState
 } from 'react';
 import { BlogCard } from '../components/BlogCard';
 import {
@@ -16,54 +16,79 @@ export const BlogGallery = ({
 	className?: string;
 }) => {
 
-	const initialLength = blogFileList.length;
-
 	const [
-		blogFileListProcessed,
-		setBlogFileListProcessed
-	]
-		= useState<IBlogMarkdownInstance<IBlogFrontmatter>[]>(blogFileList);
+		windowWidth,
+		setWindowWidth
+	] = useState(0);
+
 	useEffect(
 		() => {
 
-			const remainderTwo = initialLength % 2;
-			const remainderThree = initialLength % 3;
-			if (remainderTwo === 0 && (remainderThree === 0 || !cutRemainder))
-				return;
-
 			const update = () => {
 
-				// Between sm and md viewports
-				if (640 <= window.innerWidth && window.innerWidth < 768) {
-
-					setBlogFileListProcessed(blogFileList.slice(
-						0,
-						blogFileList.length - remainderTwo
-					));
-
-				} else if (window.innerWidth >= 768) {
-
-					setBlogFileListProcessed(blogFileList.slice(
-						0,
-						blogFileList.length - remainderThree
-					));
-
-				} else {
-
-					setBlogFileListProcessed(blogFileList);
-
-				}
+				setWindowWidth(window.innerWidth);
 
 			};
 			window.addEventListener(
 				'resize',
 				update
 			);
-
 			update();
+
+			return () => {
+
+				window.removeEventListener(
+					'resize',
+					update
+				);
+
+			};
 
 		},
 		[]
+	);
+
+	const blogFileListProcessed = useMemo(
+		() => {
+
+			if (!cutRemainder)
+				return blogFileList;
+
+			const initialLength = blogFileList.length;
+			const remainderTwo = initialLength % 2;
+			const remainderThree = initialLength % 3;
+
+			if (remainderTwo === 0 && remainderThree === 0)
+				return blogFileList;
+
+			// Between sm and md viewports
+			if (640 <= windowWidth && windowWidth < 768) {
+
+				if (remainderTwo === 0)
+					return blogFileList;
+				return blogFileList.slice(
+					0,
+					initialLength - remainderTwo
+				);
+
+			} else if (windowWidth >= 768) {
+
+				if (remainderThree === 0)
+					return blogFileList;
+				return blogFileList.slice(
+					0,
+					initialLength - remainderThree
+				);
+
+			}
+			return blogFileList;
+
+		},
+		[
+			blogFileList,
+			cutRemainder,
+			windowWidth
+		]
 	);
 
 	return (
