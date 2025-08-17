@@ -10,7 +10,7 @@ export async function GET(context: APIContext) {
 		return {
 			title: item.frontmatter.title,
 			description: item.frontmatter.description,
-			link: `${context.site?.href || import.meta.env.SITE}events/`,
+			link: `${context.site?.href || import.meta.env.SITE}blog/`,
 			pubDate: new Date(item.frontmatter.pubDate)
 		};
 
