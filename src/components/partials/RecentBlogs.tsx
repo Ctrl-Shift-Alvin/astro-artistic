@@ -9,6 +9,9 @@ export const RecentBlogs = ({ recentBlogFiles }: { recentBlogFiles: IBlogMarkdow
 
 	const config = BlogConfig(window.__TRANSLATION__);
 
+	if (recentBlogFiles.length < 1)
+		return null;
+
 	return (
 		<>
 			<div className={'my-5 w-full text-right'}>
