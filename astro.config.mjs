@@ -21,9 +21,6 @@ export default defineConfig({
 		tailwindcss(),
 		sitemap(),
 		robotsTxt(),
-		node({
-			mode: process.env.NODE_ENV || 'development'
-		}),
 		mkcert()
 	],
 	redirects: {},

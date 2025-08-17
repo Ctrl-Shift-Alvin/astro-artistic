@@ -66,7 +66,7 @@
 		"dev": "astro dev --host",
 		"prepare": "husky",
 		"preview": "astro preview",
-		"start": "astro dev"
+		"start": "node ./dist/server/entry.mjs"
 	},
 	"type": "module",
 	"version": "1.0.0",
