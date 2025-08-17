@@ -8,6 +8,7 @@ import { GlobalTranslation } from '@/locales/global';
 import Base from '@/templates/Base.astro';
 import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
 import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
+import { getSortedBlogs } from '@/backend/blogs';
 
 const translation = getTranslation(
 	cGetUserLanguage(Astro) || defaultLanguageCode
@@ -31,19 +32,18 @@ const pageSize = config.pageSize;
 const startIndex = (Number(page) - 1) * pageSize;
 const endIndex = startIndex + pageSize;
 
-const { getSortedBlogs } = await import('@/backend/blogs');
 const posts: IBlogMarkdownInstance<IBlogFrontmatter>[] = getSortedBlogs();
 const paginatedPosts: IBlogMarkdownInstance<IBlogFrontmatter>[] = posts.slice(
 	startIndex,
 	endIndex
 );
-const pageCount = Math.ceil(posts.length / pageSize);
+const pageCount = Math.ceil(posts.length / pageSize) || 1; // Default to 1, since there can't be 0 pages
 
 const prevUrl: string | undefined =
-	page === 1 ? undefined : getPageUrl(Number(page) - 1); // this is why I fu**ing hate js
+	page === 1 ? undefined : getPageUrl(Number(page) - 1); // This is why I fu**ing hate js
 const nextUrl: string | undefined =
 	endIndex < posts.length ?
-		getPageUrl(Number(page) + 1) // this as well
+		getPageUrl(Number(page) + 1) // This as well
 	:	undefined;
 
 const title = `${config.title}${Number(page) > 1 ? ` ${translation.pagination.pageWord} ${page}` : ''} - ${GlobalTranslation.siteName}`;
