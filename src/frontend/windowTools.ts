@@ -85,7 +85,7 @@ export const windowFadeIn = () => {
 
 };
 
-export const windowFadeOut = () => {
+export const windowFadeOut = async() => {
 
 	if (animatedObjects === undefined || animatedObjects.length < 1)
 		return;
@@ -99,6 +99,10 @@ export const windowFadeOut = () => {
 		e.classList.add('opacity-0');
 
 	});
+	return new Promise((resolve) => setTimeout(
+		resolve,
+		animationDurationMs
+	));
 
 };
 
@@ -106,15 +110,11 @@ export const windowRefresh = () => {
 
 	if (animatedObjects) {
 
-		windowFadeOut();
-		setTimeout(
-			() => {
+		void windowFadeOut().then(() => {
 
-				window.location.reload();
+			window.location.reload();
 
-			},
-			animationDurationMs
-		);
+		});
 
 	} else {
 
@@ -147,13 +147,18 @@ export function initWindowAnimations(
 			windowFadeIn();
 
 		},
-		getFadeInOffsetMs()
+		fadeInOffsetMs
 	);
 
 	// Play fade-out animation before reload
 	window.onbeforeunload = () => {
 
-		windowFadeOut();
+		void windowFadeOut().then(() => {
+
+			// Fade back in, in case the user navigates back to the cached state (without reloading)
+			windowFadeIn();
+
+		});
 
 	};
 
@@ -161,29 +166,21 @@ export function initWindowAnimations(
 
 export function fakeReload(callback: ()=> void | Promise<void>) {
 
-	windowFadeOut();
-	setTimeout(
-		() => {
+	void windowFadeOut().then(() => {
 
-			void callback();
-			windowFadeIn();
+		void callback();
+		windowFadeIn();
 
-		},
-		getAnimationDurationMs()
-	);
+	});
 
 }
 
 export function goto(href: string) {
 
-	windowFadeOut();
-	setTimeout(
-		() => {
+	void windowFadeOut().then(() => {
 
-			window.location.href = href;
+		window.location.href = href;
 
-		},
-		getAnimationDurationMs()
-	);
+	});
 
 }
