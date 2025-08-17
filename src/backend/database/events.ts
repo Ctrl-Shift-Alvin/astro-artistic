@@ -275,6 +275,9 @@ export const events_getEntry = (id: string): TEventsEntry => {
 
 export const events_createPage = async(id: string): Promise<boolean> => {
 
+	if (!fs.existsSync(EventsConfig.pagesPath))
+		fs.mkdirSync(EventsConfig.pagesPath);
+
 	const existingFiles = fs.readdirSync(
 		EventsConfig.pagesPath,
 		{ withFileTypes: true }
