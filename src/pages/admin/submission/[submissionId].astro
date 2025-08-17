@@ -10,9 +10,10 @@ import {
 } from '@/shared/cookies';
 import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
+import { adminIsSetup } from '@/backend/admin';
 
-import { isWindowDefined } from '@/frontend/windowTools';
-isWindowDefined();
+if (!adminIsSetup)
+	return Astro.redirect('/');
 
 const { submissionId = '-1' } = Astro.params;
 

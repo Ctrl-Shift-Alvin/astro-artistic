@@ -10,6 +10,10 @@ import {
 import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
 import { JwtPayload } from 'jsonwebtoken';
 import { jwtDecode } from 'jwt-decode';
+import { adminIsSetup } from '@/backend/admin';
+
+if (!adminIsSetup)
+	return Astro.redirect('/');
 
 const translation = getTranslation(
 	cGetUserLanguage(Astro) || defaultLanguageCode

@@ -6,17 +6,14 @@ import { cSetAuthToken } from '@/shared/cookies';
 import {
 	ZAuthDeleteApiResponse, ZAuthPostApiRequest, ZAuthPostApiResponse
 } from '@/components/types';
+import { adminIsSetup } from '@/backend/admin';
+
+if (!adminIsSetup)
+	throw new Error('Admin page is not setup but accessed!');
 
 const ADMIN_PASSWORD_HASH = import.meta.env.ADMIN_PASSWORD_HASH as string;
 const JWT_KEY = import.meta.env.JWT_KEY as string;
 const JWT_LENGTH = Number(import.meta.env.JWT_LENGTH);
-
-if (!ADMIN_PASSWORD_HASH)
-	throw new Error('ADMIN_PASSWORD_HASH missing from .env!');
-if (!JWT_KEY)
-	throw new Error('JWT_KEY missing from .env!');
-if (!JWT_LENGTH)
-	throw new Error('JWT_LENGTH missing from .env!');
 
 export async function POST(context: APIContext) {
 

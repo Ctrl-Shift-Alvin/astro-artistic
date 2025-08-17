@@ -1,6 +1,7 @@
 ---
 import { GlobalTranslation, ITranslation } from '@/locales/global';
 import { A } from '../components/A';
+import { adminIsSetup } from '@/backend/admin';
 
 export interface Props {
 	translation: ITranslation;
@@ -16,9 +17,11 @@ const { translation } = Astro.props;
 		© Copyright {new Date().getFullYear()}. {GlobalTranslation.siteName}.
 	</div>
 	<div class="flex gap-x-5">
-		<A href="/admin/home/" className="text-sm" client:only="react">
-			{translation.footer.admin}
-		</A>
+		<div class:list={{ "hidden": !adminIsSetup }}>
+			<A href="/admin/home/" className="text-sm" client:only="react">
+				{translation.footer.admin}
+			</A>
+		</div>
 		<A href="/websiteinfo/" className="text-sm" client:only="react">
 			{translation.footer.siteInfo}
 		</A>
