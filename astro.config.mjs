@@ -13,7 +13,7 @@ export default defineConfig({
 	trailingSlash: 'always',
 	output: 'server',
 	adapter: node({
-		mode: 'standalone'
+		mode: 'middleware'
 	}),
 	devToolbar: { enabled: false },
 	integrations: [
