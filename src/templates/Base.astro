@@ -47,12 +47,24 @@ const { head, translation, noTopPadding } = Astro.props as Props;
 			window.__TRANSLATION__ = translation;
 		</script>
 		<script>
-			if ("serviceWorker" in navigator) {
-				window.addEventListener("load", () => {
+import { windowRefresh } from "@/frontend/windowTools";
+
+			if ('serviceWorker' in navigator) {
+
+				window.addEventListener('load', () => {
+
 					navigator.serviceWorker
-						.register("/offline-sw.js")
-						.catch((err) => console.error("SW registration failed:", err));
+						.register('/sw.js')
+						.catch((err) => console.error('SW registration failed: ', err));
+
 				});
+
+				navigator.serviceWorker.addEventListener('message', event => {
+					if (event.data && event.data.type === 'RELOAD_PAGE') {
+						windowRefresh();
+					}
+				});
+
 			}
 		</script>
 	</head>
