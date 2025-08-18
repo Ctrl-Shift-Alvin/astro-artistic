@@ -2,7 +2,7 @@ import { type ReactNode } from 'react';
 import {
 	getAnimationDurationMs, windowFadeOut
 } from '@/frontend/windowTools';
-import { getAction } from '@/backend/actions';
+import { getAction } from '@/shared/actions';
 
 type IButtonProps = {
 	children: ReactNode;
