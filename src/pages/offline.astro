@@ -27,18 +27,7 @@ if (!translation) {
 	<link rel="stylesheet" href="/offline.css" />
 
 	<link rel="icon" type="image/x-icon" href="/favicon.ico" />
-	<script>
-		if (navigator.onLine) {
-			window.location.href = '/';
-		} else {
-			window.addEventListener('online', () => {
-				window.location.href = '/';
-			});
 
-			// ReactInit is not added, so play the transition manually
-			document.body.classList.add('opacity-100');
-		}
-	</script>
 	<script is:inline define:vars={{ translation }}>
 		window.__TRANSLATION__ = translation;
 	</script>
@@ -46,6 +35,60 @@ if (!translation) {
 <body
 	class="flex h-dvh flex-col items-center bg-gradient-to-b from-black via-black to-gray-900 text-gray-100 transition-opacity duration-750 opacity-0 alvins-class"
 >
+
+	<script is:inline>
+    const tryRedirect = async () => {
+
+			if (!navigator.onLine)
+				return false;
+
+			// Check if the server is also online
+			try {
+
+				const result = await fetch('/home/'); // Smallest resource currently
+				if (result) {
+
+					console.log(result);
+
+					// Transition
+					document.body.classList.replace('opacity-100', 'opacity-0');
+					await new Promise((res) => setTimeout(res, 750));
+
+					document.location.href = '/';
+					return true;
+
+				} else {
+
+					return false;
+
+				}
+
+			} catch {
+
+				return false;
+
+			}
+    };
+
+    (async () => {
+			if (!await tryRedirect()) {
+
+				window.addEventListener('online', () => {
+						tryRedirect();
+				});
+
+				setInterval(
+						() => void tryRedirect(),
+						5000
+				);
+
+				// ReactInit is not present, so play the transition manually
+				document.body.classList.add('opacity-100');
+
+			}
+    })();
+	</script>
+
 	<h1 class="mt-5 w-10/12 text-center text-4xl font-bold">
 		{translation.offline.title}
 	</h1>

@@ -40,7 +40,9 @@
 	"include": [
 		"src/**/*.ts",
 		"src/**/*.tsx",
-		"src/**/*.astro"
+		"src/**/*.astro",
+		"eslint.config.ts",
+    "commitlint.config.ts"
 	],
 	"exclude": [
 		"scripts/eslintCustom.js"
