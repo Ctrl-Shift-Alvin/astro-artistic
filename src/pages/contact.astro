@@ -28,6 +28,6 @@ if (!translation) {
 	translation={translation}
 >
 	<Section>
-		<ContactCard contactData={ContactConfig.contacts.default!.contact(translation)} client:only="react" />
+		<ContactCard contactData={ContactConfig.contacts.default!} client:only="react" />
 	</Section>
 </Base>

@@ -1,11 +1,8 @@
 import { z } from 'zod';
-import { type ITranslation } from '@/locales/global';
 
 // #region Contact Config
 
 export const ZContact = z.object({
-	title: z.string(),
-	description: z.string(),
 	email: z.email(),
 	telNumber: z.preprocess(
 		(val) => (
@@ -14,7 +11,8 @@ export const ZContact = z.object({
 					' ',
 					''
 				)
-				: val),
+				: val
+		),
 		z.e164()
 	),
 	defaultNumberCode: z
@@ -27,7 +25,7 @@ export const ZContactConfig = z.object({
 	contacts: z
 		.record(
 			z.string(),
-			z.object({ contact: z.custom<((translation: ITranslation)=> TContact)>((val) => typeof val === 'function') })
+			ZContact
 		)
 		.refine(
 			(val) => 'default' in val,

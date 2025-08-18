@@ -1,4 +1,5 @@
 import { ZTranslation } from './global';
+import { ContactConfig } from '@/shared/config/contact';
 import {
 	calculateAge, dateOfBirth
 } from '@/shared/dataParse';
@@ -145,8 +146,10 @@ export const Translation = ZTranslation.parse({
 	offline: {
 		title: 'Offline',
 		description: 'Sie sind offline.',
-		body: 'Sie sind nicht mit dem Internet verbunden. Bitte überprüfen Sie Ihre WLAN- '
-			+ 'oder Kabelverbindung zum Router. Hier finden Sie meine Kontaktdaten, falls Sie Fragen haben:\n'
-			+ 'Telefonnummer: +1 888 88 8888\nE-Mail: maxwellmaxmaxunwell@maxmail.com'
-	}
+		body: 'Sie sind nicht mit dem Internet verbunden oder die Webseite ist nicht erreichbar.\n'
+			+ 'Hier finden Sie meine Kontaktdaten, falls Sie daweil Fragen haben:\n'
+			+ `Telefonnummer: ${ContactConfig.contacts.default!.telNumber}\n`
+			+ `Email: ${ContactConfig.contacts.default!.email}`
+	},
+	
 });

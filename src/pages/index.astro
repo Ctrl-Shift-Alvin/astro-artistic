@@ -69,6 +69,6 @@ const recentBlogs = getSortedBlogsSliced(
 		<RecentBlogs recentBlogFiles={recentBlogs} client:only="react" />
 	</Section>
 	<Section>
-		<ContactCard contactData={ContactConfig.contacts.default!.contact(translation)} client:only="react" />
+		<ContactCard contactData={ContactConfig.contacts.default!} client:only="react" />
 	</Section>
 </Base>
