@@ -47,7 +47,7 @@ const { head, translation, noTopPadding } = Astro.props as Props;
 			window.__TRANSLATION__ = translation;
 		</script>
 		<script>
-import { windowRefresh } from "@/frontend/windowTools";
+			import { windowRefresh } from '@/frontend/windowTools';
 
 			if ('serviceWorker' in navigator) {
 
@@ -69,7 +69,7 @@ import { windowRefresh } from "@/frontend/windowTools";
 		</script>
 	</head>
 	<body
-		class:list={`bg-gradient-to-b from-black via-black to-gray-900 text-gray-100 alvins-class`}
+		class="bg-gradient-to-b from-black via-black to-gray-900 text-gray-100 alvins-class"
 	>
 		<Loader />
 
@@ -98,9 +98,9 @@ import { windowRefresh } from "@/frontend/windowTools";
 			<DialogProvider client:only="react" />
 			<script>
 				// Initializes window animations
-				import { initWindowAnimations } from "@/frontend/windowTools";
+				import { initWindowAnimations } from '@/frontend/windowTools';
 
-				window.addEventListener("react-hydrated", () => {
+				window.addEventListener('react-hydrated', () => {
 					initWindowAnimations(800, 200);
 				});
 			</script>
