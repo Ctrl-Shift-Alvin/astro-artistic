@@ -124,6 +124,9 @@ export const windowRefresh = () => {
 
 };
 
+export const defaultAnimationDurationMs = 400;
+export const defaultFadeInOffsetMs = 200;
+
 export function initWindowAnimations(
 	_animationDurationMs?: number,
 	_fadeInOffsetMs?: number
@@ -132,8 +135,8 @@ export function initWindowAnimations(
 	// Start opacity transition
 	const elements = document.querySelectorAll('.windowtools-transition');
 	animatedObjects = elements; // Pass query result to tools, for future windowRefresh() references
-	setAnimationDurationMs(_animationDurationMs || 400);
-	setFadeInOffsetMs(_fadeInOffsetMs || 200);
+	setAnimationDurationMs(_animationDurationMs || defaultAnimationDurationMs);
+	setFadeInOffsetMs(_fadeInOffsetMs || defaultFadeInOffsetMs);
 
 	animatedObjects.forEach((e: Element) => {
 
