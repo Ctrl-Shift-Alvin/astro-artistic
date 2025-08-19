@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import {
-	getAnimationDurationMs, windowFadeOut
+	windowFadeIn, windowFadeOut
 } from '@/frontend/windowTools';
 import { getAction } from '@/shared/actions';
 
@@ -32,15 +32,17 @@ const click = (
 	}
 	if (props.href) {
 
-		windowFadeOut();
-		setTimeout(
-			() => {
+		void windowFadeOut()
+			.then(() => {
 
 				window.location.href = props.href || '';
 
-			},
-			getAnimationDurationMs()
-		);
+			})
+			.then(() => {
+
+				windowFadeIn();
+
+			});
 
 	}
 
