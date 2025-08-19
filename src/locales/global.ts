@@ -119,6 +119,17 @@ export const ZTranslation = z.object({
 		title: z.string(),
 		description: z.string(),
 		body: z.string()
+	}),
+	fourTwentyNine: z.object({
+		title: z.string(),
+		description: z.string(),
+		body: z.string(),
+		reloadIn: z
+			.string()
+			.array()
+			.length(2),
+		reloadInUnknown: z.string(),
+		shouldReload: z.string()
 	})
 });
 export type ITranslation = z.infer<typeof ZTranslation>;

@@ -153,5 +153,18 @@ export const Translation = ZTranslation.parse({
 			+ `Telefonnummer: ${ContactConfig.contacts.default!.telNumber}\n`
 			+ `Email: ${ContactConfig.contacts.default!.email}`
 	},
-	
+	fourTwentyNine: {
+		title: 'Zu Viele Anfragen',
+		description: 'Die Webseite und Ihr Gerät funktioniert richtig, aber Sie haben zu viele Serveranfragen geschickt',
+		body: 'Im Moment hoste ich die Webseite selbst, und diese Anfragenlimit schützt mich vor Roboter.\n'
+			+ 'Hier finden Sie meine Kontaktdaten, falls Sie daweil Fragen haben:\n'
+			+ `Telefonnummer: ${ContactConfig.contacts.default!.telNumber}\n`
+			+ `Email: ${ContactConfig.contacts.default!.email}`,
+		reloadIn: [
+			'Sie können die Webseite in ',
+			' Sekunden wieder aufrufen. Sie sollte dann automatisch neu laden.'
+		],
+		reloadInUnknown: 'Rufen Sie die Webseite in ein paar Minuten neu auf.',
+		shouldReload: 'Website lädt neu... Falls es zu lange dauern soll, können Sie es gerne auch manuell probieren.'
+	}
 });

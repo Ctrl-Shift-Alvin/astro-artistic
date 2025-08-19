@@ -1,0 +1,107 @@
+---
+import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
+import { getTranslation, defaultLanguageCode } from '@/backend/i18n';
+import { GlobalTranslation, type ITranslation } from '@/locales/global';
+
+import '@/styles/global.css';
+
+const translation: ITranslation = getTranslation(
+	cGetUserLanguage(Astro) || defaultLanguageCode
+);
+if (!translation) {
+	if (cGetUserLanguage(Astro) === null) {
+		throw new Error('Could not load translations.');
+	} else {
+		cSetUserLanguage(null);
+	}
+}
+---
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>{translation.fourTwentyNine.title}</title>
+	<meta name="description" content={translation.fourTwentyNine.description} />
+	<meta name="author" content={GlobalTranslation.author} />
+	<meta name="theme-color" content="#000000" />
+	<link rel="stylesheet" href="/offline.css" />
+
+	<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+	<script is:inline define:vars={{ translation }}>
+		window.__TRANSLATION__ = translation;
+	</script>
+</head>
+<body
+	class="flex h-dvh flex-col items-center bg-gradient-to-b from-black via-black to-gray-900 text-gray-100 transition-opacity duration-750 opacity-0 alvins-class"
+>
+
+	<h1 class="mt-15 w-10/12 text-center text-4xl font-bold">
+		{translation.fourTwentyNine.title}
+	</h1>
+	<p class="newlines mt-3 w-10/12 text-center text-lg">
+		{translation.fourTwentyNine.body}
+	</p>
+
+    <div id="countdown" class="mt-5 mx-5 text-xl text-center font-bold" />
+
+	<div
+		class="h-sm:hidden fixed bottom-0 w-full max-w-screen-lg border-t border-gray-600 px-3 py-6"
+	>
+		<p class="text-center">
+			© Copyright {new Date().getFullYear()}. {GlobalTranslation.siteName}.
+		</p>
+	</div>
+
+    <script is:inline>
+
+			// Make sure loading this page is the right choice
+			fetch('/home/') // Small resource
+				.then((response) => {
+
+					// If response status is NOT 429, redirect
+					if (response.status !== 429) {
+						window.location.href = '/';
+						return;
+					}
+
+					// Fetch retryAfter value
+					const countdownElement = document.getElementById('countdown');
+					let retryAfterValue = parseInt(window.retryAfter);
+					if (retryAfterValue && !isNaN(retryAfterValue) && retryAfterValue > 1) {
+
+						const updateCountdown = () => {
+
+							if (retryAfterValue > 0) {
+
+								countdownElement.textContent =
+									window.__TRANSLATION__.fourTwentyNine.reloadIn[0] +
+									retryAfterValue.toString() +
+									window.__TRANSLATION__.fourTwentyNine.reloadIn[1];
+								retryAfterValue--;
+
+							} else {
+
+								countdownElement.textContent = window.__TRANSLATION__.fourTwentyNine.shouldReload;
+								window.location.reload();
+
+							}
+
+						};
+						updateCountdown();
+						setInterval(updateCountdown, 1000);
+
+					} else {
+
+						// Unknown retryAfter value
+						countdownElement.textContent = window.__TRANSLATION__.fourTwentyNine.reloadInUnknown;
+
+					}
+
+					// Transition
+					document.body.classList.replace('opacity-0', 'opacity-100');
+
+				});
+
+    </script>
+</body>

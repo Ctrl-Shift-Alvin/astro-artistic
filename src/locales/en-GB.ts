@@ -141,9 +141,23 @@ export const Translation = ZTranslation.parse({
 	offline: {
 		title: 'Offline',
 		description: 'You are offline.',
-		body: 'You are not connected to the internet or the server is currently not reachable.'
+		body: 'You are not connected to the internet or the server is currently not reachable.\n'
 			+ 'Meanwhile, here are my contact details should you have any questions:\n'
 			+ `Phone number: ${ContactConfig.contacts.default!.telNumber}\n`
 			+ `Email: ${ContactConfig.contacts.default!.email}`
+	},
+	fourTwentyNine: {
+		title: 'Too Many Requests',
+		description: 'The website and your device are working correctly, but you have sent to many requests to the server.',
+		body: 'I am currently hosting the website myself, and this request limit protects me against robots.\n'
+			+ 'Meanwhile, here are my contact details should you have any questions:\n'
+			+ `Phone number: ${ContactConfig.contacts.default!.telNumber}\n`
+			+ `Email: ${ContactConfig.contacts.default!.email}`,
+		reloadIn: [
+			'You may retrieve the website again in ',
+			' seconds. It should then reload automatically.'
+		],
+		reloadInUnknown: 'Try reloading the website a few minutes later.',
+		shouldReload: 'Website reloading... If it\'s taking too long, feel free to reload manually.'
 	}
 });
