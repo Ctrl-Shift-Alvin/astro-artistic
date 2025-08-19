@@ -2,7 +2,7 @@ import {
 	type IBlogMarkdownInstance, type IBlogFrontmatter
 } from '../types';
 import { A } from './A';
-import { defaultFormatDateString } from '@/frontend/locale';
+import { defaultFormatDateString } from '@/shared/dataParse';
 
 export const BlogCard = ({ blogFile }: { blogFile: IBlogMarkdownInstance<IBlogFrontmatter> }) => (
 	<A

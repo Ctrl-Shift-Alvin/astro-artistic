@@ -1,7 +1,9 @@
-import { ZTranslation } from './global';
+import { ZTranslation } from '@/locales/global';
 import { ContactConfig } from '@/shared/config/contact';
 import {
-	calculateAge, dateOfBirth
+	calculateAge,
+	dateOfBirth,
+	defaultFormatDateString
 } from '@/shared/dataParse';
 
 export const Translation = ZTranslation.parse({
@@ -34,7 +36,7 @@ export const Translation = ZTranslation.parse({
 	},
 	card1: {
 		title: 'Mein Leben',
-		description: `Ich wurde am ${dateOfBirth.toDateString()} auf Planet Erde geboren, wie die meisten von uns hier, und seit dem Tag, an dem ich das Licht erblickte, brillierte ich darin, Mensch zu sein. Ich war so gut darin, dass ich sogar meine Eltern (meine Mutter) zum Weinen brachte, als ich meinen ersten Atemzug nahm. Seitdem konzentriere ich mich ausschließlich darauf, meine Performance als Mensch zu verbessern. Heute bin ich einer der menschlichsten Menschen.`,
+		description: `Ich wurde am ${defaultFormatDateString(dateOfBirth)} auf Planet Erde geboren, wie die meisten von uns hier, und seit dem Tag, an dem ich das Licht erblickte, brillierte ich darin, Mensch zu sein. Ich war so gut darin, dass ich sogar meine Eltern (meine Mutter) zum Weinen brachte, als ich meinen ersten Atemzug nahm. Seitdem konzentriere ich mich ausschließlich darauf, meine Performance als Mensch zu verbessern. Heute bin ich einer der menschlichsten Menschen.`,
 		buttonText: ''
 	},
 	card2: {
