@@ -1,5 +1,3 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { ZTranslation } from '@/locales/global';
 import { ContactConfig } from '@/shared/config/contact';
 import {
@@ -7,9 +5,9 @@ import {
 	formatDateOfBirth
 } from '@/shared/dataParse';
 
-const locale = path.basename(
-	fileURLToPath(import.meta.url),
-	'.ts'
+const locale = import.meta.url.slice(
+	import.meta.url.lastIndexOf('/') + 1,
+	import.meta.url.lastIndexOf('_') || -3 // Build file might look like 'de-AT_aF4Ws.ts'
 );
 
 export const Translation = ZTranslation.parse({
