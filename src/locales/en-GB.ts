@@ -7,7 +7,7 @@ import {
 
 const locale = import.meta.url.slice(
 	import.meta.url.lastIndexOf('/') + 1,
-	import.meta.url.lastIndexOf('_') || -3 // Build file might look like 'en-GB_aF4Ws.ts'
+	import.meta.url.lastIndexOf('/') + 6
 );
 
 export const Translation = ZTranslation.parse({
