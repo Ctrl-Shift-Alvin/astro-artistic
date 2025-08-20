@@ -113,23 +113,24 @@ export const ContactCard = ({
 			<div
 				className={`flex flex-col items-center ${
 					alternate
-						? 'sm:flex-row-reverse'
-						: 'sm:flex-row'
+						? 'lg:flex-row-reverse'
+						: 'lg:flex-row'
 				} sm:justify-between md:gap-x-24`}
 			>
 				<div>
-					<h1
-						className={`mb-8 text-center ${alternate
-							? 'sm:text-right'
-							: 'sm:text-left'} text-3xl font-bold`}
-					>
-						{contactData.title}
-					</h1>
 
 					<p
 						className={`text-center ${alternate
-							? 'sm:text-right'
-							: 'sm:text-left'} text-xl leading-9`}
+							? 'lg:text-right'
+							: 'lg:text-left'} newlines text-xl leading-9`}
+					>
+						{contactData.description}
+					</p>
+
+					<p
+						className={`text-center ${alternate
+							? 'lg:text-right'
+							: 'lg:text-left'} text-xl leading-9`}
 					>
 						{window.__TRANSLATION__.contact.email}
 						{':'}
@@ -145,8 +146,8 @@ export const ContactCard = ({
 
 					<p
 						className={`mb-4 text-center ${alternate
-							? 'sm:text-right'
-							: 'sm:text-left'} text-xl leading-9`}
+							? 'lg:text-right'
+							: 'lg:text-left'} text-xl leading-9`}
 					>
 						{window.__TRANSLATION__.contact.phoneNumber}
 						{':'}
@@ -160,13 +161,6 @@ export const ContactCard = ({
 						</A>
 					</p>
 
-					<p
-						className={`text-center ${alternate
-							? 'sm:text-right'
-							: 'sm:text-left'} newlines text-xl leading-9`}
-					>
-						{contactData.description}
-					</p>
 				</div>
 			</div>
 

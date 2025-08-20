@@ -3,6 +3,9 @@ import { z } from 'zod';
 // #region Contact Config
 
 export const ZContact = z.object({
+	description: z
+		.string()
+		.optional(),
 	email: z.email(),
 	telNumber: z.preprocess(
 		(val) => (

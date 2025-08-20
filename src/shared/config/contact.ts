@@ -4,6 +4,7 @@ import { GlobalTranslation } from '@/locales/global';
 export const ContactConfig = ZContactConfig.parse({
 	contacts: {
 		default: {
+			description: '',
 			email: GlobalTranslation.email,
 			telNumber: GlobalTranslation.telNumber,
 			defaultNumberCode: '43'
