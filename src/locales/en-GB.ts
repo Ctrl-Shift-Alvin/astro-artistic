@@ -1,10 +1,16 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ZTranslation } from '@/locales/global';
 import { ContactConfig } from '@/shared/config/contact';
 import {
-	calculateAge,
-	dateOfBirth,
-	defaultFormatDateString
+	formatAge,
+	formatDateOfBirth
 } from '@/shared/dataParse';
+
+const locale = path.basename(
+	fileURLToPath(import.meta.url),
+	'.ts'
+);
 
 export const Translation = ZTranslation.parse({
 	meta: {
@@ -33,11 +39,11 @@ export const Translation = ZTranslation.parse({
 	},
 	heroAvatar: {
 		title: 'About Me',
-		description: `Hello! I am Maxwell Max Maxunwell, a ${calculateAge()}-year-old professional human. I specialize in bodily functions, such as breathing, circulating blood and most occasionally photosynthesis. Though, some of these might stop occasionally if I get too lazy. To see me perform these miracles of God, check out my social media channels:`
+		description: `Hello! I am Maxwell Max Maxunwell, a ${formatAge(locale)}-year-old professional human. I specialize in bodily functions, such as breathing, circulating blood and most occasionally photosynthesis. Though, some of these might stop occasionally if I get too lazy. To see me perform these miracles of God, check out my social media channels:`
 	},
 	card1: {
 		title: 'My Life',
-		description: `I was born on ${defaultFormatDateString(dateOfBirth)} on Planet Earth as most of us here, and since the day I first saw light, I expelled at being human. I was so good at it, that I even made my parents (my mum) cry when I took my first breath. Ever since I have focused solely on improving my performance as a human being. Today I am one of the most human beings.`,
+		description: `I was born on ${formatDateOfBirth(locale)} on Planet Earth as most of us here, and since the day I first saw light, I expelled at being human. I was so good at it, that I even made my parents (my mum) cry when I took my first breath. Ever since I have focused solely on improving my performance as a human being. Today I am one of the most human beings.`,
 		buttonText: ''
 	},
 	card2: {

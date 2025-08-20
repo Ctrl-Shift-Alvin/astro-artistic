@@ -1,51 +1,45 @@
 import { LocalesConfig } from '@/locales/locales.config';
 const defaultLanguageCode = LocalesConfig.preferredCode;
 
-export const dateOfBirth = new Date('2000-01-14');
-
-export const calculateAge = (): number => {
+export const calculateAge = (dob: Date) => {
 
 	const today = new Date();
-	let age = today.getFullYear() - dateOfBirth.getFullYear();
-	const monthDifference = today.getMonth() - dateOfBirth.getMonth();
+	let _age = today.getFullYear() - dob.getFullYear();
 
-	if (
-		(monthDifference < 0 || monthDifference === 0)
-		&& today.getDate() < dateOfBirth.getDate()
-	) {
-
-		age--;
-
-	}
-
-	return age;
+	return (
+		today.getMonth() <= dob.getMonth()
+		&& today.getDate() < dob.getDate()
+			? --_age
+			: _age
+	);
 
 };
 
+export const dateOfBirth = new Date(
+	2000,
+	1 - 1,
+	1
+);
+export const age = calculateAge(dateOfBirth);
+export const formatDateOfBirth = (locale: string) => formatDateString(
+	dateOfBirth,
+	locale
+);
+export const formatAge = (locale: string) => formatNumber(
+	age,
+	locale
+);
+
 export function defaultFormatDateString(date: Date) {
 
-	try {
-
-		return date.toLocaleDateString(
-			defaultLanguageCode,
-			{
-				day: 'numeric',
-				month: 'long',
-				year: 'numeric'
-			}
-		);
-
-	} catch(error) {
-
-		console.error(
-			'Error formatting date:',
-			error
-		);
-
-		// Fallback to a simple date format
-		return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
-
-	}
+	return date.toLocaleDateString(
+		defaultLanguageCode,
+		{
+			day: 'numeric',
+			month: 'long',
+			year: 'numeric'
+		}
+	);
 
 }
 
@@ -73,5 +67,124 @@ export function defaultFormatDateTimeString(date: Date) {
 			minute: 'numeric'
 		}
 	);
+
+}
+
+export function formatDateString(
+	date: Date,
+	locale: string
+) {
+
+	try {
+
+		// Try parsing, code might be wrong
+		const loc = new Intl.Locale(locale);
+		return date.toLocaleDateString(
+			loc,
+			{
+				day: 'numeric',
+				month: 'long',
+				year: 'numeric'
+			}
+		);
+
+	} catch(e: any) {
+
+		throw new Error(
+			`Failed to parse locale string '${locale}'`,
+			{ cause: e }
+		);
+
+	}
+
+}
+
+export function formatTimeString(
+	date: Date,
+	locale: string
+) {
+
+	try {
+
+		// Try parsing, code might be wrong
+		const loc = new Intl.Locale(locale);
+		return date.toLocaleTimeString(
+			loc,
+			{
+				day: 'numeric',
+				hour: 'numeric'
+			}
+		);
+
+	} catch(e: any) {
+
+		throw new Error(
+			`Failed to parse locale string '${locale}'`,
+			{ cause: e }
+		);
+
+	}
+
+}
+
+export function formatDateTimeString(
+	date: Date,
+	locale: string
+) {
+
+	try {
+
+		// Try parsing, code might be wrong
+		const loc = new Intl.Locale(locale);
+		return date.toLocaleString(
+			loc,
+			{
+				day: 'numeric',
+				month: 'long',
+				year: 'numeric',
+				hour: 'numeric',
+				minute: 'numeric'
+			}
+		);
+
+	} catch(e: any) {
+
+		throw new Error(
+			`Failed to parse locale string '${locale}'`,
+			{ cause: e }
+		);
+
+	}
+
+}
+
+// eslint-disable-next-line @typescript-eslint/max-params
+export function formatNumber(
+	num: number,
+	locale: string,
+	localeOptions?: Intl.LocaleOptions,
+	formatOptions?: Intl.NumberFormatOptions
+) {
+
+	try {
+
+		// Try parsing, code might be wrong
+		const loc = new Intl.Locale(
+			locale,
+			localeOptions
+		);
+		return num.toLocaleString(
+			loc,
+			formatOptions
+		);
+
+	} catch(e: any) {
+
+		throw new Error(
+			`Failed to parse locale string '${locale}'`,
+			{ cause: e }
+		);
+
+	}
 
 }

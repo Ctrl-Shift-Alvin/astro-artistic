@@ -1,10 +1,16 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ZTranslation } from '@/locales/global';
 import { ContactConfig } from '@/shared/config/contact';
 import {
-	calculateAge,
-	dateOfBirth,
-	defaultFormatDateString
+	formatAge,
+	formatDateOfBirth
 } from '@/shared/dataParse';
+
+const locale = path.basename(
+	fileURLToPath(import.meta.url),
+	'.ts'
+);
 
 export const Translation = ZTranslation.parse({
 	meta: {
@@ -32,11 +38,11 @@ export const Translation = ZTranslation.parse({
 	},
 	heroAvatar: {
 		title: 'Über mich',
-		description: `Hallo! Ich bin Maxwell Max Maxunwell, ein ${calculateAge()}-jähriger professioneller Mensch. Ich spezialisiere mich auf Körperfunktionen wie Atmen, Blutzirkulation und gelegentlich Photosynthese. Einige dieser Funktionen pausieren manchmal, wenn ich zu faul bin. Um mich bei diesen Wundern Gottes zu beobachten, besuchen Sie meine Social-Media-Kanäle:`
+		description: `Hallo! Ich bin Maxwell Max Maxunwell, ein ${formatAge(locale)}-jähriger professioneller Mensch. Ich spezialisiere mich auf Körperfunktionen wie Atmen, Blutzirkulation und gelegentlich Photosynthese. Einige dieser Funktionen pausieren manchmal, wenn ich zu faul bin. Um mich bei diesen Wundern Gottes zu beobachten, besuchen Sie meine Social-Media-Kanäle:`
 	},
 	card1: {
 		title: 'Mein Leben',
-		description: `Ich wurde am ${defaultFormatDateString(dateOfBirth)} auf Planet Erde geboren, wie die meisten von uns hier, und seit dem Tag, an dem ich das Licht erblickte, brillierte ich darin, Mensch zu sein. Ich war so gut darin, dass ich sogar meine Eltern (meine Mutter) zum Weinen brachte, als ich meinen ersten Atemzug nahm. Seitdem konzentriere ich mich ausschließlich darauf, meine Performance als Mensch zu verbessern. Heute bin ich einer der menschlichsten Menschen.`,
+		description: `Ich wurde am ${formatDateOfBirth(locale)} auf Planet Erde geboren, wie die meisten von uns hier, und seit dem Tag, an dem ich das Licht erblickte, brillierte ich darin, Mensch zu sein. Ich war so gut darin, dass ich sogar meine Eltern (meine Mutter) zum Weinen brachte, als ich meinen ersten Atemzug nahm. Seitdem konzentriere ich mich ausschließlich darauf, meine Performance als Mensch zu verbessern. Heute bin ich einer der menschlichsten Menschen.`,
 		buttonText: ''
 	},
 	card2: {
@@ -89,7 +95,7 @@ export const Translation = ZTranslation.parse({
 		madeBy: [
 			'Übersetzt von: ',
 			''
-		] // Bitte behalte das: Es ist eh die Einzige zeile, wo ich für diess SCHMERZHAFTE Projekt kreditiert werde
+		] // Bitte behalte das: Es ist eh die Einzige zeile, wo ich für dieses SCHMERZHAFTE Projekt kreditiert werde
 	},
 	blog: {
 		title: 'Blog',

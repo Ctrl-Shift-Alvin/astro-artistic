@@ -120,7 +120,9 @@ This template supports multiple languages. To add a new language, you need to:
 1.	Add the language to the `locales.config.ts` file in `/src/locales`.
 2.	Create a new translation file (e.g., `fr.ts`) in the `/src/locales` directory. This file should export a default object with the translated strings.
 
-The website will remember the user's language choice using cookies, while the server will read those, and provide the correct language.
+The website will remember the user's language choice using a cookie, while the server will read those and provide the according strings.
+
+For formatting any types of data, use the utility in `/src/shared/dataParse.ts`. It provides different functions for formatting dates, times, datetimes, numbers and ages.
 
 
 ### Cookies
