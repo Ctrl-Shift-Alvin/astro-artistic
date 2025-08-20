@@ -47,7 +47,6 @@ const { head, translation, noTopPadding } = Astro.props as Props;
 			window.__TRANSLATION__ = translation;
 		</script>
 		<script>
-			import { windowRefresh } from '@/frontend/windowTools';
 
 			if ('serviceWorker' in navigator) {
 
@@ -60,12 +59,17 @@ const { head, translation, noTopPadding } = Astro.props as Props;
 				});
 
 				navigator.serviceWorker.addEventListener('message', event => {
+
 					if (event.data && event.data.type === 'RELOAD_PAGE') {
-						windowRefresh();
+
+						// windowTools might fail import here, if it fails to 429, so just use plain old JS
+						document.location.reload();
+
 					}
 				});
 
 			}
+			
 		</script>
 	</head>
 	<body

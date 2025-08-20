@@ -2,8 +2,9 @@
 
 // #region CONFIGURATION
 
-const CACHE_NAME = 'cache-v1';
+const CACHE_NAME = 'cache-v2';
 const OFFLINE_URL = '/offline/';
+const FOURTWENTYNINE_URL = '/429/';
 const STATIC_ASSETS = [
 	'/favicon.ico',
 	'/images/banner.png',
@@ -11,57 +12,69 @@ const STATIC_ASSETS = [
 ];
 const ASSETS_TO_CACHE = [
 	...STATIC_ASSETS,
-	OFFLINE_URL
+	OFFLINE_URL,
+	FOURTWENTYNINE_URL
 ];
 
 // #endregion
 
-// #region INSTALLATION
+self.oninstall = (event) => {
 
-self.addEventListener(
-	'install',
-	(event) => {
+	event.waitUntil((async() => {
 
-		event.waitUntil(caches
-			.open(CACHE_NAME)
-			.then((cache) => cache.addAll(ASSETS_TO_CACHE)));
-		self.skipWaiting();
+		const cache = await caches.open(CACHE_NAME);
 
-	}
-);
+		// Cache assets
+		await addAllWithBypass(
+			cache,
+			ASSETS_TO_CACHE
+		);
 
-// #endregion
+		// Activate immediately
+		await self.skipWaiting();
 
-// #region ACTIVATION
+	})());
 
-self.addEventListener(
-	'activate',
-	(event) => {
+};
 
-		event.waitUntil(caches
-			.keys()
-			.then((cacheNames) => {
+self.onactivate = (event) => {
 
-				// Delete outdated caches
-				return Promise.all(cacheNames.map((cacheName) => {
+	event.waitUntil((async() => {
 
-					if (cacheName !== CACHE_NAME) {
+		const cache = await caches.open(CACHE_NAME);
 
-						return caches.delete(cacheName);
+		// Delete outdated caches
+		const keys = await caches.keys();
+		await Promise.all(keys
+			.filter((k) => k !== CACHE_NAME)
+			.map((k) => caches.delete(k)));
 
-					}
+		// Refetch and recache /offline/ and /429/ pages
+		await addAllWithBypass(
+			cache,
+			[
+				OFFLINE_URL,
+				FOURTWENTYNINE_URL
+			]
+		);
 
-				}));
+		// Take control of clients immediately
+		await self.clients.claim();
 
-			}));
-		self.clients.claim();
+		// Check if CSS is cached, otherwise reload with the sw active this time, and let 'fetch' cache the CSS files
+		const cachedRequests = await cache.keys();
+		const hasCSS = cachedRequests.some((request) => request.url.endsWith('.css'));
 
-	}
-);
+		if (!hasCSS) {
 
-// #endregion
+			requestReload();
 
-// #region FETCH
+		}
+
+	})());
+
+};
+
 self.addEventListener(
 	'fetch',
 	(event) => {
@@ -69,30 +82,43 @@ self.addEventListener(
 		// Handle navigation requests with offline fallback
 		if (event.request.mode === 'navigate') {
 
-			handleNavigationRequest(event);
+			event.respondWith(handleNavigationRequest(event));
 
 		} else {
 
-			// Handle static asset requests with cache-first strategy
-			handleStaticAssetRequest(event);
+			event.respondWith(handleStaticAssetRequest(event));
 
 		}
 
 	}
 );
 
-// #endregion
-
 // #region HANDLERS
 
-function handleNavigationRequest(event) {
+async function addAllWithBypass(
+	cache,
+	urls
+) {
 
-	// Return offline page
-	event.respondWith(fetch(event.request).catch(() => {
+	for (const url of urls) {
 
-		return caches.match(OFFLINE_URL);
+		const request = new Request(
+			`${url}?t=${Date.now()}`,
+			{ cache: 'no-store' }
+		);
 
-	}));
+		const response = await fetch(request);
+		if (!response.ok) {
+
+			throw new Error(`Failed to fetch ${request.url}: ${response.statusText}`);
+
+		}
+		await cache.put(
+			url, // Store against the original URL
+			response
+		);
+
+	}
 
 }
 
@@ -114,68 +140,192 @@ function calculateHash(buffer) {
 
 }
 
-function handleStaticAssetRequest(event) {
+let hasSentReload = false;
+function requestReload() {
 
-	event.respondWith(caches
+	if (hasSentReload)
+		return;
+	hasSentReload = true;
+
+	self.clients
+		.matchAll()
+		.then((clients) => {
+
+			clients.forEach((cl) => cl.postMessage({ type: 'RELOAD_PAGE' }));
+
+		});
+
+	hasSentReload = false;
+
+}
+
+async function handle429Response(response) {
+
+	const retryAfter = response.headers.get('Retry-After');
+	const cached429 = await caches.match(FOURTWENTYNINE_URL);
+
+	if (!cached429) {
+
+		return response;
+
+	}
+
+	// Inject retryAfter value
+	const body = await cached429.text();
+	const newBody = body.replace(
+		'<script>',
+		`<script>window.retryAfter = ${JSON.stringify(retryAfter)};\n`
+	);
+
+	const headers = new Headers(cached429.headers);
+	headers.set(
+		'Content-Type',
+		'text/html'
+	);
+
+	return new Response(
+		newBody,
+		{
+			status: 429,
+			statusText: 'too-many-requests',
+			headers: headers
+		}
+	);
+
+}
+
+async function handleNavigationRequest(event) {
+
+	return fetch(event.request)
+		.then((networkResponse) => {
+
+			if (networkResponse.status === 429) {
+
+				return handle429Response(networkResponse);
+
+			}
+
+			return networkResponse;
+
+		})
+		.catch(async() => {
+
+			// If fetch fails, return from cache, otherwise return offline page
+			return await caches.match(event.request) || caches.match(OFFLINE_URL);
+
+		});
+
+}
+
+async function handleStaticAssetRequest(event) {
+
+	// Only proccess assets inside STATIC_ASSETS
+	const url = new URL(event.request.url);
+	if (!STATIC_ASSETS.some((e) => e === url.pathname) && !url.pathname.endsWith('.css')) {
+
+		return fetch(event.request)
+			.then((res) => {
+
+				/*
+				 * Navigation might load, but requests after that might fail with 429.
+				 * In that case, reload the page and allow 'fetch' handler to load 429 page.
+				 */
+				if (res.status === 429) {
+
+					requestReload(true);
+
+				}
+				return res;
+
+			})
+			.catch(() => {
+
+				// Catch offline errors
+				return new Response(
+					null,
+					{
+						status: 599,
+						statusText: 'offline'
+					}
+				);
+
+			});
+
+	}
+
+	return caches
 		.open(CACHE_NAME)
 		.then(async(cache) => {
 
 			const cachedResponse = await cache.match(event.request);
-			const fetchPromise = fetch(event.request).then(async(networkResponse) => {
 
-				if (networkResponse && networkResponse.status === 200) {
+			// Fetch from network to both update cache state, and in case the response isn't cached
+			const fetchPromise = fetch(event.request)
+				.then(async(initialNetworkResponse) => {
 
-					const responseToCache = networkResponse.clone();
-					const bodyBuffer = await responseToCache.arrayBuffer();
-					const networkHash = await calculateHash(bodyBuffer);
+					if (!initialNetworkResponse || initialNetworkResponse.status !== 200) {
 
+						if (initialNetworkResponse === undefined)
+							console.log('BAD');
+						return initialNetworkResponse;
+
+					}
+
+					const networkResponse = initialNetworkResponse.clone();
+					const networkBodyBuffer = await initialNetworkResponse.arrayBuffer();
+					const networkBodyHash = calculateHash(networkBodyBuffer);
+
+					// Append asset hash
+					const newHeaders = new Headers(networkResponse.headers);
+					newHeaders.append(
+						'X-Asset-Hash',
+						networkBodyHash
+					);
+
+					// Cache response
+					await cache.put(
+						event.request,
+						new Response(
+							networkBodyBuffer,
+							{
+								headers: newHeaders,
+								status: networkResponse.status,
+								statusText: networkResponse.statusText
+							}
+						)
+					);
+
+					// If a cached response is found, compare hashes, and trigger a reload if different
 					if (cachedResponse) {
 
 						const cachedHash = cachedResponse.headers.get('X-Asset-Hash');
+						if (cachedHash !== networkBodyHash) {
 
-						// If the hash is different, send a reload message.
-						if (cachedHash !== networkHash) {
-
-							self.clients
-								.matchAll()
-								.then((clients) => {
-
-									clients.forEach((client) => client.postMessage({ type: 'RELOAD_PAGE' }));
-
-								});
+							requestReload();
 
 						}
 
 					}
 
-					const headers = new Headers(responseToCache.headers);
-					headers.append(
-						'X-Asset-Hash',
-						networkHash
-					);
+					return initialNetworkResponse;
 
-					const responseWithHash = new Response(
-						bodyBuffer,
+				})
+				.catch(() => {
+
+					return new Response(
+						null,
 						{
-							headers,
-							status: responseToCache.status,
-							statusText: responseToCache.statusText
+							status: 599,
+							statusText: 'offline'
 						}
 					);
 
-					await cache.put(
-						event.request,
-						responseWithHash
-					);
+				});
 
-				}
-				return networkResponse;
-
-			});
-
+			// Return cached response if available, otherwise the network response
 			return cachedResponse || fetchPromise;
 
-		}));
+		});
 
 }
 
