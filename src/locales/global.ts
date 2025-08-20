@@ -77,6 +77,7 @@ export const ZTranslation = z.object({
 		title: z.string(),
 		description: z.string(),
 		recentPosts: z.string(),
+		noPosts: z.string(),
 		gotoBlogButton: z.string()
 	}),
 	pagination: z.object({ pageWord: z.string() }),
@@ -105,6 +106,7 @@ export const ZTranslation = z.object({
 	events: z.object({
 		title: z.string(),
 		description: z.string(),
+		noEvents: z.string(),
 		dateRow: z.string(),
 		locationRow: z.string(),
 		titleRow: z.string()

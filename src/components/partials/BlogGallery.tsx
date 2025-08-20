@@ -91,17 +91,23 @@ export const BlogGallery = ({
 		]
 	);
 
-	return (
-		<div
-			className={`grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 ${className}`}
-		>
-			{blogFileListProcessed.map((instance) => (
-				<BlogCard
-					key={instance.url}
-					blogFile={instance}
-				/>
-			))}
-		</div>
-	);
+	return blogFileListProcessed.length > 0
+		? (
+			<div
+				className={`grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 ${className}`}
+			>
+				{blogFileListProcessed.map((instance) => (
+					<BlogCard
+						key={instance.url}
+						blogFile={instance}
+					/>
+				))}
+			</div>
+		)
+		: (
+			<p className={'w-full text-center text-lg'}>
+				{window.__TRANSLATION__.blog.noPosts}
+			</p>
+		);
 
 };
