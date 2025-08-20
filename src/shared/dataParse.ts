@@ -1,4 +1,5 @@
-import { defaultLanguageCode } from '@/backend/i18n';
+import { LocalesConfig } from '@/locales/locales.config';
+const defaultLanguageCode = LocalesConfig.preferredCode;
 
 export const dateOfBirth = new Date('2000-01-14');
 
