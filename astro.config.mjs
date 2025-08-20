@@ -9,7 +9,7 @@ import mkcert from 'vite-plugin-mkcert';
 // https://astro.build/config
 export default defineConfig({
 	// Base: '.', // Set a path prefix.
-	site: 'http://maxmaxwell.com/', // Use to generate your sitemap and canonical URLs in your final build.
+	site: 'http://maxmaxwell.com/',
 	trailingSlash: 'always',
 	output: 'server',
 	adapter: node({
@@ -29,13 +29,13 @@ export default defineConfig({
 			host: '0.0.0.0',
 			port: 4321,
 			strictPort: true,
-			https: true,
 			allowedHosts: [
 				'nasty', 'testsite.local'
 			],
 			cors: true,
 			plugins: [
-				tailwindcss(), react({ include: /\.(mdx|js|jsx|ts|tsx)$/ })
+				tailwindcss(),
+				react({ include: /\.(mdx|js|jsx|ts|tsx)$/ })
 			],
 			hmr: true
 		},
@@ -57,7 +57,10 @@ export default defineConfig({
 			mkcert({
 				force: false,
 				savePath: '.cert/',
-				hosts: [ 'yourwebsite.eu' ]
+				hosts: [ 'yourwebsite.eu' ],
+				keyFileName: 'dev-key.pem',
+				certFileName: 'dev-cert.pem',
+				autoUpgrade: true
 			})
 		]
 	},
