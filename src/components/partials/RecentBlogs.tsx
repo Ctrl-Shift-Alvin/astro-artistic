@@ -1,5 +1,5 @@
-import { A } from '../components/A';
-import { BlogGallery } from './BlogGallery';
+import { BlogGallery } from '@/components/partials/BlogGallery';
+import { A } from '@/components/components/A';
 import {
 	type IBlogFrontmatter, type IBlogMarkdownInstance
 } from '@/components/types';
@@ -8,9 +8,6 @@ import { BlogConfig } from '@/shared/config/blog';
 export const RecentBlogs = ({ recentBlogFiles }: { recentBlogFiles: IBlogMarkdownInstance<IBlogFrontmatter>[] }) => {
 
 	const config = BlogConfig(window.__TRANSLATION__);
-
-	if (recentBlogFiles.length < 1)
-		return null;
 
 	return (
 		<>

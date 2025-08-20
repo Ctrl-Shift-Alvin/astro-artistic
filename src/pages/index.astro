@@ -65,10 +65,10 @@ const recentBlogs = getSortedBlogsSliced(
 			buttonUrl="/others/"
 		/>
 	</Section>
-	<Section title={blogConfig.recentBlogsCard.title}>
+	{recentBlogs.length > 0 && <Section title={blogConfig.recentBlogsCard.title}>
 		<RecentBlogs recentBlogFiles={recentBlogs} client:only="react" />
-	</Section>
-	<Section>
+	</Section>}
+	<Section title={translation.contact.title}>
 		<ContactCard contactData={ContactConfig.contacts.default!} client:only="react" />
 	</Section>
 </Base>
