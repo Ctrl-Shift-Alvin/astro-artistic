@@ -51,7 +51,7 @@ export const BlogGallery = ({
 	const blogFileListProcessed = useMemo(
 		() => {
 
-			if (!cutRemainder)
+			if (!cutRemainder || blogFileList.length === 1)
 				return blogFileList;
 
 			const initialLength = blogFileList.length;
