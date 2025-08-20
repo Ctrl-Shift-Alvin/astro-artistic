@@ -2,9 +2,7 @@ import { z } from 'zod';
 
 export const GlobalTranslation = {
 	siteName: 'Maxwell Max Maxunwell',
-	author: 'Maxwell Max Maxunwell',
-	email: 'maxwellmaxmaxunwell@maxmail.com',
-	telNumber: '+1 8888 88 888'
+	author: 'Maxwell Max Maxunwell'
 };
 
 export const ZTranslation = z.object({

@@ -1,12 +1,11 @@
 import { ZContactConfig } from './configTypes';
-import { GlobalTranslation } from '@/locales/global';
 
 export const ContactConfig = ZContactConfig.parse({
 	contacts: {
 		default: {
 			description: '',
-			email: GlobalTranslation.email,
-			telNumber: GlobalTranslation.telNumber,
+			email: 'maxwellmaxmaxunwell@maxmail.com',
+			telNumber: '+1 8888 88 888',
 			defaultNumberCode: '43'
 		}
 
