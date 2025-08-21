@@ -394,7 +394,6 @@ export default eslintTs.config([
         extraFileExtensions: ['.astro'],
         sourceType: 'module',
         ecmaVersion: 'latest',
-        project: './tsconfig.json',
       },
     },
 		rules: {
