@@ -1,4 +1,4 @@
-/* eslint-disable import/unambiguous */
+/* eslint-disable import-x/unambiguous */
 
 // #region CONFIGURATION
 
@@ -251,7 +251,7 @@ async function handleStaticAssetRequest(event) {
 		}
 	);
 
-	const cachedResponse = await cache.match(event.request);
+	const cachedResponse = await caches.match(event.request);
 
 	const fetchPromise = fetch(event.request)
 		.then(async(initialNetworkResponse) => {

@@ -8,24 +8,23 @@ import { globalIgnores } from 'eslint/config';
 import eslintTs from 'typescript-eslint';
 import * as eslintCustom from './scripts/eslintCustom';
 import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
-import eslintPluginImport from 'eslint-plugin-import';
+import eslintPluginImport from 'eslint-plugin-import-x';
 import eslintAstroParser from 'astro-eslint-parser';
 import path from 'node:path';
 
 export default eslintTs.config([
 	includeIgnoreFile(path.join(process.cwd(), '.gitignore')),
-	globalIgnores(['.husky/', '*.ts']),
+	globalIgnores(['.husky/', 'eslint.config.ts', 'commitlint.config.ts']),
 	{ // eslint-config
 		name: 'eslint-config',
 		files: ['**/*.{ts,js,tsx,jsx}'],
-		extends: [eslint.configs.recommended],
 		rules: {
 			'no-undef': 'off'
 		}
 	},
 	{ // eslint-ts
 		name: 'eslintTs',
-		files: ['**/*.{ts,tsx}'],
+		files: ['src/**/*.{ts,tsx}'],
 		extends: [eslintTs.configs.recommendedTypeChecked],
 		languageOptions: {
 			parserOptions: {
@@ -693,41 +692,42 @@ export default eslintTs.config([
 		files: ['**/*.{ts,tsx,js,jsx}'],
 		extends: [eslintPluginImport.flatConfigs.recommended, eslintPluginImport.flatConfigs.typescript],
 		settings: {
-			'import/resolver': {
+			'import-x/resolver': {
 				typescript: true,
 				node: true
 			}
 		},
 		rules: {
-			'import/export': 'error',
-			'import/no-deprecated': 'error',
-			'import/no-empty-named-blocks': 'error',
-			'import/no-extraneous-dependencies': ['error', {
+			'import-x/export': 'error',
+			'import-x/no-deprecated': 'error',
+			'import-x/no-empty-named-blocks': 'error',
+			'import-x/no-extraneous-dependencies': ['error', {
 				devDependencies: true,
 				optionalDependencies: true,
 				peerDependencies: true,
 				bundledDependencies: true
 			}],
-			'import/no-mutable-exports': 'error',
-			'import/no-named-as-default': 'error',
-			'import/no-named-as-default-member': 'error',
-			'import/no-unused-modules': 'warn',
-			'import/no-amd': 'error',
-			'import/no-commonjs': 'error',
-			'import/no-import-module-exports': 'error',
-			'import/no-nodejs-modules': 'off',
-			'import/unambiguous': 'error',
-			'import/default': 'error',
-			'import/enforce-node-protocol-usage': ['error', 'always'],
-			'import/named': 'error',
-			'import/namespace': 'error',
-			'import/no-absolute-path': 'error',
-			'import/no-cycle': 'error',
-			'import/no-dynamic-require': 'error',
-			'import/no-internal-modules': 'off',
-			'import/no-relative-packages': 'error',
-			'import/no-relative-parent-imports': 'off',
-			'import/no-restricted-paths': ['error', {
+			'import-x/no-mutable-exports': 'error',
+			'import-x/no-named-as-default': 'off',
+			'import-x/no-named-as-default-member': 'off',
+			'import-x/no-rename-default': 'off',
+
+			'import-x/no-amd': 'error',
+			'import-x/no-commonjs': 'error',
+			'import-x/no-import-module-exports': 'error',
+			'import-x/no-nodejs-modules': 'off',
+			'import-x/unambiguous': 'error',
+
+			'import-x/default': 'error',
+			'import-x/named': 'error',
+			'import-x/namespace': 'error',
+			'import-x/no-absolute-path': 'error',
+			'import-x/no-cycle': 'error',
+			'import-x/no-dynamic-require': 'error',
+			'import-x/no-internal-modules': 'off',
+			'import-x/no-relative-packages': 'error',
+			'import-x/no-relative-parent-imports': 'off',
+			'import-x/no-restricted-paths': ['error', {
 				zones: [
 					{
 						target: './src/frontend/**/*',
@@ -743,31 +743,34 @@ export default eslintTs.config([
 					}
 				]
 			}],
-			'import/no-self-import': 'error',
-			'import/no-unresolved': 'error',
-			'import/no-useless-path-segments': 'error',
-			'import/no-webpack-loader-syntax': 'error',
-			'import/consistent-type-specifier-style': ['error', 'prefer-inline'],
-			'import/dynamic-import-chunkname': 'off',
-			'import/export-last': 'off',
-			'import/extensions': 'off',
-			'import/first': 'error',
-			'import/group-exports': 'off',
-			'import/imports-first': 'off', // Replaced by 'import/first'
-			'import/max-dependencies': 'off',
-			'import/newline-after-import': 'off',
-			'import/no-anonymous-default-export': 'off', // See next rule
-			'import/no-default-export': 'error',
-			'import/no-duplicates': 'error',
-			'import/no-named-default': 'off', // In favor of 'import/no-default-export'
-			'import/no-named-export': 'off',
-			'import/no-namespace': 'off',
-			'import/no-unassigned-import': ['error', {
+			'import-x/no-self-import': 'error',
+			'import-x/no-unresolved': 'error',
+			'import-x/no-useless-path-segments': 'error',
+			'import-x/no-webpack-loader-syntax': 'error',
+
+			'import-x/consistent-type-specifier-style': ['error', 'prefer-inline'],
+			'import-x/dynamic-import-chunkname': 'off',
+			'import-x/export-last': 'off',
+			'import-x/extensions': 'off',
+			'import-x/first': 'error',
+			'import-x/group-exports': 'off',
+			'import-x/imports-first': 'off', // Replaced by 'import/first'
+			'import-x/max-dependencies': 'off',
+			'import-x/newline-after-import': ['error', {
+				considerComments: true
+			}],
+			'import-x/no-anonymous-default-export': 'off', // See next rule
+			'import-x/no-default-export': 'error',
+			'import-x/no-duplicates': 'error',
+			'import-x/no-named-default': 'off', // In favor of 'import/no-default-export'
+			'import-x/no-named-export': 'off',
+			'import-x/no-namespace': 'off',
+			'import-x/no-unassigned-import': ['error', {
 				allow: ['styles/*.css']
 			}],
-			'import/order': 'error',
-			'import/prefer-default-export': 'off',
-			
+			'import-x/order': 'error',
+			'import-x/prefer-default-export': 'off',
+			'import-x/prefer-namespace-import': 'off'
 		}
 	},
   { // eslint-custom

@@ -1,4 +1,5 @@
 import { LocalesConfig } from '@/locales/locales.config';
+
 const defaultLanguageCode = LocalesConfig.preferredCode;
 
 export const calculateAge = (dob: Date) => {
