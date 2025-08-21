@@ -199,24 +199,37 @@ async function handleNavigationRequest(event) {
 	return fetch(event.request)
 		.then(async(networkResponse) => {
 
+			let response;
 			switch (networkResponse.status === 502) {
 
 				case 429:
-					return handle429Response(networkResponse);
+					response = handle429Response(networkResponse);
+					break;
 
 				case 502:
-					return await caches.match(OFFLINE_URL);
+					response = await caches.match(OFFLINE_URL);
+					break;
 
 				case 503:
-					return await caches.match(OFFLINE_URL); // Change later to server maintenance page
+					response = await caches.match(OFFLINE_URL); // Change later to server maintenance page
+					break;
 
 				case 504:
-					return await caches.match(OFFLINE_URL);
+					response = await caches.match(OFFLINE_URL);
+					break;
 
 				default:
 					return networkResponse;
 
 			}
+
+			return new Response(
+				response.body,
+				{
+					status: 200,
+					statusText: 'overriden'
+				}
+			);
 
 		})
 		.catch(async() => {
