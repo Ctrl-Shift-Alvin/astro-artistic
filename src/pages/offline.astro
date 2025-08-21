@@ -70,6 +70,9 @@ if (!translation) {
 			}
     };
 
+		// ReactInit is not present, so play the transition manually
+		document.body.classList.add('opacity-100');
+
     (async () => {
 			if (!await tryRedirect()) {
 
@@ -81,9 +84,6 @@ if (!translation) {
 					() => void tryRedirect(),
 					5000
 				);
-
-				// ReactInit is not present, so play the transition manually
-				document.body.classList.add('opacity-100');
 
 			}
     })();
