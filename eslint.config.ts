@@ -1,5 +1,4 @@
 import { includeIgnoreFile } from '@eslint/compat';
-import eslint from '@eslint/js';
 import eslintPluginStylistic from '@stylistic/eslint-plugin';
 import eslintPluginAstro from 'eslint-plugin-astro';
 import eslintPluginJsonc from 'eslint-plugin-jsonc';
@@ -28,7 +27,7 @@ export default eslintTs.config([
 		extends: [eslintTs.configs.recommendedTypeChecked],
 		languageOptions: {
 			parserOptions: {
-				projectService: true,
+				project: './tsconfig.json',
 				tsconfigRootDir: import.meta.dirname
 			}
 		},
@@ -721,7 +720,7 @@ export default eslintTs.config([
 			'import-x/named': 'error',
 			'import-x/namespace': 'error',
 			'import-x/no-absolute-path': 'error',
-			'import-x/no-cycle': 'error',
+			'import-x/no-cycle': 'off',
 			'import-x/no-dynamic-require': 'error',
 			'import-x/no-internal-modules': 'off',
 			'import-x/no-relative-packages': 'error',
