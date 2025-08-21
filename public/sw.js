@@ -1,7 +1,5 @@
 /* eslint-disable import/unambiguous */
 
-const { response } = require('express');
-
 // #region CONFIGURATION
 
 const CACHE_NAME = 'cache-v2';
