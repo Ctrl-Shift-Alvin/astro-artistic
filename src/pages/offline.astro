@@ -48,7 +48,7 @@ if (!translation) {
 			try {
 
 				const result = await fetch('/home/', { cache: 'no-cache' }); // Smallest resource currently
-				if (result.ok) {
+				if (result.ok && result.status === 200) {
 
 					// Transition
 					document.body.classList.replace('opacity-100', 'opacity-0');
