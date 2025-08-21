@@ -1,6 +1,5 @@
 import { type ReactNode } from 'react';
 import {
-	getAnimationDurationMs,
 	windowFadeIn,
 	windowFadeOut
 } from '@/frontend/windowTools';
@@ -23,33 +22,23 @@ const hrefClicked = (
 		props.onClick(clickEvent);
 	if (props.href) {
 
-		if (props.target === '_blank') {
+		void windowFadeOut().then(() => {
 
-			windowFadeOut();
-			setTimeout(
-				() => {
+			if (props.target === '_blank') {
 
-					window.open(
-						props.href,
-						'_blank'
-					);
-					windowFadeIn();
+				window.open(
+					props.href,
+					'_blank'
+				);
 
-				},
-				getAnimationDurationMs()
-			);
-			return;
-
-		}
-		windowFadeOut();
-		setTimeout(
-			() => {
+			} else {
 
 				window.location.href = props.href || '';
 
-			},
-			getAnimationDurationMs()
-		);
+			}
+			windowFadeIn();
+
+		});
 
 	}
 
