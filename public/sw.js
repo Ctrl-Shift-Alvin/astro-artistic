@@ -1,5 +1,7 @@
 /* eslint-disable import/unambiguous */
 
+const { response } = require('express');
+
 // #region CONFIGURATION
 
 const CACHE_NAME = 'cache-v2';
@@ -200,7 +202,7 @@ async function handleNavigationRequest(event) {
 		.then(async(networkResponse) => {
 
 			let response;
-			switch (networkResponse.status === 502) {
+			switch (networkResponse.status) {
 
 				case 429:
 					response = handle429Response(networkResponse);
@@ -243,111 +245,86 @@ async function handleNavigationRequest(event) {
 
 async function handleStaticAssetRequest(event) {
 
-	// Only proccess assets inside STATIC_ASSETS
-	const url = new URL(event.request.url);
-	if (!STATIC_ASSETS.some((e) => e === url.pathname) && !url.pathname.endsWith('.css')) {
+	const offlineResponse = () => new Response(
+		null,
+		{
+			status: 599,
+			statusText: 'offline'
+		}
+	);
 
-		return fetch(event.request)
-			.then((res) => {
+	const cachedResponse = await cache.match(event.request);
 
-				/*
-				 * Navigation might load, but requests after that might fail with 429.
-				 * In that case, reload the page and allow 'fetch' handler to load 429 page.
-				 */
-				if (res.status === 429) {
+	const fetchPromise = fetch(event.request)
+		.then(async(initialNetworkResponse) => {
 
-					requestReload(true);
+			// Handle error packages
+			switch (initialNetworkResponse.status) {
+
+				case 429:
+					requestReload();
+					return offlineResponse();
+
+				case 502:
+					return offlineResponse();
+
+				case 503:
+					return offlineResponse();
+
+				case 504:
+					return offlineResponse();
+
+			}
+
+			const cache = await caches.open(CACHE_NAME);
+
+			const networkResponse = initialNetworkResponse.clone();
+			const networkBodyBuffer = await initialNetworkResponse.arrayBuffer();
+			const networkBodyHash = calculateHash(networkBodyBuffer);
+
+			// Append asset hash
+			const newHeaders = new Headers(networkResponse.headers);
+			newHeaders.append(
+				'X-Asset-Hash',
+				networkBodyHash
+			);
+
+			// Cache response
+			await cache.put(
+				event.request,
+				new Response(
+					networkBodyBuffer,
+					{
+						headers: newHeaders,
+						status: networkResponse.status,
+						statusText: networkResponse.statusText
+					}
+				)
+			);
+
+			// If a cached response is found, compare hashes, and trigger a reload if different
+			if (cachedResponse) {
+
+				const cachedHash = cachedResponse.headers.get('X-Asset-Hash');
+				if (cachedHash !== networkBodyHash) {
+
+					requestReload();
 
 				}
-				return res;
 
-			})
-			.catch(() => {
+			}
 
-				// Catch offline errors
-				return new Response(
-					null,
-					{
-						status: 599,
-						statusText: 'offline'
-					}
-				);
+			return initialNetworkResponse;
 
-			});
+		})
+		.catch(async() => {
 
-	}
-
-	return caches
-		.open(CACHE_NAME)
-		.then(async(cache) => {
-
-			const cachedResponse = await cache.match(event.request);
-
-			// Fetch from network to both update cache state, and in case the response isn't cached
-			const fetchPromise = fetch(event.request)
-				.then(async(initialNetworkResponse) => {
-
-					if (!initialNetworkResponse || initialNetworkResponse.status !== 200) {
-
-						return initialNetworkResponse;
-
-					}
-
-					const networkResponse = initialNetworkResponse.clone();
-					const networkBodyBuffer = await initialNetworkResponse.arrayBuffer();
-					const networkBodyHash = calculateHash(networkBodyBuffer);
-
-					// Append asset hash
-					const newHeaders = new Headers(networkResponse.headers);
-					newHeaders.append(
-						'X-Asset-Hash',
-						networkBodyHash
-					);
-
-					// Cache response
-					await cache.put(
-						event.request,
-						new Response(
-							networkBodyBuffer,
-							{
-								headers: newHeaders,
-								status: networkResponse.status,
-								statusText: networkResponse.statusText
-							}
-						)
-					);
-
-					// If a cached response is found, compare hashes, and trigger a reload if different
-					if (cachedResponse) {
-
-						const cachedHash = cachedResponse.headers.get('X-Asset-Hash');
-						if (cachedHash !== networkBodyHash) {
-
-							requestReload();
-
-						}
-
-					}
-
-					return initialNetworkResponse;
-
-				})
-				.catch(() => {
-
-					return new Response(
-						null,
-						{
-							status: 599,
-							statusText: 'offline'
-						}
-					);
-
-				});
-
-			// Return cached response if available, otherwise the network response
-			return cachedResponse || fetchPromise;
+			return offlineResponse();
 
 		});
+
+	// Return cached response if available, otherwise the network response
+	return cachedResponse || fetchPromise;
 
 }
 
