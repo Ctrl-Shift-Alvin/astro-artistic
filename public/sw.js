@@ -197,21 +197,32 @@ async function handle429Response(response) {
 async function handleNavigationRequest(event) {
 
 	return fetch(event.request)
-		.then((networkResponse) => {
+		.then(async(networkResponse) => {
 
-			if (networkResponse.status === 429) {
+			switch (networkResponse.status === 502) {
 
-				return handle429Response(networkResponse);
+				case 429:
+					return handle429Response(networkResponse);
+
+				case 502:
+					return await caches.match(OFFLINE_URL);
+
+				case 503:
+					return await caches.match(OFFLINE_URL); // Change later to server maintenance page
+
+				case 504:
+					return await caches.match(OFFLINE_URL);
+
+				default:
+					return networkResponse;
 
 			}
-
-			return networkResponse;
 
 		})
 		.catch(async() => {
 
-			// If fetch fails, return from cache, otherwise return offline page
-			return await caches.match(event.request) || caches.match(OFFLINE_URL);
+			// If fetch fails, return offline page
+			return await caches.match(OFFLINE_URL);
 
 		});
 
@@ -265,8 +276,6 @@ async function handleStaticAssetRequest(event) {
 
 					if (!initialNetworkResponse || initialNetworkResponse.status !== 200) {
 
-						if (initialNetworkResponse === undefined)
-							console.log('BAD');
 						return initialNetworkResponse;
 
 					}
