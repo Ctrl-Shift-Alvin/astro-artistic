@@ -2,7 +2,6 @@
 import Section from '@/components/astro-components/Section.astro';
 import { A } from '@/components/components/A';
 import { Button } from '@/components/components/Button';
-import '@/styles/global.css';
 import Base from '@/templates/Base.astro';
 import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
 import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
@@ -79,6 +78,6 @@ const suggestions = getSuggestions(requestedPath, allRoutes);
 				</div>
 			)
 		}
-		<Button href="/" className="mt-20">{translation.fourOfour.button}</Button>
+		<Button href="/" className="mt-20" client:only="react">{translation.fourOfour.button}</Button>
 	</Section>
 </Base>
