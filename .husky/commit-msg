@@ -1,3 +1,9 @@
 #!/usr/bin/env sh
 npx commitlint --edit $1
-npx eslint .
+
+# Get all staged files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+if [ -n "$STAGED_FILES" ]; then
+  npx eslint $STAGED_FILES
+fi
