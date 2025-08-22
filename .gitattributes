@@ -1,2 +1,2 @@
-public/images/** binary
 * text eol=lf
+public/images/** -text
