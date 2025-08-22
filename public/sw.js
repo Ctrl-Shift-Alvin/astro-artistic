@@ -5,15 +5,18 @@
 const CACHE_NAME = 'cache-v2';
 const OFFLINE_URL = '/offline/';
 const FOURTWENTYNINE_URL = '/429/';
+const NAV_URLS = [
+	OFFLINE_URL,
+	FOURTWENTYNINE_URL
+];
 const STATIC_ASSETS = [
 	'/favicon.ico',
 	'/images/banner.png',
-	'/images/piano-hands.png'
-];
-const ASSETS_TO_CACHE = [
-	...STATIC_ASSETS,
-	OFFLINE_URL,
-	FOURTWENTYNINE_URL
+	'/images/piano-hands.png',
+	'/images/facebook-icon.png',
+	'/images/linkedin-icon.png',
+	'/images/twitter-icon.png',
+	'/images/youtube-icon.png'
 ];
 
 // #endregion
@@ -22,15 +25,7 @@ self.oninstall = (event) => {
 
 	event.waitUntil((async() => {
 
-		const cache = await caches.open(CACHE_NAME);
-
-		// Cache assets
-		await addAllWithBypass(
-			cache,
-			ASSETS_TO_CACHE
-		);
-
-		// Activate immediately
+		// Take control of clients immediately
 		await self.skipWaiting();
 
 	})());
@@ -41,35 +36,17 @@ self.onactivate = (event) => {
 
 	event.waitUntil((async() => {
 
-		const cache = await caches.open(CACHE_NAME);
+		// First take control of clients
+		await self.clients.claim();
 
 		// Delete outdated caches
-		const keys = await caches.keys();
-		await Promise.all(keys
+		await Promise.all((await caches.keys())
 			.filter((k) => k !== CACHE_NAME)
 			.map((k) => caches.delete(k)));
 
-		// Refetch and recache /offline/ and /429/ pages
-		await addAllWithBypass(
-			cache,
-			[
-				OFFLINE_URL,
-				FOURTWENTYNINE_URL
-			]
-		);
-
-		// Take control of clients immediately
-		await self.clients.claim();
-
-		// Check if CSS is cached, otherwise reload with the sw active this time, and let 'fetch' cache the CSS files
-		const cachedRequests = await cache.keys();
-		const hasCSS = cachedRequests.some((request) => request.url.endsWith('.css'));
-
-		if (!hasCSS) {
-
-			requestReload();
-
-		}
+		// Refetch and recache pages
+		await cacheNavUrls();
+		await cacheStaticAssets();
 
 	})());
 
@@ -79,42 +56,131 @@ self.addEventListener(
 	'fetch',
 	(event) => {
 
-		// Handle navigation requests with offline fallback
+		// Handle navigation requests
 		if (event.request.mode === 'navigate') {
 
 			event.respondWith(handleNavigationRequest(event));
 
-		} else {
+		}
 
-			event.respondWith(handleStaticAssetRequest(event));
+		const url = new URL(event.request.url);
+
+		// Handle listed static assets
+		if (STATIC_ASSETS.includes(url.pathname) || url.pathname.endsWith('.css')) {
+
+			event.respondWith(handleCacheRequest(event));
 
 		}
 
 	}
 );
 
-// #region HANDLERS
+// #region HELPER FUNCTIONS
 
-async function addAllWithBypass(
+const offlineResponse = () => new Response(
+	null,
+	{
+		status: 599,
+		statusText: 'offline'
+	}
+);
+
+const cacheStaticAssets = () => caches
+	.open(CACHE_NAME)
+	.then(async(cache) => {
+
+		return cacheAddAllBypass(
+			cache,
+			STATIC_ASSETS
+		);
+
+	});
+
+const cacheNavUrls = async() => {
+
+	return caches
+		.open(CACHE_NAME)
+		.then(async(cache) => {
+
+			let cssUrls = new Set();
+			for (const navUrl of NAV_URLS) {
+
+				// Fetch page
+				const response = await fetchResponse(new Request(
+					navUrl,
+					{ cache: 'no-store' }
+				));
+				if (!response.ok || response.status == 599) {
+
+					throw new Error(`Failed to fetch ${response.url}: ${response.status}, '${response.statusText}'`);
+
+				}
+				await cache.put(
+					navUrl,
+					response.clone()
+				);
+
+				/*
+				 * Parse relative CSS URLs and filter out already-fetched URLs
+				 * Tip: Depending on Astro's settings, a page's style might be inlined as a module, or made external,
+				 * through a <link rel="stylesheet" href="..." /> element. In case the latter happens, also fetch the styles.
+				 */
+				const text = await response
+					.clone()
+					.text();
+				[ ...text.matchAll(/<link[^>]+rel=["']stylesheet["'][^>]+href=["']([^"']+)["']/gi) ]
+					.map((match) => match[1])
+					.forEach((e) => cssUrls.add(e));
+
+			}
+
+			// Fetch and cache relative styles for the fetched pages
+			for (const cssUrl of cssUrls) {
+
+				const cssResponse = await fetchResponse(
+					cssUrl,
+					{ cache: 'no-store' }
+				);
+				if (!cssResponse.ok || cssResponse.status == 599) {
+
+					console.log(`Failed to fetch CSS file '${cssUrl}': ${cssResponse.statusText}, ${cssResponse.status}'`);
+
+				}
+				await cache.put(
+					cssUrl,
+					cssResponse
+				);
+
+			}
+
+		});
+
+};
+
+async function fetchResponse(url) {
+
+	return fetch(url).catch(() => offlineResponse());
+
+}
+
+async function cacheAddAllBypass(
 	cache,
 	urls
 ) {
 
 	for (const url of urls) {
 
-		const request = new Request(
-			`${url}?t=${Date.now()}`,
+		const response = await fetchResponse(new Request(
+			url,
 			{ cache: 'no-store' }
-		);
-
-		const response = await fetch(request);
+		));
 		if (!response.ok) {
 
-			throw new Error(`Failed to fetch ${request.url}: ${response.statusText}`);
+			throw new Error(`Failed to fetch ${url}: ${response.status}, '${response.statusText}'`);
 
 		}
 		await cache.put(
-			url, // Store against the original URL
+			url,
 			response
 		);
 
@@ -140,24 +206,30 @@ function calculateHash(buffer) {
 
 }
 
-let hasSentReload = false;
+let reloadPromise = null;
 function requestReload() {
 
-	if (hasSentReload)
-		return;
-	hasSentReload = true;
+	console.log('GOOOOOOOO');
 
-	self.clients
-		.matchAll()
-		.then((clients) => {
+	if (reloadPromise)
+		return reloadPromise;
 
-			clients.forEach((cl) => cl.postMessage({ type: 'RELOAD_PAGE' }));
+	reloadPromise = (async() => {
 
-		});
+		const clients = await self.clients.matchAll();
+		await Promise.all(clients.map((cl) => cl.postMessage({ type: 'RELOAD_PAGE' })));
 
-	hasSentReload = false;
+		reloadPromise = null;
+
+	})();
+
+	return reloadPromise;
 
 }
+
+// #endregion
+
+// #region HANDLERS
 
 async function handle429Response(response) {
 
@@ -196,130 +268,85 @@ async function handle429Response(response) {
 
 async function handleNavigationRequest(event) {
 
-	return fetch(event.request)
-		.then(async(networkResponse) => {
+	return fetchResponse(event.request).then(async(networkResponse) => {
 
-			let response;
-			switch (networkResponse.status) {
+		switch (networkResponse.status) {
 
-				case 429:
-					response = handle429Response(networkResponse);
-					break;
+			case 429:
+				return handle429Response(networkResponse);
 
-				case 502:
-					response = await caches.match(OFFLINE_URL);
-					break;
+			case 502:
+				return await caches.match(OFFLINE_URL);
 
-				case 503:
-					response = await caches.match(OFFLINE_URL); // Change later to server maintenance page
-					break;
+			case 503:
+				return await caches.match(OFFLINE_URL); // Change later to server maintenance page
 
-				case 504:
-					response = await caches.match(OFFLINE_URL);
-					break;
+			case 504:
+				return await caches.match(OFFLINE_URL);
 
-				default:
-					return networkResponse;
+			case 599: // Response failed
+				return await caches.match(OFFLINE_URL);
 
-			}
+			default:
+				return networkResponse;
 
-			return new Response(
-				response.body,
-				{
-					status: 200,
-					statusText: 'overriden'
-				}
-			);
+		}
 
-		})
-		.catch(async() => {
-
-			// If fetch fails, return offline page
-			return await caches.match(OFFLINE_URL);
-
-		});
+	});
 
 }
 
-async function handleStaticAssetRequest(event) {
-
-	const offlineResponse = () => new Response(
-		null,
-		{
-			status: 599,
-			statusText: 'offline'
-		}
-	);
+async function handleCacheRequest(event) {
 
 	const cachedResponse = await caches.match(event.request);
+	const fetchPromise = fetchResponse(event.request).then(async(initialNetworkResponse) => {
 
-	const fetchPromise = fetch(event.request)
-		.then(async(initialNetworkResponse) => {
-
-			// Handle error packages
-			switch (initialNetworkResponse.status) {
-
-				case 429:
-					requestReload();
-					return offlineResponse();
-
-				case 502:
-					return offlineResponse();
-
-				case 503:
-					return offlineResponse();
-
-				case 504:
-					return offlineResponse();
-
-			}
-
-			const cache = await caches.open(CACHE_NAME);
-
-			const networkResponse = initialNetworkResponse.clone();
-			const networkBodyBuffer = await initialNetworkResponse.arrayBuffer();
-			const networkBodyHash = calculateHash(networkBodyBuffer);
-
-			// Append asset hash
-			const newHeaders = new Headers(networkResponse.headers);
-			newHeaders.append(
-				'X-Asset-Hash',
-				networkBodyHash
-			);
-
-			// Cache response
-			await cache.put(
-				event.request,
-				new Response(
-					networkBodyBuffer,
-					{
-						headers: newHeaders,
-						status: networkResponse.status,
-						statusText: networkResponse.statusText
-					}
-				)
-			);
-
-			// If a cached response is found, compare hashes, and trigger a reload if different
-			if (cachedResponse) {
-
-				const cachedHash = cachedResponse.headers.get('X-Asset-Hash');
-				if (cachedHash !== networkBodyHash) {
-
-					requestReload();
-
-				}
-
-			}
-
+		// Only cache status 200 responses
+		if (initialNetworkResponse.status != 200)
 			return initialNetworkResponse;
 
-		})
-		.catch(async() => {
+		const cache = await caches.open(CACHE_NAME);
 
-			return offlineResponse();
+		const networkResponse = initialNetworkResponse.clone();
+		const networkBodyBuffer = await networkResponse.arrayBuffer();
+		const networkBodyHash = calculateHash(networkBodyBuffer);
 
-		});
+		// Append asset hash
+		const newHeaders = new Headers(networkResponse.headers);
+		newHeaders.append(
+			'X-Asset-Hash',
+			networkBodyHash
+		);
+
+		// If a cached response is found, compare hashes, and trigger a reload if different
+		if (cachedResponse) {
+
+			const cachedHash = cachedResponse.headers.get('X-Asset-Hash');
+			if (cachedHash !== networkBodyHash) {
+
+				// Recache response
+				await cache.put(
+					event.request,
+					new Response(
+						networkBodyBuffer,
+						{
+							headers: newHeaders,
+							status: networkResponse.status,
+							statusText: networkResponse.statusText
+						}
+					)
+				);
+				requestReload();
+
+			}
+
+		}
+
+		return initialNetworkResponse;
+
+	});
+
+	event.waitUntil(fetchPromise);
 
 	// Return cached response if available, otherwise the network response
 	return cachedResponse || fetchPromise;
