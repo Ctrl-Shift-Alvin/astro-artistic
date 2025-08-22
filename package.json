@@ -68,8 +68,9 @@
 		"dev": "astro dev --host",
 		"prepare": "husky",
 		"preview": "astro preview",
+		"buildVersion": "node ./scripts/buildVersion.js",
 		"start": "node server-entrypoint.mjs",
-		"bs": "astro build && npm run start"
+		"bs": "npm run buildVersion && astro build && npm run start"
 	},
 	"type": "module",
 	"version": "1.0.0",

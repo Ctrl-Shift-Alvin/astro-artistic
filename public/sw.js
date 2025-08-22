@@ -2,7 +2,7 @@
 
 // #region CONFIGURATION
 
-const CACHE_NAME = 'cache-v2';
+const CACHE_NAME = 'cache-1b80ca5dc904add856ba054ecbc1b88d620df5e052ff305e28d71f6edde16d16';
 const OFFLINE_URL = '/offline/';
 const FOURTWENTYNINE_URL = '/429/';
 const NAV_URLS = [
@@ -206,27 +206,6 @@ function calculateHash(buffer) {
 
 }
 
-let reloadPromise = null;
-function requestReload() {
-
-	console.log('GOOOOOOOO');
-
-	if (reloadPromise)
-		return reloadPromise;
-
-	reloadPromise = (async() => {
-
-		const clients = await self.clients.matchAll();
-		await Promise.all(clients.map((cl) => cl.postMessage({ type: 'RELOAD_PAGE' })));
-
-		reloadPromise = null;
-
-	})();
-
-	return reloadPromise;
-
-}
-
 // #endregion
 
 // #region HANDLERS
@@ -302,43 +281,14 @@ async function handleCacheRequest(event) {
 	const fetchPromise = fetchResponse(event.request).then(async(initialNetworkResponse) => {
 
 		// Only cache status 200 responses
-		if (initialNetworkResponse.status != 200)
-			return initialNetworkResponse;
+		if (initialNetworkResponse.status == 200 || !cachedResponse) {
 
-		const cache = await caches.open(CACHE_NAME);
-
-		const networkResponse = initialNetworkResponse.clone();
-		const networkBodyBuffer = await networkResponse.arrayBuffer();
-		const networkBodyHash = calculateHash(networkBodyBuffer);
-
-		// Append asset hash
-		const newHeaders = new Headers(networkResponse.headers);
-		newHeaders.append(
-			'X-Asset-Hash',
-			networkBodyHash
-		);
-
-		// If a cached response is found, compare hashes, and trigger a reload if different
-		if (cachedResponse) {
-
-			const cachedHash = cachedResponse.headers.get('X-Asset-Hash');
-			if (cachedHash !== networkBodyHash) {
-
-				// Recache response
-				await cache.put(
+			await caches
+				.open(CACHE_NAME)
+				.then((cache) => cache.put(
 					event.request,
-					new Response(
-						networkBodyBuffer,
-						{
-							headers: newHeaders,
-							status: networkResponse.status,
-							statusText: networkResponse.statusText
-						}
-					)
-				);
-				requestReload();
-
-			}
+					initialNetworkResponse
+				));
 
 		}
 
