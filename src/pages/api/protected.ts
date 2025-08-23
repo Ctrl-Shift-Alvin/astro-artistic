@@ -10,7 +10,7 @@ import path from 'node:path';
 import { type APIContext } from 'astro';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import {
-	ApiResponse,
+	ZApiResponse,
 	ZEventsEntry,
 	ZProtectedGetApiResponse,
 	ZProtectedPostApiRequestMap,
@@ -863,7 +863,7 @@ export async function POST(context: APIContext) {
 
 		default: {
 
-			const errorBody = ApiResponse.parse({ error: 'bad-request-type' });
+			const errorBody = ZApiResponse.parse({ error: 'bad-request-type' });
 			return new Response(
 				JSON.stringify(errorBody),
 				{ status: 400 }

@@ -2,7 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import Database from 'better-sqlite3';
 import {
-	ContactFormEntry, type TContactFormEntry, type TContactFormSubmission
+	ZContactFormEntry,
+	type TContactFormEntry,
+	type TContactFormSubmission
 } from '@/components/types';
 import { ContactConfig } from '@/backend/config/contact';
 
@@ -149,7 +151,7 @@ export const contact_dbGet = (
 			.prepare(query)
 			.get(searchParams);
 		db.close();
-		const parsed = ContactFormEntry.parse(result);
+		const parsed = ZContactFormEntry.parse(result);
 		return parsed;
 
 	} catch(e: any) {
@@ -182,7 +184,7 @@ export const contact_dbAll = (
 			.prepare(query)
 			.all(searchParams);
 		db.close();
-		const parsed = ContactFormEntry
+		const parsed = ZContactFormEntry
 			.array()
 			.parse(result);
 		return parsed;

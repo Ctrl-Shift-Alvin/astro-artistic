@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Monolog } from '../components/MonologProvider';
-import { ContactFormSubmission } from '../types';
+import { ZContactFormSubmission } from '../types';
 import { A } from '../components/A';
 import { Button } from '../components/Button';
 import { type TContact } from '@/shared/config/configTypes';
@@ -42,7 +42,7 @@ export const ContactCard = ({
 
 		}
 
-		const requestBody = ContactFormSubmission.safeParse(formData);
+		const requestBody = ZContactFormSubmission.safeParse(formData);
 		if (!requestBody.success) {
 
 			switch (requestBody.error.issues[0]?.path[0]) {

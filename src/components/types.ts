@@ -13,11 +13,20 @@ export const ZApiResponseError = z.object({
 });
 export type TApiResponseError = z.infer<typeof ZApiResponseError>;
 
-export const ApiResponse = z.union([
+export const ZApiResponse = z.union([
 	ZApiResponseSuccess,
 	ZApiResponseError
 ]);
-export type TApiResponse = z.infer<typeof ApiResponse>;
+export type TApiResponse = z.infer<typeof ZApiResponse>;
+
+export const ZStatusCode = z
+	.int()
+	.min(100)
+	.max(599);
+export type TStatusCode = z.infer<typeof ZStatusCode>;
+
+export const ZStatusArray = z.array(ZStatusCode);
+export type TStatusArray = z.infer<typeof ZStatusArray>;
 
 // #endregion
 
@@ -70,7 +79,7 @@ export interface IEventsMarkdownInstance<T extends Record<string, any>> {
 
 // #region Contact API
 
-export const ContactFormSubmission = z.object({
+export const ZContactFormSubmission = z.object({
 	firstName: z.string(),
 	lastName: z.string(),
 	email: z.email(),
@@ -88,9 +97,9 @@ export const ContactFormSubmission = z.object({
 		.string()
 		.optional()
 });
-export type TContactFormSubmission = z.infer<typeof ContactFormSubmission>;
+export type TContactFormSubmission = z.infer<typeof ZContactFormSubmission>;
 
-export const ContactFormEntry = z.object({
+export const ZContactFormEntry = z.object({
 	id: z.coerce.number(),
 	createdAt: z.string(),
 	firstName: z.string(),
@@ -110,13 +119,13 @@ export const ContactFormEntry = z.object({
 		.string()
 		.optional()
 });
-export type TContactFormEntry = z.infer<typeof ContactFormEntry>;
+export type TContactFormEntry = z.infer<typeof ZContactFormEntry>;
 
-export const FormSubmissionApiRequest = z.object({ data: ContactFormSubmission });
-export type TFormSubmissionApiRequest = z.infer<typeof FormSubmissionApiRequest>;
+export const ZFormSubmissionApiRequest = z.object({ data: ZContactFormSubmission });
+export type TFormSubmissionApiRequest = z.infer<typeof ZFormSubmissionApiRequest>;
 
-export const FormSubmissionApiResponse = ApiResponse;
-export type TFormSubmissionApiResponse = z.infer<typeof FormSubmissionApiResponse>;
+export const ZFormSubmissionApiResponse = ZApiResponse;
+export type TFormSubmissionApiResponse = z.infer<typeof ZFormSubmissionApiResponse>;
 
 // #endregion
 
@@ -205,26 +214,26 @@ export const ZProtectedPostApiRequestMap = {
 
 export const TProtectedPostApiResponseMap = {
 	'forms/index': z.union([
-		ZApiResponseSuccess.extend({ data: ContactFormEntry.array() }),
+		ZApiResponseSuccess.extend({ data: ZContactFormEntry.array() }),
 		ZApiResponseError
 	]),
 	'forms/get': z.union([
-		ZApiResponseSuccess.extend({ data: ContactFormEntry }),
+		ZApiResponseSuccess.extend({ data: ZContactFormEntry }),
 		ZApiResponseError
 	]),
-	'forms/remove': ApiResponse,
+	'forms/remove': ZApiResponse,
 	'events/index': z.union([
 		ZApiResponseSuccess.extend({ data: ZEventsEntry.array() }),
 		ZApiResponseError
 	]),
-	'events/add': ApiResponse,
-	'events/remove': ApiResponse,
+	'events/add': ZApiResponse,
+	'events/remove': ZApiResponse,
 	'events/get': z.union([
 		ZApiResponseSuccess.extend({ data: z.string() }),
 		ZApiResponseError
 	]),
-	'events/save': ApiResponse,
-	'events/edit': ApiResponse,
+	'events/save': ZApiResponse,
+	'events/edit': ZApiResponse,
 	'blog/index': z.union([
 		ZApiResponseSuccess.extend({
 			data: z
@@ -238,9 +247,9 @@ export const TProtectedPostApiResponseMap = {
 		ZApiResponseSuccess.extend({ data: z.string() }),
 		ZApiResponseError
 	]),
-	'blog/save': ApiResponse,
-	'blog/new': ApiResponse,
-	'blog/remove': ApiResponse
+	'blog/save': ZApiResponse,
+	'blog/new': ZApiResponse,
+	'blog/remove': ZApiResponse
 } as const;
 
 // #endregion
@@ -254,10 +263,10 @@ export const ZAuthPostApiRequest = z.object({
 });
 export type TAuthPostApiRequest = z.infer<typeof ZAuthPostApiRequest>;
 
-export const ZAuthPostApiResponse = ApiResponse;
+export const ZAuthPostApiResponse = ZApiResponse;
 export type TAuthPostApiResponse = z.infer<typeof ZAuthPostApiResponse>;
 
-export const ZAuthDeleteApiResponse = ApiResponse;
+export const ZAuthDeleteApiResponse = ZApiResponse;
 export type TAuthDeleteApiResponse = z.infer<typeof ZAuthDeleteApiResponse>;
 
 // #endregion
