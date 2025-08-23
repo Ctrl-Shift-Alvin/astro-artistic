@@ -153,6 +153,13 @@ export const Translation = ZTranslation.parse({
 			+ `Phone number: ${ContactConfig.contacts.default!.telNumber}\n`
 			+ `Email: ${ContactConfig.contacts.default!.email}`
 	},
+	fiveHundreed: {
+		title: 'Server Error',
+		description: 'An internal server error happened, and you cannot see this page.',
+		body: 'Error 500 happens when something goes wrong on my side, and the webpage therefore cannot reach you. This issue has already been reported to me, and I will do my best to fix it.\nMeanwhile, feel free to use the rest of the webpages, or simply contact me directly either by phone or email!',
+		expandButton: 'Show/Hide Error',
+		homeButton: 'Go to Homepage'
+	},
 	fourTwentyNine: {
 		title: 'Too Many Requests',
 		description: 'The website and your device are working correctly, but you have sent to many requests to the server.',

@@ -130,6 +130,13 @@ export const ZTranslation = z.object({
 			.length(2),
 		reloadInUnknown: z.string(),
 		shouldReload: z.string()
+	}),
+	fiveHundreed: z.object({
+		title: z.string(),
+		description: z.string(),
+		body: z.string(),
+		expandButton: z.string(),
+		homeButton: z.string()
 	})
 });
 export type ITranslation = z.infer<typeof ZTranslation>;

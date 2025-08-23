@@ -155,6 +155,13 @@ export const Translation = ZTranslation.parse({
 			+ `Telefonnummer: ${ContactConfig.contacts.default!.telNumber}\n`
 			+ `Email: ${ContactConfig.contacts.default!.email}`
 	},
+	fiveHundreed: {
+		title: 'Serverfehler',
+		description: 'Ein interner Fehler kam vor, und Sie können diese Webseite nicht sehen.',
+		body: 'Fehler 500 passiert, wenn etwas meinerseits schiefläuft, und die Webseite Sie deswegen nicht erreichen kann. Dieser Fehler wurde mir schon gemeldet, und ich werde mein Bestes geben dies umgehend zu beheben.\nWährenddessen, nutzen Sie gerne die restlichen Webseiten, oder kontaktieren Sie mich direkt per Telefon oder Email!',
+		expandButton: 'Fehler Anzeigen/Verstecken',
+		homeButton: 'Zur Homepage'
+	},
 	fourTwentyNine: {
 		title: 'Zu Viele Anfragen',
 		description: 'Die Webseite und Ihr Gerät funktioniert richtig, aber Sie haben zu viele Serveranfragen geschickt',
