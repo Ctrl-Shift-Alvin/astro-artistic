@@ -8,18 +8,18 @@ export const HeroConfig = (translation: ITranslation) => ZHeroConfig.parse({
 	avatarImageSource: '/images/piano-hands.png',
 	heroSocialButtons: [
 		{
-			href: 'youtube.com/',
+			href: 'https://youtube.com/',
 			imageSource: '/images/youtube-icon.png',
 			imageAlt: 'Youtube Icon'
 		},
 		{
-			href: 'youtube.com/home',
-			imageSource: '/images/youtube-icon.png',
+			href: 'https://twitter.com/', // Shut up
+			imageSource: '/images/twitter-icon.png',
 			imageAlt: 'Youtube Icon'
 		},
 		{
-			href: 'youtube.com/#',
-			imageSource: '/images/youtube-icon.png',
+			href: 'https://facebook.com/',
+			imageSource: '/images/facebook-icon.png',
 			imageAlt: 'Youtube Icon'
 		}
 	]
