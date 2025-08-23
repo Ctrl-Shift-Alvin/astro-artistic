@@ -65,6 +65,7 @@
 		"clean": "rimraf dist",
 		"createEnv": "node ./scripts/createEnv.js",
 		"createPost": "node ./scripts/createPost.js",
+		"createEvent": "node ./scripts/createEvent.js",
 		"dev": "astro dev --host",
 		"prepare": "husky",
 		"preview": "astro preview",
