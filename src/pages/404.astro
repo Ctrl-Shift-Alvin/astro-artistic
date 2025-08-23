@@ -28,6 +28,8 @@ const allRoutes = Object.keys(pageModules)
 		(path: string) =>
 			!path.includes('404') &&
 			!path.includes('index') &&
+			!path.includes('429') &&
+			!path.includes('offline') &&
 			!path.includes('[') &&
 			!path.includes(']')
 	); // Filter out 404, index, and dynamic routes
