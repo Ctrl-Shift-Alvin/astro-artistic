@@ -13,16 +13,17 @@ const CURRENT_VERSION = updateQueries.length;
 
 const events_createDbIfNotExists = (): boolean => {
 
+	if (fs.existsSync(EventsConfig.dbPath) && fs.statSync(EventsConfig.dbPath).size > 1)
+		return false;
+
+	if (!fs.existsSync('./data')) {
+
+		fs.mkdirSync('./data');
+
+	}
+
+	const db = new Database(EventsConfig.dbPath);
 	try {
-
-		if (fs.existsSync(EventsConfig.dbPath) && fs.statSync(EventsConfig.dbPath).size > 1)
-			return false;
-
-		if (!fs.existsSync('./data')) {
-
-			fs.mkdirSync('./data');
-
-		}
 
 		const dbSetupQuery
 		= 'CREATE TABLE IF NOT EXISTS events ('
@@ -33,17 +34,29 @@ const events_createDbIfNotExists = (): boolean => {
 			+ 'enablePage BOOLEAN NOT NULL CHECK (enablePage IN (0, 1)),'
 			+ 'createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
 			+ ');';
-		const dbVersionQuery = 'user_version = 1;';
-		new Database(EventsConfig.dbPath)
-			.exec(dbSetupQuery)
-			.exec(dbVersionQuery)
-			.close();
+		const dbVersionQuery = 'user_version = 0;';
 
+		db
+			.exec(dbSetupQuery)
+			.pragma(dbVersionQuery);
+
+		if (CURRENT_VERSION > 0) {
+
+			events_updateDb();
+
+		}
 		return true;
 
-	} catch {
+	} catch(err: any) {
 
-		return false;
+		throw new Error(
+			'Error creating database table!',
+			{ cause: err }
+		);
+
+	} finally {
+
+		db.close();
 
 	}
 

@@ -43,17 +43,26 @@ const contact_createDbIfNotExists = (): boolean => {
 				+ 'message TEXT NOT NULL,'
 				+ 'createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
 				+ ');';
-		db.exec(dbSetupQuery);
+		const dbVersionQuery = 'user_version = 0;';
 
+		db
+			.exec(dbSetupQuery)
+			.pragma(dbVersionQuery);
+
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		if (CURRENT_VERSION > 0) {
+
+			contact_updateDb();
+
+		}
 		return true;
 
 	} catch(err: any) {
 
-		console.error(
-			'Error creating database table:',
-			err
+		throw new Error(
+			'Error creating database table!',
+			{ cause: err }
 		);
-		return false;
 
 	} finally {
 
