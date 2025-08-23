@@ -2,7 +2,7 @@
 ---
 <div
 	id="loader"
-	class="fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-1000"
+	class="fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-1000 opacity-100"
 >
 	<svg
 		class="animate-spin"
@@ -30,13 +30,43 @@
 	</svg>
 	<script> // Removes loader when react is hydrated
 
+		let loaderRemoved = false;
+		const loader = document.getElementById('loader');
+		if (!loader) {
+			throw new Error('Could not find \'loader\' element!');
+		}
+
+		const removeLoader = () => {
+
+			if (loaderRemoved)
+				return;
+
+			loader.classList.replace('opacity-100', 'opacity-0');
+			loader.classList.add('pointer-events-none');
+			setTimeout(() => loader.remove(), 1000);
+			loaderRemoved = true;
+
+		};
+
 		window.addEventListener('react-hydrated', () => {
 
-			const loader = document.getElementById('loader');
-			loader?.classList.add('opacity-0', 'pointer-events-none');
-			setTimeout(() => loader?.remove(), 1000);
+			removeLoader();
+			window.removeEventListener('react-hydrated', removeLoader);
 
 		});
+		setTimeout(() => {
+
+			if (!loaderRemoved) {
+
+				removeLoader();
+				window.removeEventListener('react-hydrated', removeLoader);
+				console.error('Loader timed out after 2 seconds!');
+
+			}
+
+		}, 2000); // Timeout after 2s
+
+		
 
 	</script>
 </div>
