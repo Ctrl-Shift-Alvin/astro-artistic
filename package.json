@@ -70,7 +70,7 @@
 		"prepare": "husky",
 		"preview": "astro preview",
 		"buildVersion": "node ./scripts/buildVersion.js",
-		"start": "node server-entrypoint.mjs",
+		"start": "node ./dist/server/entry.mjs",
 		"bs": "astro build && npm run start"
 	},
 	"type": "module",

@@ -2,7 +2,7 @@
 
 // #region CONFIGURATION
 
-const CACHE_NAME = 'cache-1b80ca5dc904add856ba054ecbc1b88d620df5e052ff305e28d71f6edde16d16';
+const CACHE_NAME = 'cache-cd2d53a26b9e9326e29d7e786fc4febce8bce21455a8066a03cd86ccc7dfa074';
 const OFFLINE_URL = '/offline/';
 const FOURTWENTYNINE_URL = '/429/';
 const NAV_URLS = [
