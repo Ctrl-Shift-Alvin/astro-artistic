@@ -1,8 +1,12 @@
 import { type ReactNode } from 'react';
 import {
-	windowFadeIn, windowFadeOut
+	windowFadeIn,
+	windowFadeOut
 } from '@/frontend/windowTools';
-import { getAction } from '@/shared/actions';
+import {
+	getAction,
+	TAction
+} from '@/shared/actions';
 
 type IButtonProps = {
 	children: ReactNode;
@@ -12,7 +16,7 @@ type IButtonProps = {
 	form?: string;
 	href?: string;
 	onClick?: (event: React.MouseEvent<HTMLButtonElement>)=> void;
-	onClickAction?: string;
+	onClickAction?: TAction;
 };
 
 const click = (
@@ -24,10 +28,7 @@ const click = (
 
 	if (props.onClickAction) {
 
-		const action = getAction(props.onClickAction);
-		if (!action)
-			throw new Error('Could not find action string.');
-		action();
+		getAction(props.onClickAction)();
 
 	}
 	if (props.href) {

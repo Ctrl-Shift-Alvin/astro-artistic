@@ -3,6 +3,10 @@ import {
 	windowFadeIn,
 	windowFadeOut
 } from '@/frontend/windowTools';
+import {
+	getAction,
+	TAction
+} from '@/shared/actions';
 
 type IAProps = {
 	children: ReactNode;
@@ -10,6 +14,7 @@ type IAProps = {
 	href?: string;
 	target?: '_blank' | '_self' | '_parent' | '_top' | undefined;
 	onClick?: (mouseEvent: React.MouseEvent<HTMLAnchorElement>)=> void;
+	onClickAction?: TAction;
 	key?: string;
 };
 
@@ -18,8 +23,14 @@ const hrefClicked = (
 	props: IAProps
 ) => {
 
-	if (props.onClick)
-		props.onClick(clickEvent);
+	props.onClick?.(clickEvent);
+
+	if (props.onClickAction) {
+
+		getAction(props.onClickAction)();
+
+	}
+
 	if (props.href) {
 
 		void windowFadeOut().then(() => {

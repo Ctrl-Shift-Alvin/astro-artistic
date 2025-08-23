@@ -1,16 +1,18 @@
 import { windowRefresh } from '@/frontend/windowTools';
 import { cSetIgnoreSizeError } from '@/shared/cookies';
 
-const actions: Record<string, ()=> void> = {
+const actions = {
 	sizeErrorIgnore: () => {
 
 		cSetIgnoreSizeError(true);
 		windowRefresh();
 
 	}
-};
+} as const;
 
-export const getAction = (actionName: string): (()=> void) | undefined => {
+export type TAction = keyof typeof actions;
+
+export const getAction = (actionName: TAction): ()=> void => {
 
 	return actions[actionName];
 
