@@ -567,7 +567,7 @@ export async function POST(context: APIContext) {
 					&& !readdirSync(EventsConfig.pagesPath).some((v) => v === `${id}.md`)
 				) {
 
-					if (!await events_createPage(id.toString())) {
+					if (!await events_createPage(id)) {
 
 						throw new Error();
 
