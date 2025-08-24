@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import Database from 'better-sqlite3';
+import z from 'zod';
 import {
 	ZContactFormEntry,
 	type TContactFormEntry,
@@ -8,6 +9,12 @@ import {
 } from '@/components/types';
 import { ContactConfig } from '@/backend/config/contact';
 
+process.on(
+	'exit',
+	() => db.close()
+);
+
+const db = new Database(ContactConfig.dbPath);
 const CURRENT_VERSION = 0;
 const updateQueries: string[][] = []; // updateQueries[0] updates to 1, updateQueries[1] updates to 2, etc.
 
@@ -30,7 +37,6 @@ const contact_createDbIfNotExists = (): boolean => {
 
 	}
 
-	const db = new Database(ContactConfig.dbPath);
 	try {
 
 		const dbSetupQuery
@@ -64,84 +70,83 @@ const contact_createDbIfNotExists = (): boolean => {
 			{ cause: err }
 		);
 
-	} finally {
-
-		db.close();
-
 	}
 
 };
 
 const contact_updateDb = () => {
 
-	const startDbVersion = new Database(ContactConfig.dbPath).pragma('user_version') as number;
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	const result = db.pragma('user_version') as [{ user_version: number }];
+	const startDbVersion = result[0].user_version;
 
-	if (startDbVersion < CURRENT_VERSION) {
-
-		console.log(`Updating contact submissions database from version '${startDbVersion}' to '${CURRENT_VERSION}'!`);
-
-		const db = new Database(ContactConfig.dbPath);
-		try {
-
-			db.transaction(() => {
-
-				for (let i = startDbVersion; i < CURRENT_VERSION; i++) {
-
-					updateQueries[i]?.forEach((q) => db.exec(q));
-					db.pragma(`user_version = ${i + 1}`);
-
-				}
-				return true;
-
-			});
-
-			return true;
-
-		} catch {
-
-			throw new Error('Couldn\'t update contact submissions database!');
-
-		} finally {
-
-			db.close();
-
-		}
-
-	} else if (startDbVersion > CURRENT_VERSION) {
+	if (startDbVersion > CURRENT_VERSION) {
 
 		throw new Error('Contact submissions database version is larger than the CURRENT_VERSION.');
 
 	}
 
-	return false;
+	if (startDbVersion == CURRENT_VERSION) {
+
+		return;
+
+	}
+
+	console.log(`Updating contact submissions database from version '${startDbVersion}' to '${CURRENT_VERSION}'!`);
+
+	try {
+
+		db.transaction(() => {
+
+			for (let i = startDbVersion; i < CURRENT_VERSION; i++) {
+
+				updateQueries[i]?.forEach((q) => db.exec(q));
+				db.pragma(`user_version = ${i + 1}`);
+
+			}
+			return true;
+
+		});
+
+		return true;
+
+	} catch(err: any) {
+
+		throw new Error(
+			`Couldn't update contact submissions database: ${err}`,
+			{ cause: err }
+		);
+
+	}
 
 };
 
 export const contact_dbRun = (
 	query: string,
-	...searchParams: unknown[]
-): void => {
+	...params: unknown[]
+): Database.RunResult => {
 
 	try {
 
-		const db = new Database(ContactConfig.dbPath);
-		db
+		return db
 			.prepare(query)
-			.run(searchParams);
-		db.close();
+			.run(params);
 
-	} catch(e: any) {
+	} catch(err: any) {
 
 		if (contact_createDbIfNotExists()) {
 
-			contact_dbRun(
+			return contact_dbRun(
 				query,
-				...searchParams
+				...params
 			);
 
 		} else {
 
-			throw new Error(`Failed to run query: ${e}`);
+			throw new Error(
+				`Failed to run query '${query}': ${err}`,
+				{ cause: err }
+			);
 
 		}
 
@@ -150,31 +155,32 @@ export const contact_dbRun = (
 };
 export const contact_dbGet = (
 	query: string,
-	...searchParams: unknown[]
+	...params: unknown[]
 ): TContactFormEntry => {
 
 	try {
 
-		const db = new Database(ContactConfig.dbPath);
 		const result = db
 			.prepare(query)
-			.get(searchParams);
-		db.close();
+			.get(params);
 		const parsed = ZContactFormEntry.parse(result);
 		return parsed;
 
-	} catch(e: any) {
+	} catch(err: any) {
 
 		if (contact_createDbIfNotExists()) {
 
 			return contact_dbGet(
 				query,
-				...searchParams
+				...params
 			);
 
 		} else {
 
-			throw new Error(`Failed to run query: ${e}`);
+			throw new Error(
+				`Failed to run query '${query}': ${err}`,
+				{ cause: err }
+			);
 
 		}
 
@@ -183,33 +189,34 @@ export const contact_dbGet = (
 };
 export const contact_dbAll = (
 	query: string,
-	...searchParams: unknown[]
+	...params: unknown[]
 ): TContactFormEntry[] => {
 
 	try {
 
-		const db = new Database(ContactConfig.dbPath);
 		const result = db
 			.prepare(query)
-			.all(searchParams);
-		db.close();
+			.all(params);
 		const parsed = ZContactFormEntry
 			.array()
 			.parse(result);
 		return parsed;
 
-	} catch(e: any) {
+	} catch(err: any) {
 
 		if (contact_createDbIfNotExists()) {
 
 			return contact_dbAll(
 				query,
-				...searchParams
+				...params
 			);
 
 		} else {
 
-			throw new Error(`Failed to run query: ${e}`);
+			throw new Error(
+				`Failed to run query '${query}': ${err}`,
+				{ cause: err }
+			);
 
 		}
 
@@ -224,18 +231,19 @@ export const contact_isDbDuplicateEntry = (
 
 	try {
 
-		const db = new Database(ContactConfig.dbPath);
-		const { count } = db
+		const result = db
 			.prepare('SELECT COUNT(*) AS count FROM submissions WHERE email = ? AND message = ?')
 			.get(
 				email,
 				message ?? null
-			) as { count: number };
+			);
+		const parsed = z
+			.object({ count: z.coerce.number() })
+			.parse(result);
 
-		db.close();
-		return count > 0;
+		return parsed.count > 0;
 
-	} catch(e: any) {
+	} catch(err: any) {
 
 		if (contact_createDbIfNotExists()) {
 
@@ -246,7 +254,10 @@ export const contact_isDbDuplicateEntry = (
 
 		} else {
 
-			throw new Error(`Failed to verify duplicate entry: ${e}`);
+			throw new Error(
+				`Failed to verify duplicate entry: ${err}`,
+				{ cause: err }
+			);
 
 		}
 
@@ -256,7 +267,7 @@ export const contact_isDbDuplicateEntry = (
 
 export const contact_addForm = (form: TContactFormSubmission) => {
 
-	contact_dbRun(
+	return contact_dbRun(
 		'INSERT INTO submissions (firstName, lastName, email, phoneNumber, message) VALUES (?, ?, ?, ?, ?)',
 		form.firstName,
 		form.lastName,

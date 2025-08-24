@@ -320,7 +320,7 @@ export async function POST(context: APIContext) {
 
 				if (newEntry.enablePage) {
 
-					if (!await events_createPage(id.toString())) {
+					if (!await events_createPage(id)) {
 
 						throw new Error();
 

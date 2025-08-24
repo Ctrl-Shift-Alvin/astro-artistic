@@ -8,6 +8,12 @@ import {
 import { EventsConfig } from '@/backend/config/events';
 import { EventsConfig as SharedEventsConfig } from '@/shared/config/events';
 
+process.on(
+	'exit',
+	() => db.close()
+);
+
+const db = new Database(EventsConfig.dbPath);
 const updateQueries: string[][] = []; // updateQueries[0] updates to 1, updateQueries[1] updates to 2, etc.
 const CURRENT_VERSION = updateQueries.length;
 
@@ -22,7 +28,6 @@ const events_createDbIfNotExists = (): boolean => {
 
 	}
 
-	const db = new Database(EventsConfig.dbPath);
 	try {
 
 		const dbSetupQuery
@@ -54,166 +59,171 @@ const events_createDbIfNotExists = (): boolean => {
 			{ cause: err }
 		);
 
-	} finally {
-
-		db.close();
-
 	}
 
 };
 const events_updateDb = () => {
 
-	const startDbVersion = new Database(EventsConfig.dbPath).pragma('user_version') as number;
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	const result = db.pragma('user_version') as [{ user_version: number }];
+	const startDbVersion = result[0].user_version;
 
-	if (startDbVersion < CURRENT_VERSION) {
-
-		console.log(`Updating events database from version '${startDbVersion}' to '${CURRENT_VERSION}'!`);
-
-		const db = new Database(EventsConfig.dbPath);
-		try {
-
-			db.transaction(() => {
-
-				for (let i = startDbVersion; i < CURRENT_VERSION; i++) {
-
-					updateQueries[i]?.forEach((q) => db.exec(q));
-					db.pragma(`user_version = ${i + 1}`);
-
-				}
-				return true;
-
-			});
-			return true;
-
-		} catch {
-
-			throw new Error('Couldn\'t update events.db!');
-
-		} finally {
-
-			db.close();
-
-		}
-
-	} else if (startDbVersion > CURRENT_VERSION) {
+	if (startDbVersion > CURRENT_VERSION) {
 
 		throw new Error('events.db version is larger than the CURRENT_VERSION.');
 
 	}
 
-	return false;
+	if (startDbVersion == CURRENT_VERSION) {
+
+		return;
+
+	}
+
+	console.log(`Updating events database from version '${startDbVersion}' to '${CURRENT_VERSION}'!`);
+
+	try {
+
+		db.transaction(() => {
+
+			for (let i = startDbVersion; i < CURRENT_VERSION; i++) {
+
+				updateQueries[i]?.forEach((q) => db.exec(q));
+				db.pragma(`user_version = ${i + 1}`);
+
+			}
+			return true;
+
+		});
+		return true;
+
+	} catch(err: any) {
+
+		throw new Error(
+			`Couldn't update events database: ${err}`,
+			{ cause: err }
+		);
+
+	}
 
 };
 
 export const events_dbRun = (
 	query: string,
-	...searchParams: unknown[]
+	...params: unknown[]
 ): Database.RunResult => {
 
 	try {
 
-		const db = new Database(EventsConfig.dbPath);
 		const result = db
 			.prepare(query)
-			.run(searchParams);
-		db.close();
+			.run(params);
 		return result;
 
-	} catch(e: any) {
+	} catch(err: any) {
 
 		if (events_createDbIfNotExists()) {
 
 			return events_dbRun(
 				query,
-				...searchParams
+				...params
 			);
 
 		} else {
 
-			throw new Error(`Failed to run query: ${e}`);
+			throw new Error(
+				`Failed to run query ${query}: ${err}`,
+				{ cause: err }
+			);
 
 		}
 
 	}
 
 };
-export function events_dbGet(
+export const events_dbGet = (
 	query: string,
-	...searchParams: unknown[]
-) {
+	...params: unknown[]
+): TEventsEntry => {
 
 	try {
 
-		const db = new Database(EventsConfig.dbPath);
 		const result = db
 			.prepare(query)
-			.get(searchParams);
-		db.close();
-		return result;
+			.get(params);
+		const parsed = ZEventsEntry.parse(result);
+		return parsed;
 
-	} catch(e: any) {
+	} catch(err: any) {
 
 		if (events_createDbIfNotExists()) {
 
 			return events_dbGet(
 				query,
-				...searchParams
+				...params
 			);
 
 		} else {
 
-			throw new Error(`Failed to run query: ${e}`);
+			throw new Error(
+				`Failed to run query '${query}': ${err}`,
+				{ cause: err }
+			);
 
 		}
 
 	}
 
-}
-export function events_dbAll(
+};
+export const events_dbAll = (
 	query: string,
-	...searchParams: unknown[]
-) {
+	...params: unknown[]
+): TEventsEntry[] => {
 
 	try {
 
-		const db = new Database(EventsConfig.dbPath);
 		const result = db
 			.prepare(query)
-			.all(searchParams);
-		db.close();
-		return result;
+			.all(params);
+		const parsed = ZEventsEntry
+			.array()
+			.parse(result);
+		return parsed;
 
-	} catch(e: any) {
+	} catch(err: any) {
 
 		if (events_createDbIfNotExists()) {
 
 			return events_dbAll(
 				query,
-				...searchParams
+				...params
 			);
 
 		} else {
 
-			throw new Error(`Failed to run query: ${e}`);
+			throw new Error(
+				`Failed to run query '${query}': ${err}`,
+				{ cause: err }
+			);
 
 		}
 
 	}
 
-}
+};
 
 export const events_getAllEntries = (): TEventsEntry[] => {
 
 	try {
 
-		const result = events_dbAll('SELECT * FROM events');
-		return ZEventsEntry
-			.array()
-			.parse(result);
+		return events_dbAll('SELECT * FROM events');
 
-	} catch(e: any) {
+	} catch(err: any) {
 
-		throw new Error(`Failed to fetch all event entries: ${e}`);
+		throw new Error(
+			`Failed to fetch all event entries: ${err}`,
+			{ cause: err }
+		);
 
 	}
 
@@ -251,18 +261,18 @@ export const events_getAllRelevantEntries = (): TEventsEntry[] => {
 
 		}
 
-		const result = events_dbAll(
+		return events_dbAll(
 			'SELECT * FROM events WHERE datetime(dateTime) BETWEEN ? AND ?',
 			minDateString,
 			maxDateString
 		);
-		return ZEventsEntry
-			.array()
-			.parse(result);
 
-	} catch(e: any) {
+	} catch(err: any) {
 
-		throw new Error(`Failed to fetch all timed events entries: ${e}`);
+		throw new Error(
+			`Failed to fetch all timed events entries: ${err}`,
+			{ cause: err }
+		);
 
 	}
 
@@ -272,21 +282,23 @@ export const events_getEntry = (id: string): TEventsEntry => {
 
 	try {
 
-		const result = events_dbGet(
+		return events_dbGet(
 			'SELECT * FROM events WHERE id=?',
 			id
 		);
-		return ZEventsEntry.parse(result);
 
-	} catch(e: any) {
+	} catch(err: any) {
 
-		throw new Error(`Failed to fetch entry with id '${id}': ${e}`);
+		throw new Error(
+			`Failed to fetch event entry with id '${id}': ${err}`,
+			{ cause: err }
+		);
 
 	}
 
 };
 
-export const events_createPage = async(id: string): Promise<boolean> => {
+export const events_createPage = async(id: number | bigint): Promise<boolean> => {
 
 	if (!fs.existsSync(EventsConfig.pagesPath))
 		fs.mkdirSync(EventsConfig.pagesPath);
@@ -314,7 +326,7 @@ export const events_createPage = async(id: string): Promise<boolean> => {
 				'node',
 				[
 					'./scripts/createEvent',
-					id
+					id.toString()
 				],
 				{ shell: true }
 			);
@@ -333,10 +345,10 @@ export const events_createPage = async(id: string): Promise<boolean> => {
 				}
 			);
 
-		} catch(e: any) {
+		} catch(err: any) {
 
 			// eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
-			reject(e);
+			reject(err);
 
 		}
 
