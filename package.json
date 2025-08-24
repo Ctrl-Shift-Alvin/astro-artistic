@@ -54,6 +54,7 @@
 		"husky": "^9.1.7",
 		"path-browserify": "^1.0.1",
 		"tailwindcss": "^4.0.6",
+		"tsx": "^4.20.5",
 		"typescript-eslint": "^8.40.0",
 		"zod": "^4.0.14"
 	},
@@ -69,7 +70,7 @@
 		"dev": "astro dev --host",
 		"prepare": "husky",
 		"preview": "astro preview",
-		"buildVersion": "node ./scripts/buildVersion.js",
+		"buildVersion": "tsx ./scripts/buildVersion.ts",
 		"start": "node ./dist/server/entry.mjs",
 		"bs": "astro build && npm run start"
 	},
