@@ -206,6 +206,15 @@ export async function POST(context: APIContext) {
 					'SELECT * FROM submissions WHERE id=?',
 					requestDataId
 				);
+				if (!result) {
+
+					const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'not-found' });
+					return new Response(
+						JSON.stringify(responseBody),
+						{ status: 404 }
+					);
+
+				}
 				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					data: result
@@ -415,10 +424,10 @@ export async function POST(context: APIContext) {
 				);
 				if (!existsSync(filePath)) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].safeParse({ error: 'bad-request' });
+					const errorBody = TProtectedPostApiResponseMap[requestType].safeParse({ error: 'not-found' });
 					return new Response(
 						JSON.stringify(errorBody),
-						{ status: 400 }
+						{ status: 404 }
 					);
 
 				}
@@ -637,10 +646,10 @@ export async function POST(context: APIContext) {
 				);
 				if (!existsSync(filePath)) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].safeParse({ error: 'bad-request' });
+					const errorBody = TProtectedPostApiResponseMap[requestType].safeParse({ error: 'not-found' });
 					return new Response(
 						JSON.stringify(errorBody),
-						{ status: 400 }
+						{ status: 404 }
 					);
 
 				}
@@ -661,8 +670,9 @@ export async function POST(context: APIContext) {
 
 			} catch {
 
+				const responseBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
 				return new Response(
-					JSON.stringify({ eeror: 'server-error' }),
+					JSON.stringify(responseBody),
 					{ status: 500 }
 				);
 

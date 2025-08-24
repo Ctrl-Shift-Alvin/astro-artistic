@@ -156,14 +156,16 @@ export const contact_dbRun = (
 export const contact_dbGet = (
 	query: string,
 	...params: unknown[]
-): TContactFormEntry => {
+): TContactFormEntry | undefined => {
 
 	try {
 
 		const result = db
 			.prepare(query)
 			.get(params);
-		const parsed = ZContactFormEntry.parse(result);
+		const parsed = ZContactFormEntry
+			.optional()
+			.parse(result);
 		return parsed;
 
 	} catch(err: any) {

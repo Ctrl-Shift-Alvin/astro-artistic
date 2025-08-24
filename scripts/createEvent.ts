@@ -1,29 +1,32 @@
-// Npm run event {id}
+// Npm run createEvent {id}
 import {
 	existsSync, mkdirSync, writeFileSync
 } from 'node:fs';
 import { join } from 'node:path';
-import Database from 'better-sqlite3';
+import { EventsConfig } from '@/backend/config/events';
+import { events_getEntry } from '@/backend/database/events';
 
-const root = process.cwd();
+if (!process.argv[2]) {
+
+	console.error('Usage: createEvent <id>');
+	process.exit(1);
+
+}
 
 const id = Number.parseInt(process.argv[2]);
-
-const fileDir = 'src/pages/events/';
-const fileName = `${process.argv[2]}${process.argv[2].endsWith('.md')
-	? ''
-	: '.md'}`;
+const fileDir = EventsConfig.pagesPath;
+const fileName
+	= process.argv[2].endsWith('.md')
+		? process.argv[2]
+		: `${process.argv[2]}.md`;
 const filePath = join(
-	root,
+	process.cwd(),
 	fileDir,
 	fileName
 );
 
-const db = new Database('./data/events.db');
-const entry = db
-	.prepare('SELECT * FROM events WHERE id=?')
-	.get(id);
-if (entry === null)
+const entry = events_getEntry(id);
+if (!entry)
 	throw new Error(`Could not find entry with the ID '${id}'!`);
 
 const layout = '../../templates/BaseEvent.astro';

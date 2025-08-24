@@ -1,16 +1,23 @@
-// Npm run post {file_name} {title?}
+// Npm run createPost {file_name} {title?}
 import {
 	existsSync, mkdirSync, writeFileSync
 } from 'node:fs';
 import { join } from 'node:path';
 
-const root = process.cwd();
+if (!process.argv[2]) {
+
+	console.error('Usage: createPost <file_name> (title)');
+	process.exit(1);
+
+}
+
 const fileDir = 'src/pages/blog/';
-const fileName = `${process.argv[2]}${process.argv[2].endsWith('.md')
-	? ''
-	: '.md'}`;
+const fileName
+	= process.argv[2].endsWith('.md')
+		? process.argv[2]
+		: `${process.argv[2]}.md`;
 const filePath = join(
-	root,
+	process.cwd(),
 	fileDir,
 	fileName
 );
@@ -54,6 +61,8 @@ writeFileSync(
 	filePath,
 	frontmatter
 );
-console.log(`Created post at '${filePath}'${title
-	? ` titled '${title}`
-	: ''}'`);
+console.log(`Created post at '${filePath}' ${
+	title
+		? `titled '${title}'`
+		: ''
+}`);

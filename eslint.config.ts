@@ -23,7 +23,7 @@ export default eslintTs.config([
 	},
 	{ // eslint-ts
 		name: 'eslintTs',
-		files: ['src/**/*.{ts,tsx}'],
+		files: ['**/*.{ts,tsx}'],
 		extends: [eslintTs.configs.recommendedTypeChecked],
 		languageOptions: {
 			parserOptions: {

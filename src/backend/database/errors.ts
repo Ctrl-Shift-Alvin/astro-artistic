@@ -145,11 +145,11 @@ const errors_updateDb = () => {
 export const errors_dbRun = (
 	query: string,
 	...params: unknown[]
-): void => {
+): Database.RunResult => {
 
 	try {
 
-		db
+		return db
 			.prepare(query)
 			.run(params);
 
@@ -157,7 +157,7 @@ export const errors_dbRun = (
 
 		if (errors_createDbIfNotExists()) {
 
-			errors_dbRun(
+			return errors_dbRun(
 				query,
 				...params
 			);
@@ -174,14 +174,16 @@ export const errors_dbRun = (
 export const errors_dbGetBuild = (
 	query: string,
 	...params: unknown[]
-): TBuild => {
+): TBuild | undefined => {
 
 	try {
 
 		const result = db
 			.prepare(query)
 			.get(params);
-		const parsed = ZBuild.parse(result);
+		const parsed = ZBuild
+			.optional()
+			.parse(result);
 		return parsed;
 
 	} catch(err: any) {
@@ -238,14 +240,16 @@ export const errors_dbAllBuild = (
 export const errors_dbGetError = (
 	query: string,
 	...params: unknown[]
-): TError => {
+): TError | undefined => {
 
 	try {
 
 		const result = db
 			.prepare(query)
 			.get(params);
-		const parsed = ZError.parse(result);
+		const parsed = ZError
+			.optional()
+			.parse(result);
 		return parsed;
 
 	} catch(err: any) {
@@ -326,7 +330,7 @@ export const errors_getMaxBuildNumber = (): number => {
 };
 export const errors_addBuild = (build: TBuild) => {
 
-	errors_dbRun(
+	return errors_dbRun(
 		'INSERT INTO builds (buildNumber, createdAt, gitBranch, gitCommit, isGitDirty) VALUES (?,?,?,?,?)',
 		build.buildNumber,
 		build.createdAt,
@@ -346,7 +350,7 @@ export const errors_getAllBuilds = (): TBuild[] => {
 
 export const errors_addErrorSubmission = (submission: TErrorSubmission) => {
 
-	errors_dbRun(
+	return errors_dbRun(
 		// eslint-disable-next-line @stylistic/max-len
 		'INSERT INTO errors (buildNumber, isClient, status, statusText, errorMessage, errorCause, errorStack) VALUES (?,?,?,?,?,?,?)',
 		submission.buildNumber,

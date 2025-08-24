@@ -19,6 +19,7 @@
 		"noUnusedParameters": true,
 		"allowUnreachableCode": false,
 		"noFallthroughCasesInSwitch": true,
+		"noEmit": true,
 
 		"declaration": true,
 
@@ -38,9 +39,12 @@
 		}
 	},
 	"include": [
-		"src/**/*.ts",
-		"src/**/*.tsx",
-		"src/**/*.astro",
-    "commitlint.config.ts"
+		"**/*.ts",
+		"**/*.tsx",
+		"**/*.astro"
+	],
+	"exclude": [
+		"scripts/eslintCustom.js",
+		"eslint.config.ts"
 	]
 }

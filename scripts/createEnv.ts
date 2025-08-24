@@ -5,20 +5,25 @@ import {
 } from 'node:fs';
 import bcrypt from 'bcrypt';
 
-const DEFAULT_JWT_LENGTH = '1000';
+const DEFAULT_JWT_LENGTH = 1000;
 
-function parseDurationToSeconds(duration) {
+function parseDurationToSeconds(duration?: string): number {
 
 	if (!duration)
-		return Number(DEFAULT_JWT_LENGTH);
-	if ((/^\d+$/).test(duration))
-		return Number(duration);
+		return DEFAULT_JWT_LENGTH;
+	if ((/^\d+$/).test(duration)) // Only numbers?
+		return parseInt(duration);
 
-	let total = 0;
-	const regex = /(\d+)([smhd])/g;
+	let total: number | undefined = 0;
 	let match;
-	while ((match = regex.exec(duration)) !== null) {
+	while ((match = (/(\d+)([smhd])/g).exec(duration)) !== null) {
 
+		if (!match[1]) {
+
+			total = undefined;
+			break;
+
+		}
 		const value = parseInt(
 			match[1],
 			10
@@ -41,7 +46,16 @@ function parseDurationToSeconds(duration) {
 		}
 
 	}
-	return total || Number(DEFAULT_JWT_LENGTH);
+	if (total) {
+
+		return total;
+
+	} else {
+
+		console.warn('Failed to parse duration to seconds, returning default value!');
+		return DEFAULT_JWT_LENGTH;
+
+	}
 
 }
 
@@ -72,9 +86,9 @@ function generateJwtKey() {
 }
 
 async function createEnvContent(
-	adminPassword,
-	jwtKey,
-	jwtLength
+	adminPassword: string,
+	jwtKey: string,
+	jwtLength: number
 ) {
 
 	const hash = await bcrypt.hash(
@@ -91,7 +105,7 @@ async function createEnvContent(
 
 }
 
-function main() {
+async function main() {
 
 	if (existsSync('.env')) {
 
@@ -100,12 +114,13 @@ function main() {
 
 	}
 	const {
-		adminPassword, jwtLength
-	} = parseArgs();
-	const jwtKey = generateJwtKey();
-	createEnvContent(
 		adminPassword,
-		jwtKey,
+		jwtLength
+	} = parseArgs();
+
+	await createEnvContent(
+		adminPassword,
+		generateJwtKey(),
 		jwtLength
 	).then((envContent) => {
 
@@ -120,4 +135,4 @@ function main() {
 
 }
 
-main();
+await main();

@@ -28,6 +28,8 @@ if (!eventId)
 throw new Error("Couldn't fetch event page URL!");
 
 const eventEntry = events_getEntry(eventId);
+if (!eventEntry)
+	throw new Error('Couldn\'t fetch event entry from database!')
 const eventPage = events_getEventContent(eventId);
 if (!eventPage)
 throw new Error('Couldn\'t fetch event page contents!');

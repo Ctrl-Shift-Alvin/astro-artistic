@@ -144,14 +144,16 @@ export const events_dbRun = (
 export const events_dbGet = (
 	query: string,
 	...params: unknown[]
-): TEventsEntry => {
+): TEventsEntry | undefined => {
 
 	try {
 
 		const result = db
 			.prepare(query)
 			.get(params);
-		const parsed = ZEventsEntry.parse(result);
+		const parsed = ZEventsEntry
+			.optional()
+			.parse(result);
 		return parsed;
 
 	} catch(err: any) {
@@ -278,7 +280,7 @@ export const events_getAllRelevantEntries = (): TEventsEntry[] => {
 
 };
 
-export const events_getEntry = (id: string): TEventsEntry => {
+export const events_getEntry = (id: string | number): TEventsEntry | undefined => {
 
 	try {
 
