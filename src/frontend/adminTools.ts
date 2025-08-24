@@ -6,7 +6,8 @@ import {
 	type TNewEventsEntry,
 	ZProtectedGetApiResponse,
 	ZProtectedPostApiRequestMap,
-	TProtectedPostApiResponseMap
+	TProtectedPostApiResponseMap,
+	TBuild
 } from '@/components/types';
 import {
 	lsGetAuthTokenExpiry,
@@ -469,6 +470,78 @@ export const saveEvent = async(
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['events/save'].safeParseAsync(await response.json());
+	return parsedResponse.success && !('error' in parsedResponse.data);
+
+};
+
+// #endregion
+
+// #region Errors & Builds
+
+export const getBuildsIndex = async(count: number | string): Promise<{
+	data: TBuild[];
+	count: number;
+} | null> => {
+
+	const requestBody = ZProtectedPostApiRequestMap['builds/index'].safeParse({ count });
+	if (!requestBody.success)
+		return null;
+
+	const response = await fetch(
+		'/api/protected/?type=builds/index',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestBody.data),
+			credentials: 'include'
+		}
+	);
+
+	const parsedResponse = await TProtectedPostApiResponseMap['builds/index'].safeParseAsync(await response.json());
+	return parsedResponse.success && !('error' in parsedResponse.data)
+		? parsedResponse.data
+		: null;
+
+};
+export const getBuild = async(buildNumber: number | string): Promise<TBuild | null> => {
+
+	const requestBody = ZProtectedPostApiRequestMap['builds/get'].safeParse({ buildNumber });
+	if (!requestBody.success)
+		return null;
+
+	const response = await fetch(
+		'/api/protected/?type=builds/get',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestBody.data),
+			credentials: 'include'
+		}
+	);
+
+	const parsedResponse = await TProtectedPostApiResponseMap['builds/get'].safeParseAsync(await response.json());
+	return parsedResponse.success && !('error' in parsedResponse.data)
+		? parsedResponse.data.data
+		: null;
+
+};
+export const removeBuild = async(buildNumber: number | string): Promise<boolean> => {
+
+	const requestBody = ZProtectedPostApiRequestMap['builds/remove'].safeParse({ buildNumber });
+	if (!requestBody.success)
+		return false;
+
+	const response = await fetch(
+		'/api/protected/?type=builds/remove',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestBody.data),
+			credentials: 'include'
+		}
+	);
+
+	const parsedResponse = await TProtectedPostApiResponseMap['builds/remove'].safeParseAsync(await response.json());
 	return parsedResponse.success && !('error' in parsedResponse.data);
 
 };

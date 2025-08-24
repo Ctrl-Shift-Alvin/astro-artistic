@@ -143,7 +143,10 @@ export const ZErrorsConfig = z.object({
 		502,
 		504,
 		508
-	])
+	]),
+	tableInitialEntryCount: z
+		.number()
+		.default(10)
 });
 
 // #endregion
