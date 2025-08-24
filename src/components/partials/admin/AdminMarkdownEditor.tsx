@@ -35,30 +35,36 @@ export const AdminMarkdownEditor = ({
 				<ReactCodeMirror
 					width={'100%'}
 					height={'100%'}
-					extensions={[
-						markdown({
-							base: markdownLanguage,
-							codeLanguages: languages
-						}),
-						editorKeymap
-					]}
+					extensions={
+						[
+							markdown({
+								base: markdownLanguage,
+								codeLanguages: languages
+							}),
+							editorKeymap
+						]
+					}
 					theme={material}
 					value={value}
-					onChange={(v) => {
+					onChange={
+						(v) => {
 
-						onChange(v);
+							onChange(v);
 
-					}}
+						}
+					}
 				/>
 			</div>
 
 			<div className={'prose prose-invert prose-img:rounded-lg w-full mt-8'}>
 				<article
-					dangerouslySetInnerHTML={{
-						__html: marked.parse(value
-							.split('-')
-							.at(-1) ?? '')
-					}}
+					dangerouslySetInnerHTML={
+						{
+							__html: marked.parse(value
+								.split('-')
+								.at(-1) ?? '')
+						}
+					}
 					className={'border-2 p-5'}
 				/>
 			</div>

@@ -53,19 +53,23 @@ export const Button = (props: IButtonProps) => {
 
 	return (
 		<button
-			className={`${props.small
-				? 'h-10 w-18 text-lg'
-				: 'h-20 w-40 text-2xl'} shrink-0 cursor-pointer rounded-md border-2 border-solid border-white ${props.className}`}
+			className={
+				`${props.small
+					? 'h-10 w-18 text-lg'
+					: 'h-20 w-40 text-2xl'} shrink-0 cursor-pointer rounded-md border-2 border-solid border-white ${props.className}`
+			}
 			type={props.type}
 			form={props.form}
-			onClick={(e) => {
+			onClick={
+				(e) => {
 
-				click(
-					props,
-					e
-				);
+					click(
+						props,
+						e
+					);
 
-			}}
+				}
+			}
 		>
 			{props.children}
 		</button>

@@ -90,9 +90,11 @@ export const Navbar = ({
 		<>
 			<div
 				id={'hamburger-div'}
-				className={`fixed top-0 z-50 flex h-min w-full justify-center bg-gradient-to-b from-black via-black via-80% to-black/5 py-5 transition-colors duration-500 sm:hidden ${hamburgerBackgroundAlpha && !hamburgerOpen
-					? 'bg-none'
-					: ''}`}
+				className={
+					`fixed top-0 z-50 flex h-min w-full justify-center bg-gradient-to-b from-black via-black via-80% to-black/5 py-5 transition-colors duration-500 sm:hidden ${hamburgerBackgroundAlpha && !hamburgerOpen
+						? 'bg-none'
+						: ''}`
+				}
 			>
 				<svg
 					xmlns={'http://www.w3.org/2000/svg'}
@@ -131,20 +133,24 @@ export const Navbar = ({
 			</div>
 
 			<nav
-				className={`fixed top-0 z-40 flex w-full flex-col justify-start bg-gradient-to-b from-black via-black via-95% to-gray-900/0 pt-20 pb-7 transition-transform duration-500 sm:hidden ${hamburgerOpen
-					? 'translate-y-0'
-					: '-translate-y-full'}`}
+				className={
+					`fixed top-0 z-40 flex w-full flex-col justify-start bg-gradient-to-b from-black via-black via-95% to-gray-900/0 pt-20 pb-7 transition-transform duration-500 sm:hidden ${hamburgerOpen
+						? 'translate-y-0'
+						: '-translate-y-full'}`
+				}
 			>
-				{NavbarConfig(window.__TRANSLATION__).map((item) => (
-					<ol
-						key={item.name}
-						className={'flex flex-col justify-start text-center text-2xl'}
-					>
-						<NavMenuItem href={item.href}>
-							{item.name}
-						</NavMenuItem>
-					</ol>
-				))}
+				{
+					NavbarConfig(window.__TRANSLATION__).map((item) => (
+						<ol
+							key={item.name}
+							className={'flex flex-col justify-start text-center text-2xl'}
+						>
+							<NavMenuItem href={item.href}>
+								{item.name}
+							</NavMenuItem>
+						</ol>
+					))
+				}
 
 				<LanguageSelect
 					availableLanguages={availableLanguages}
@@ -156,29 +162,35 @@ export const Navbar = ({
 			</nav>
 
 			<div
-				className={`fixed z-30 h-full w-full ${hamburgerOpen
-					? ''
-					: 'hidden'}`}
-				onMouseDown={() => {
+				className={
+					`fixed z-30 h-full w-full ${hamburgerOpen
+						? ''
+						: 'hidden'}`
+				}
+				onMouseDown={
+					() => {
 
-					setHamburgerOpen(false);
+						setHamburgerOpen(false);
 
-				}}
+					}
+				}
 			/>
 
 			<nav
 				className={'absolute z-50 hidden w-full justify-center pt-8 pb-18 sm:flex'}
 			>
-				{NavbarConfig(window.__TRANSLATION__).map((item) => (
-					<ol
-						key={item.name}
-						className={'mx-5 font-medium text-gray-200'}
-					>
-						<NavMenuItem href={item.href}>
-							{item.name}
-						</NavMenuItem>
-					</ol>
-				))}
+				{
+					NavbarConfig(window.__TRANSLATION__).map((item) => (
+						<ol
+							key={item.name}
+							className={'mx-5 font-medium text-gray-200'}
+						>
+							<NavMenuItem href={item.href}>
+								{item.name}
+							</NavMenuItem>
+						</ol>
+					))
+				}
 
 				<LanguageSelect
 					availableLanguages={availableLanguages}

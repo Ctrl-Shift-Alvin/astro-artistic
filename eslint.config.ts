@@ -491,7 +491,10 @@ export default eslintTs.config([
       '@stylistic/jsx-closing-bracket-location': ['error', 'tag-aligned'],
       '@stylistic/jsx-closing-tag-location': ['error', 'line-aligned'],
       '@stylistic/jsx-curly-brace-presence': ['error', 'always'],
-      '@stylistic/jsx-curly-newline': ['error', 'consistent'],
+      '@stylistic/jsx-curly-newline': ['error', {
+				multiline: 'require',
+				singleline: 'forbid'
+			}],
       '@stylistic/jsx-curly-spacing': ['error', {
         when: 'never',
         attributes: true,

@@ -38,11 +38,13 @@ export const DialogPopup: React.FC<DialogPopupProps> = ({
 		>
 			<div
 				className={'border-2 border-white bg-gray-900 w-full max-w-lg m-4 rounded-lg shadow-xl'}
-				onClick={(e) => {
+				onClick={
+					(e) => {
 
-					e.stopPropagation(); // Prevent click from bubbling up to the backdrop
+						e.stopPropagation(); // Prevent click from bubbling up to the backdrop
 
-				}}
+					}
+				}
 			>
 				<div className={'flex flex-col p-6'}>
 					{/* Dialog Title */}
@@ -57,20 +59,22 @@ export const DialogPopup: React.FC<DialogPopupProps> = ({
 
 					{/* Dialog Buttons */}
 					<div className={'mt-5 flex w-full justify-end gap-4'}>
-						{buttons.map((
-							btn,
-							index
-						) => (
-							<Button
-								key={index}
-								small
-								className={btn.className}
-								type={btn.type}
-								onClick={btn.onClick}
-							>
-								{btn.text}
-							</Button>
-						))}
+						{
+							buttons.map((
+								btn,
+								index
+							) => (
+								<Button
+									key={index}
+									small
+									className={btn.className}
+									type={btn.type}
+									onClick={btn.onClick}
+								>
+									{btn.text}
+								</Button>
+							))
+						}
 					</div>
 				</div>
 			</div>

@@ -20,15 +20,17 @@ export const LanguageSelect = ({
 			name={'languageSelect'}
 			onChange={onLanguageChange}
 		>
-			{availableLanguages.map((lang: ILocale) => (
-				<option
-					key={lang.code}
-					value={lang.code}
-					className={'border-gray-800 bg-black text-white'}
-				>
-					{lang.name}
-				</option>
-			))}
+			{
+				availableLanguages.map((lang: ILocale) => (
+					<option
+						key={lang.code}
+						value={lang.code}
+						className={'border-gray-800 bg-black text-white'}
+					>
+						{lang.name}
+					</option>
+				))
+			}
 		</select>
 
 		<svg

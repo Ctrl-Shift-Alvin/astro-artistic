@@ -93,11 +93,13 @@ export const MonologPopup = ({
 
 	return (
 		<div
-			className={`fixed z-50 ${positionClassName} border-2 border-white bg-gray-900 p-4 ${fadeDurationMs
-				? `transition-opacity duration-${fadeDurationMs} ${visible
-					? 'opacity-100'
-					: 'opacity-0'}`
-				: ''} ${className || ''}`}
+			className={
+				`fixed z-50 ${positionClassName} border-2 border-white bg-gray-900 p-4 ${fadeDurationMs
+					? `transition-opacity duration-${fadeDurationMs} ${visible
+						? 'opacity-100'
+						: 'opacity-0'}`
+					: ''} ${className || ''}`
+			}
 		>
 			<p className={'newlines text-center text-white'}>
 				{text}

@@ -69,10 +69,12 @@ function FormWrapper<T>({
 
 	return (
 		<>
-			{form.body(
-				formValues,
-				setFormValues
-			)}
+			{
+				form.body(
+					formValues,
+					setFormValues
+				)
+			}
 		</>
 	);
 

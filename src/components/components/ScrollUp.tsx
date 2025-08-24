@@ -45,19 +45,23 @@ export const ScrollUp = ({ scrollYThreshold }: { scrollYThreshold: number }) => 
 
 	return (
 		<div
-			className={`fixed right-10 bottom-10 z-50 rounded-full border-2 border-white p-2 transition-opacity ${
-				visible
-					? 'pointer-events-auto cursor-pointer opacity-100'
-					:	'pointer-events-none opacity-0'
-			}`}
-			onClick={() => {
+			className={
+				`fixed right-10 bottom-10 z-50 rounded-full border-2 border-white p-2 transition-opacity ${
+					visible
+						? 'pointer-events-auto cursor-pointer opacity-100'
+						:	'pointer-events-none opacity-0'
+				}`
+			}
+			onClick={
+				() => {
 
-				smoothScroll(
-					0,
-					1000
-				);
+					smoothScroll(
+						0,
+						1000
+					);
 
-			}}
+				}
+			}
 		>
 			<svg
 				className={'size-6 text-white'}

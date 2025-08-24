@@ -177,11 +177,13 @@ export const AdminBlogEditor = () => {
 					name={'fileName'}
 					id={'fileName'}
 					value={formValues.fileName}
-					onChange={(e) => {
+					onChange={
+						(e) => {
 
-						setFormValues({ fileName: e.target.value });
+							setFormValues({ fileName: e.target.value });
 
-					}}
+						}
+					}
 				/>
 			</form>
 		);
@@ -294,21 +296,25 @@ export const AdminBlogEditor = () => {
 						</thead>
 
 						<tbody>
-							{filesTable.map((row) => (
-								<tr key={row.fileName}>
-									<td
-										className={`${row.isSelected
-											? 'font-bold'
-											: ''} p-2`}
-									>
-										<A
-											onClick={() => void selectFile(row.fileName)}
+							{
+								filesTable.map((row) => (
+									<tr key={row.fileName}>
+										<td
+											className={
+												`${row.isSelected
+													? 'font-bold'
+													: ''} p-2`
+											}
 										>
-											{row.fileName}
-										</A>
-									</td>
-								</tr>
-							))}
+											<A
+												onClick={() => void selectFile(row.fileName)}
+											>
+												{row.fileName}
+											</A>
+										</td>
+									</tr>
+								))
+							}
 
 							<tr key={'addnew'}>
 								<td className={'border-t-1 p-2'}>
@@ -320,37 +326,43 @@ export const AdminBlogEditor = () => {
 						</tbody>
 					</table>
 
-					{getSelected() !== undefined && (
-						<div className={'flex flex-row'}>
-							<Button
-								small={true}
-								onClick={() => void remove()}
-							>
-								{'Remove'}
-							</Button>
+					{
+						getSelected() !== undefined && (
+							<div className={'flex flex-row'}>
+								<Button
+									small={true}
+									onClick={() => void remove()}
+								>
+									{'Remove'}
+								</Button>
 
-							<Button
-								small={true}
-								onClick={() => void save()}
-							>
-								{'Save'}
-							</Button>
-						</div>
-					)}
+								<Button
+									small={true}
+									onClick={() => void save()}
+								>
+									{'Save'}
+								</Button>
+							</div>
+						)
+					}
 				</div>
 
-				{getSelected() && !hideEditor && (
-					<AdminMarkdownEditor
-						value={fileContent}
-						onChange={(v) => {
+				{
+					getSelected() && !hideEditor && (
+						<AdminMarkdownEditor
+							value={fileContent}
+							onChange={
+								(v) => {
 
-							setFileContent(v);
-							setFileContentChanged(true);
+									setFileContent(v);
+									setFileContentChanged(true);
 
-						}}
-						onSave={() => void save()}
-					/>
-				)}
+								}
+							}
+							onSave={() => void save()}
+						/>
+					)
+				}
 			</div>
 		</>
 	);

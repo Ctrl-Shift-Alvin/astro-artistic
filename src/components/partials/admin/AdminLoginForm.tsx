@@ -13,19 +13,21 @@ export const AdminLoginForm = () => (
 		<form
 			id={'authForm'}
 			name={'authForm'}
-			onSubmit={(e: React.FormEvent) => {
+			onSubmit={
+				(e: React.FormEvent) => {
 
-				void handleAuthSubmit(e.nativeEvent).then(() => {
+					void handleAuthSubmit(e.nativeEvent).then(() => {
 
-					if (checkLogin()) {
+						if (checkLogin()) {
 
-						goto('/admin/home/');
+							goto('/admin/home/');
 
-					}
+						}
 
-				});
+					});
 
-			}}
+				}
+			}
 		>
 			<div className={'gap-y-6'}>
 				<div className={'border-b border-gray-600/40 pb-12'}>

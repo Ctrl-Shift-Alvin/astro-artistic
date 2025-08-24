@@ -111,26 +111,32 @@ export const ContactCard = ({
 	return (
 		<>
 			<div
-				className={`flex flex-col items-center ${
-					alternate
-						? 'lg:flex-row-reverse'
-						: 'lg:flex-row'
-				} sm:justify-between md:gap-x-24`}
+				className={
+					`flex flex-col items-center ${
+						alternate
+							? 'lg:flex-row-reverse'
+							: 'lg:flex-row'
+					} sm:justify-between md:gap-x-24`
+				}
 			>
 				<div>
 
 					<p
-						className={`text-center ${alternate
-							? 'lg:text-right'
-							: 'lg:text-left'} newlines text-xl leading-9`}
+						className={
+							`text-center ${alternate
+								? 'lg:text-right'
+								: 'lg:text-left'} newlines text-xl leading-9`
+						}
 					>
 						{contactData.description}
 					</p>
 
 					<p
-						className={`text-center ${alternate
-							? 'lg:text-right'
-							: 'lg:text-left'} text-xl leading-9`}
+						className={
+							`text-center ${alternate
+								? 'lg:text-right'
+								: 'lg:text-left'} text-xl leading-9`
+						}
 					>
 						{window.__TRANSLATION__.contact.email}
 						{':'}
@@ -145,9 +151,11 @@ export const ContactCard = ({
 					</p>
 
 					<p
-						className={`mb-4 text-center ${alternate
-							? 'lg:text-right'
-							: 'lg:text-left'} text-xl leading-9`}
+						className={
+							`mb-4 text-center ${alternate
+								? 'lg:text-right'
+								: 'lg:text-left'} text-xl leading-9`
+						}
 					>
 						{window.__TRANSLATION__.contact.phoneNumber}
 						{':'}
@@ -164,177 +172,189 @@ export const ContactCard = ({
 				</div>
 			</div>
 
-			{enableContactForm && (
-				<form onSubmit={(e) => void handleSubmit(e)}>
-					<div className={'gap-y-6'}>
-						<div className={'border-b border-gray-600/40 pb-12'}>
-							<div className={'mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6'}>
-								<div className={'sm:col-span-3'}>
-									<label
-										htmlFor={'first-name'}
-										className={'block text-sm/6 font-medium text-white'}
-									>
-										{window.__TRANSLATION__.contact.firstName}
-									</label>
+			{
+				enableContactForm && (
+					<form onSubmit={(e) => void handleSubmit(e)}>
+						<div className={'gap-y-6'}>
+							<div className={'border-b border-gray-600/40 pb-12'}>
+								<div className={'mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6'}>
+									<div className={'sm:col-span-3'}>
+										<label
+											htmlFor={'first-name'}
+											className={'block text-sm/6 font-medium text-white'}
+										>
+											{window.__TRANSLATION__.contact.firstName}
+										</label>
 
-									<div className={'mt-2'}>
-										<input
-											id={'first-name'}
-											name={'first-name'}
-											type={'text'}
-											autoComplete={'given-name'}
-											className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
-											value={formData.firstName}
-											onChange={(e) => {
+										<div className={'mt-2'}>
+											<input
+												id={'first-name'}
+												name={'first-name'}
+												type={'text'}
+												autoComplete={'given-name'}
+												className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
+												value={formData.firstName}
+												onChange={
+													(e) => {
 
-												setFormData({
-													...formData,
-													firstName: e.target.value
-												});
+														setFormData({
+															...formData,
+															firstName: e.target.value
+														});
 
-											}}
-										/>
+													}
+												}
+											/>
+										</div>
 									</div>
-								</div>
 
-								<div className={'sm:col-span-3'}>
-									<label
-										htmlFor={'last-name'}
-										className={'block text-sm/6 font-medium text-white'}
-									>
-										{window.__TRANSLATION__.contact.lastName}
-									</label>
+									<div className={'sm:col-span-3'}>
+										<label
+											htmlFor={'last-name'}
+											className={'block text-sm/6 font-medium text-white'}
+										>
+											{window.__TRANSLATION__.contact.lastName}
+										</label>
 
-									<div className={'mt-2'}>
-										<input
-											id={'last-name'}
-											name={'last-name'}
-											type={'text'}
-											autoComplete={'family-name'}
-											className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
-											value={formData.lastName}
-											onChange={(e) => {
+										<div className={'mt-2'}>
+											<input
+												id={'last-name'}
+												name={'last-name'}
+												type={'text'}
+												autoComplete={'family-name'}
+												className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
+												value={formData.lastName}
+												onChange={
+													(e) => {
 
-												setFormData({
-													...formData,
-													lastName: e.target.value
-												});
+														setFormData({
+															...formData,
+															lastName: e.target.value
+														});
 
-											}}
-										/>
+													}
+												}
+											/>
+										</div>
 									</div>
-								</div>
 
-								<div className={'sm:col-span-3'}>
-									<label
-										htmlFor={'email'}
-										className={'block text-sm/6 font-medium text-white'}
-									>
-										{window.__TRANSLATION__.contact.email}
-									</label>
+									<div className={'sm:col-span-3'}>
+										<label
+											htmlFor={'email'}
+											className={'block text-sm/6 font-medium text-white'}
+										>
+											{window.__TRANSLATION__.contact.email}
+										</label>
 
-									<div className={'mt-2'}>
-										<input
-											id={'email'}
-											name={'email'}
-											type={'text'}
-											autoComplete={'email'}
-											className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
-											value={formData.email}
-											onChange={(e) => {
+										<div className={'mt-2'}>
+											<input
+												id={'email'}
+												name={'email'}
+												type={'text'}
+												autoComplete={'email'}
+												className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
+												value={formData.email}
+												onChange={
+													(e) => {
 
-												setFormData({
-													...formData,
-													email: e.target.value
-												});
+														setFormData({
+															...formData,
+															email: e.target.value
+														});
 
-											}}
-										/>
+													}
+												}
+											/>
+										</div>
 									</div>
-								</div>
 
-								<div className={'sm:col-span-3'}>
-									<label
-										htmlFor={'phone-number'}
-										className={'block text-sm/6 font-medium text-white'}
-									>
-										{window.__TRANSLATION__.contact.phoneNumber}
-									</label>
+									<div className={'sm:col-span-3'}>
+										<label
+											htmlFor={'phone-number'}
+											className={'block text-sm/6 font-medium text-white'}
+										>
+											{window.__TRANSLATION__.contact.phoneNumber}
+										</label>
 
-									<div className={'mt-2'}>
-										<input
-											id={'phone-number'}
-											name={'phone-number'}
-											type={'text'}
-											autoComplete={'tel'}
-											className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
-											value={formData.phoneNumber}
-											onChange={(e) => {
+										<div className={'mt-2'}>
+											<input
+												id={'phone-number'}
+												name={'phone-number'}
+												type={'text'}
+												autoComplete={'tel'}
+												className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
+												value={formData.phoneNumber}
+												onChange={
+													(e) => {
 
-												setFormData({
-													...formData,
-													phoneNumber: e.target.value.startsWith('00') // Replace 00 with +
-														? `+${e.target.value
-															.slice(2)
-															.replace(
-																/\s/g,
-																''
-															)}`
-														: e.target.value.startsWith('0') // Replace first 0 with default code
-															? `+43${e.target.value
-																.slice(1)
-																.replace(
-																	/\s/g,
-																	''
-																)}`
-															: e.target.value.replace(
-																/\s/g,
-																''
-															)
-												});
+														setFormData({
+															...formData,
+															phoneNumber: e.target.value.startsWith('00') // Replace 00 with +
+																? `+${e.target.value
+																	.slice(2)
+																	.replace(
+																		/\s/g,
+																		''
+																	)}`
+																: e.target.value.startsWith('0') // Replace first 0 with default code
+																	? `+43${e.target.value
+																		.slice(1)
+																		.replace(
+																			/\s/g,
+																			''
+																		)}`
+																	: e.target.value.replace(
+																		/\s/g,
+																		''
+																	)
+														});
 
-											}}
-										/>
+													}
+												}
+											/>
+										</div>
 									</div>
-								</div>
 
-								<div className={'col-span-full'}>
-									<label
-										htmlFor={'message'}
-										className={'block text-sm/6 font-medium text-white'}
-									>
-										{window.__TRANSLATION__.contact.message}
-									</label>
+									<div className={'col-span-full'}>
+										<label
+											htmlFor={'message'}
+											className={'block text-sm/6 font-medium text-white'}
+										>
+											{window.__TRANSLATION__.contact.message}
+										</label>
 
-									<div className={'mt-2'}>
-										<textarea
-											id={'message'}
-											name={'message'}
-											rows={3}
-											className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
-											value={formData.message}
-											onChange={(e) => {
+										<div className={'mt-2'}>
+											<textarea
+												id={'message'}
+												name={'message'}
+												rows={3}
+												className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
+												value={formData.message}
+												onChange={
+													(e) => {
 
-												setFormData({
-													...formData,
-													message: e.target.value
-												});
+														setFormData({
+															...formData,
+															message: e.target.value
+														});
 
-											}}
-										/>
+													}
+												}
+											/>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
 
-					<div className={'mt-6 flex justify-center gap-x-6 sm:justify-end'}>
-						<Button type={'submit'}>
-							{window.__TRANSLATION__.contact.submit}
-						</Button>
-					</div>
-				</form>
-			)}
+						<div className={'mt-6 flex justify-center gap-x-6 sm:justify-end'}>
+							<Button type={'submit'}>
+								{window.__TRANSLATION__.contact.submit}
+							</Button>
+						</div>
+					</form>
+				)
+			}
 		</>
 	);
 

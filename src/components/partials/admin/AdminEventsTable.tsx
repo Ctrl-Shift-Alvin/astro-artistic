@@ -260,14 +260,16 @@ export const AdminEventsTable = () => {
 					id={'title'}
 					className={'w-full border-1 border-white text-white'}
 					value={formValues.title}
-					onChange={(e) => {
+					onChange={
+						(e) => {
 
-						setFormValues({
-							...formValues,
-							title: e.target.value
-						});
+							setFormValues({
+								...formValues,
+								title: e.target.value
+							});
 
-					}}
+						}
+					}
 				/>
 			</div>
 
@@ -283,14 +285,16 @@ export const AdminEventsTable = () => {
 					id={'location'}
 					className={'w-full border-1 border-white text-white'}
 					value={formValues.location}
-					onChange={(e) => {
+					onChange={
+						(e) => {
 
-						setFormValues({
-							...formValues,
-							location: e.target.value
-						});
+							setFormValues({
+								...formValues,
+								location: e.target.value
+							});
 
-					}}
+						}
+					}
 				/>
 			</div>
 
@@ -311,14 +315,16 @@ export const AdminEventsTable = () => {
 						maxLength={2}
 						value={formValues.day}
 						className={'w-full border-1 border-white text-white'}
-						onChange={(e) => {
+						onChange={
+							(e) => {
 
-							setFormValues({
-								...formValues,
-								day: Number(e.target.value)
-							});
+								setFormValues({
+									...formValues,
+									day: Number(e.target.value)
+								});
 
-						}}
+							}
+						}
 					/>
 				</div>
 
@@ -338,14 +344,16 @@ export const AdminEventsTable = () => {
 						maxLength={2}
 						value={formValues.month}
 						className={'w-full border-1 border-white text-white'}
-						onChange={(e) => {
+						onChange={
+							(e) => {
 
-							setFormValues({
-								...formValues,
-								month: Number(e.target.value)
-							});
+								setFormValues({
+									...formValues,
+									month: Number(e.target.value)
+								});
 
-						}}
+							}
+						}
 
 					/>
 				</div>
@@ -366,14 +374,16 @@ export const AdminEventsTable = () => {
 						maxLength={4}
 						value={formValues.year}
 						className={'w-full border-1 border-white text-white'}
-						onChange={(e) => {
+						onChange={
+							(e) => {
 
-							setFormValues({
-								...formValues,
-								year: Number(e.target.value)
-							});
+								setFormValues({
+									...formValues,
+									year: Number(e.target.value)
+								});
 
-						}}
+							}
+						}
 					/>
 				</div>
 
@@ -393,14 +403,16 @@ export const AdminEventsTable = () => {
 						maxLength={2}
 						value={formValues.hours}
 						className={'w-full border-1 border-white text-white'}
-						onChange={(e) => {
+						onChange={
+							(e) => {
 
-							setFormValues({
-								...formValues,
-								hours: Number(e.target.value)
-							});
+								setFormValues({
+									...formValues,
+									hours: Number(e.target.value)
+								});
 
-						}}
+							}
+						}
 					/>
 				</div>
 
@@ -420,14 +432,16 @@ export const AdminEventsTable = () => {
 						maxLength={2}
 						value={formValues.minutes}
 						className={'w-full border-1 border-white text-white'}
-						onChange={(e) => {
+						onChange={
+							(e) => {
 
-							setFormValues({
-								...formValues,
-								minutes: Number(e.target.value)
-							});
+								setFormValues({
+									...formValues,
+									minutes: Number(e.target.value)
+								});
 
-						}}
+							}
+						}
 					/>
 				</div>
 			</div>
@@ -445,14 +459,16 @@ export const AdminEventsTable = () => {
 					type={'checkbox'}
 					checked={formValues.enablePage}
 					className={'size-5'}
-					onChange={(e) => {
+					onChange={
+						(e) => {
 
-						setFormValues({
-							...formValues,
-							enablePage: e.target.checked
-						});
+							setFormValues({
+								...formValues,
+								enablePage: e.target.checked
+							});
 
-					}}
+						}
+					}
 				/>
 			</div>
 		</form>
@@ -587,75 +603,83 @@ export const AdminEventsTable = () => {
 				</thead>
 
 				<tbody>
-					{eventEntries
-						.sort((
-							a,
-							b
-						) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())
-						.map((entry) => (
-							<tr key={entry.id}>
+					{
+						eventEntries
+							.sort((
+								a,
+								b
+							) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())
+							.map((entry) => (
+								<tr key={entry.id}>
 
-								<td className={'border p-2'}>
-									{entry.id}
-								</td>
+									<td className={'border p-2'}>
+										{entry.id}
+									</td>
 
-								<td className={'border p-2'}>
-									{entry.title}
-								</td>
+									<td className={'border p-2'}>
+										{entry.title}
+									</td>
 
-								<td className={'border p-2'}>
-									{entry.location}
-								</td>
+									<td className={'border p-2'}>
+										{entry.location}
+									</td>
 
-								<td className={'border p-2'}>
-									{Intl
-										.DateTimeFormat(
-											cGetUserLanguage() ?? defaultLanguageCode,
-											{
-												year: 'numeric',
-												month: 'numeric',
-												day: 'numeric',
-												hour: 'numeric',
-												minute: 'numeric'
-											}
-										)
-										.format(new Date(entry.dateTime))}
-								</td>
+									<td className={'border p-2'}>
+										{
+											Intl
+												.DateTimeFormat(
+													cGetUserLanguage() ?? defaultLanguageCode,
+													{
+														year: 'numeric',
+														month: 'numeric',
+														day: 'numeric',
+														hour: 'numeric',
+														minute: 'numeric'
+													}
+												)
+												.format(new Date(entry.dateTime))
+										}
+									</td>
 
-								<td className={'border p-2'}>
-									{entry.enablePage
-										?	(<A href={`/events/${entry.id}/`}>
-											{'A'}
-										</A>)
-										: (<p>
-											{'-'}
-										</p>)}
-								</td>
+									<td className={'border p-2'}>
+										{
+											entry.enablePage
+												?	(<A href={`/events/${entry.id}/`}>
+													{'A'}
+												</A>)
+												: (<p>
+													{'-'}
+												</p>)
+										}
+									</td>
 
-								<td className={'border p-2'}>
-									<A
-										className={'mr-2'}
-										onClick={() => void edit(entry.id)}
-									>
-										{'Data'}
-									</A>
+									<td className={'border p-2'}>
+										<A
+											className={'mr-2'}
+											onClick={() => void edit(entry.id)}
+										>
+											{'Data'}
+										</A>
 
-									{entry.enablePage
-										&& (<A onClick={() => void get(entry.id)}>
-											{'Page'}
-										</A>)}
-								</td>
+										{
+											entry.enablePage
+											&& (<A onClick={() => void get(entry.id)}>
+												{'Page'}
+											</A>)
+										}
+									</td>
 
-								<td className={'border p-2'}>
-									<A
-										className={'text-red-600'}
-										onClick={() => void remove(entry.id)}
-									>
-										{'D'}
-									</A>
-								</td>
-							</tr>
-						))}
+									<td className={'border p-2'}>
+										<A
+											className={'text-red-600'}
+											onClick={() => void remove(entry.id)}
+										>
+											{'D'}
+										</A>
+									</td>
+								</tr>
+							))
+					}
 				</tbody>
 			</table>
 
@@ -669,25 +693,31 @@ export const AdminEventsTable = () => {
 			</div>
 
 			<div className={'w-full mt-5'}>
-				{pageEditorSelectedId !== null && (
-					<AdminMarkdownEditor
-						value={pageEditorContent}
-						onChange={(v) => {
+				{
+					pageEditorSelectedId !== null && (
+						<AdminMarkdownEditor
+							value={pageEditorContent}
+							onChange={
+								(v) => {
 
-							setPageEditorContent(v);
-							setPageEditorContentChanged(true);
+									setPageEditorContent(v);
+									setPageEditorContentChanged(true);
 
-						}}
-						onSave={(v) => {
+								}
+							}
+							onSave={
+								(v) => {
 
-							void save(
-								pageEditorSelectedId,
-								v
-							);
+									void save(
+										pageEditorSelectedId,
+										v
+									);
 
-						}}
-					/>
-				)}
+								}
+							}
+						/>
+					)
+				}
 			</div>
 		</>
 	);

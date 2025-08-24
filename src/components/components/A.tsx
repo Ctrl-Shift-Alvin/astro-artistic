@@ -60,14 +60,16 @@ export const A = (props: IAProps) => (
 		key={props.key}
 		className={`cursor-pointer ${props.className}`}
 		target={props.target}
-		onClick={(e) => {
+		onClick={
+			(e) => {
 
-			hrefClicked(
-				e,
-				props
-			);
+				hrefClicked(
+					e,
+					props
+				);
 
-		}}
+			}
+		}
 	>
 		{props.children}
 	</a>

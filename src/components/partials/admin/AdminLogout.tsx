@@ -46,16 +46,18 @@ export const AdminLogout = () => {
 
 	return (
 		<Button
-			onClick={() => {
+			onClick={
+				() => {
 
-				setLogoutCallback(() => {
+					setLogoutCallback(() => {
 
-					goto('/admin/login/');
+						goto('/admin/login/');
 
-				});
-				void logout();
+					});
+					void logout();
 
-			}}
+				}
+			}
 		>
 			{'Logout'}
 		</Button>

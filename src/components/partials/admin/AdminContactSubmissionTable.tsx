@@ -89,41 +89,43 @@ export const AdminContactSubmissionTable = () => {
 				</thead>
 
 				<tbody>
-					{formSubmissions.map((entry) => (
-						<tr key={entry.id}>
+					{
+						formSubmissions.map((entry) => (
+							<tr key={entry.id}>
 
-							<td className={'border p-2'}>
-								{entry.id}
-							</td>
+								<td className={'border p-2'}>
+									{entry.id}
+								</td>
 
-							<td className={'border p-2'}>
-								{entry.firstName}
-							</td>
+								<td className={'border p-2'}>
+									{entry.firstName}
+								</td>
 
-							<td className={'border p-2'}>
-								{entry.lastName}
-							</td>
+								<td className={'border p-2'}>
+									{entry.lastName}
+								</td>
 
-							<td className={'max-w-44 truncate border p-2 overflow-ellipsis'}>
-								{entry.message}
-							</td>
+								<td className={'max-w-44 truncate border p-2 overflow-ellipsis'}>
+									{entry.message}
+								</td>
 
-							<td className={'border p-2'}>
-								<A
-									className={'text-red-600'}
-									onClick={() => void remove(entry.id)}
-								>
-									{'D'}
-								</A>
-							</td>
+								<td className={'border p-2'}>
+									<A
+										className={'text-red-600'}
+										onClick={() => void remove(entry.id)}
+									>
+										{'D'}
+									</A>
+								</td>
 
-							<td className={'border p-2'}>
-								<A href={`/admin/submission/${entry.id}/`}>
-									{'A'}
-								</A>
-							</td>
-						</tr>
-					))}
+								<td className={'border p-2'}>
+									<A href={`/admin/submission/${entry.id}/`}>
+										{'A'}
+									</A>
+								</td>
+							</tr>
+						))
+					}
 				</tbody>
 			</table>
 		</>
