@@ -347,6 +347,22 @@ export const errors_getAllBuilds = (): TBuild[] => {
 	return errors_dbAllBuild('SELECT * FROM builds');
 
 };
+export const errors_getBuildCount = (): number => {
+
+	const result = db
+		.prepare('SELECT COUNT(*) AS count')
+		.run();
+
+	const parsed = z
+		.object({
+			count: z.coerce
+				.number()
+				.default(0)
+		})
+		.parse(result);
+	return parsed.count;
+
+};
 
 export const errors_addErrorSubmission = (submission: TErrorSubmission) => {
 

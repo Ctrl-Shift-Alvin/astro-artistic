@@ -29,6 +29,12 @@ import {
 } from '@/backend/database/events';
 import { EventsConfig } from '@/backend/config/events';
 import { BlogConfig } from '@/backend/config/blog';
+import {
+	errors_dbAllBuild,
+	errors_dbGetBuild,
+	errors_dbRun,
+	errors_getBuildCount
+} from '@/backend/database/errors';
 
 const SECRET_KEY = import.meta.env.JWT_KEY as string;
 
@@ -868,6 +874,131 @@ export async function POST(context: APIContext) {
 				JSON.stringify(responseBody),
 				{ status: 200 }
 			);
+
+		}
+
+		case 'builds/index': {
+
+			try {
+
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
+
+					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				const result = errors_dbAllBuild(
+					'SELECT * FROM builds LIMIT ?',
+					parsedBody.data.count
+				);
+
+				const countResult = errors_getBuildCount();
+
+				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+					message: 'success',
+					count: countResult,
+					data: result
+				});
+				return new Response(
+					JSON.stringify(responseBody),
+					{ status: 200 }
+				);
+
+			} catch {
+
+				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+				return new Response(
+					JSON.stringify(errorBody),
+					{ status: 500 }
+				);
+
+			}
+
+		}
+		case 'builds/get': {
+
+			try {
+
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
+
+					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				const result = errors_dbGetBuild(
+					'SELECT * FROM builds WHERE buildNumber=?',
+					parsedBody.data.buildNumber
+				);
+
+				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+					message: 'success',
+					data: result
+				});
+				return new Response(
+					JSON.stringify(responseBody),
+					{ status: 200 }
+				);
+
+			} catch {
+
+				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+				return new Response(
+					JSON.stringify(errorBody),
+					{ status: 500 }
+				);
+
+			}
+
+		}
+		case 'builds/remove': {
+
+			try {
+
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
+
+					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				console.log(parsedBody);
+				const result = errors_dbRun(
+					'DELETE FROM builds WHERE buildNumber=?',
+					parsedBody.data.buildNumber
+				);
+
+				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+					message: 'success',
+					data: result
+				});
+				return new Response(
+					JSON.stringify(responseBody),
+					{ status: 200 }
+				);
+
+			} catch {
+
+				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+				return new Response(
+					JSON.stringify(errorBody),
+					{ status: 500 }
+				);
+
+			}
 
 		}
 

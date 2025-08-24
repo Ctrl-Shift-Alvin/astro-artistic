@@ -129,6 +129,45 @@ export type TFormSubmissionApiResponse = z.infer<typeof ZFormSubmissionApiRespon
 
 // #endregion
 
+// #region Errors API
+
+export const ZBuild = z.object({
+	buildNumber: z.coerce.number(),
+	createdAt: z.string(),
+	gitBranch: z.string(),
+	gitCommit: z
+		.string()
+		.min(40),
+	isGitDirty: z.coerce.boolean()
+});
+export type TBuild = z.infer<typeof ZBuild>;
+
+export const ZError = z.object({
+	id: z.coerce.number(),
+	createdAt: z.string(),
+	buildNumber: z.coerce.number(),
+	isClient: z.coerce.boolean(),
+	status: ZStatusCode,
+	statusText: z.string(),
+	errorMessage: z.string(),
+	errorCause: z.string(),
+	errorStack: z.string()
+});
+export type TError = z.infer<typeof ZError>;
+
+export const ZErrorSubmission = z.object({
+	buildNumber: z.coerce.number(),
+	isClient: z.coerce.boolean(),
+	status: ZStatusCode,
+	statusText: z.string(),
+	errorMessage: z.string(),
+	errorCause: z.string(),
+	errorStack: z.string()
+});
+export type TErrorSubmission = z.infer<typeof ZErrorSubmission>;
+
+// #endregion
+
 // #region Protected API
 
 export const ZProtectedGetApiResponse = z.union([
@@ -209,7 +248,10 @@ export const ZProtectedPostApiRequestMap = {
 			.string()
 			.nonempty()
 			.endsWith('.md')
-	})
+	}),
+	'builds/index': z.object({ count: z.coerce.number() }),
+	'builds/get': z.object({ buildNumber: z.coerce.number() }),
+	'builds/remove': z.object({ buildNumber: z.coerce.number() })
 } as const;
 
 export const TProtectedPostApiResponseMap = {
@@ -249,7 +291,19 @@ export const TProtectedPostApiResponseMap = {
 	]),
 	'blog/save': ZApiResponse,
 	'blog/new': ZApiResponse,
-	'blog/remove': ZApiResponse
+	'blog/remove': ZApiResponse,
+	'builds/index': z.union([
+		ZApiResponseSuccess.extend({
+			data: ZBuild.array(),
+			count: z.coerce.number()
+		}),
+		ZApiResponseError
+	]),
+	'builds/get': z.union([
+		ZApiResponseSuccess.extend({ data: ZBuild }),
+		ZApiResponseError
+	]),
+	'builds/remove': ZApiResponse
 } as const;
 
 // #endregion
@@ -268,44 +322,5 @@ export type TAuthPostApiResponse = z.infer<typeof ZAuthPostApiResponse>;
 
 export const ZAuthDeleteApiResponse = ZApiResponse;
 export type TAuthDeleteApiResponse = z.infer<typeof ZAuthDeleteApiResponse>;
-
-// #endregion
-
-// #region Errors API
-
-export const ZBuild = z.object({
-	buildNumber: z.coerce.number(),
-	createdAt: z.string(),
-	gitBranch: z.string(),
-	gitCommit: z
-		.string()
-		.min(40),
-	isGitDirty: z.boolean()
-});
-export type TBuild = z.infer<typeof ZBuild>;
-
-export const ZError = z.object({
-	id: z.coerce.number(),
-	createdAt: z.string(),
-	buildNumber: z.coerce.number(),
-	isClient: z.coerce.boolean(),
-	status: ZStatusCode,
-	statusText: z.string(),
-	errorMessage: z.string(),
-	errorCause: z.string(),
-	errorStack: z.string()
-});
-export type TError = z.infer<typeof ZError>;
-
-export const ZErrorSubmission = z.object({
-	buildNumber: z.coerce.number(),
-	isClient: z.coerce.boolean(),
-	status: ZStatusCode,
-	statusText: z.string(),
-	errorMessage: z.string(),
-	errorCause: z.string(),
-	errorStack: z.string()
-});
-export type TErrorSubmission = z.infer<typeof ZErrorSubmission>;
 
 // #endregion
