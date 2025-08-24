@@ -782,6 +782,7 @@ export default eslintTs.config([
       'custom/function-args-newline': 'error',
       'custom/condition-paren-newline': 'error',
 			'custom/newline-per-chained-call': 'error'
+			// TODO Add custom style for jsx-parens-newline
     }
   },
 	{ // eslint-rules
