@@ -270,3 +270,42 @@ export const ZAuthDeleteApiResponse = ZApiResponse;
 export type TAuthDeleteApiResponse = z.infer<typeof ZAuthDeleteApiResponse>;
 
 // #endregion
+
+// #region Errors API
+
+export const ZBuild = z.object({
+	buildNumber: z.coerce.number(),
+	createdAt: z.string(),
+	gitBranch: z.string(),
+	gitCommit: z
+		.string()
+		.min(40),
+	isGitDirty: z.boolean()
+});
+export type TBuild = z.infer<typeof ZBuild>;
+
+export const ZError = z.object({
+	id: z.coerce.number(),
+	createdAt: z.string(),
+	buildNumber: z.coerce.number(),
+	isClient: z.coerce.boolean(),
+	status: ZStatusCode,
+	statusText: z.string(),
+	errorMessage: z.string(),
+	errorCause: z.string(),
+	errorStack: z.string()
+});
+export type TError = z.infer<typeof ZError>;
+
+export const ZErrorSubmission = z.object({
+	buildNumber: z.coerce.number(),
+	isClient: z.coerce.boolean(),
+	status: ZStatusCode,
+	statusText: z.string(),
+	errorMessage: z.string(),
+	errorCause: z.string(),
+	errorStack: z.string()
+});
+export type TErrorSubmission = z.infer<typeof ZErrorSubmission>;
+
+// #endregion

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ZStatusArray } from '@/components/types';
 
 // #region Contact Config
 
@@ -109,5 +110,40 @@ export type TNavbarItem = z.infer<typeof ZNavbarItem>;
 
 export const ZNavbarConfig = ZNavbarItem.array();
 export type TNavbarConfig = z.infer<typeof ZNavbarConfig>;
+
+// #endregion
+
+// #region Errors Config
+
+export const ZErrorsConfig = z.object({
+	enable: z.boolean(),
+	enableUserLogging: z.boolean(),
+	enableApiLogging: z.boolean(),
+	userStatusCodes: ZStatusArray.default([
+		400,
+		401,
+		403,
+		414,
+		421,
+		431,
+		451,
+		500,
+		501,
+		502,
+		504,
+		508
+	]),
+	apiStatusCodes: ZStatusArray.default([
+		400,
+		414,
+		421,
+		431,
+		500,
+		501,
+		502,
+		504,
+		508
+	])
+});
 
 // #endregion

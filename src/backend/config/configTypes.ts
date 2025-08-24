@@ -23,3 +23,10 @@ export const ZEventsConfig = z.object({
 		.nonempty()
 });
 export type TEventsConfig = z.infer<typeof ZEventsConfig>;
+
+export const ZErrorsConfig = z.object({
+	dbPath: z
+		.string()
+		.nonempty()
+});
+export type TErrorsConfig = z.infer<typeof ZErrorsConfig>;
