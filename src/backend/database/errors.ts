@@ -313,7 +313,7 @@ export const errors_getLastBuild = (): TBuild | undefined => {
 
 	try {
 
-		return errors_dbGetBuild('SELECT * FROM builds ORDER BY createdAt DESC LIMIT 1');
+		return errors_dbGetBuild('SELECT * FROM builds ORDER BY buildNumber DESC LIMIT 1');
 
 	} catch(err: any) {
 
@@ -375,8 +375,10 @@ export const errors_getBuildCount = (): number => {
 	try {
 
 		const result = db
-			.prepare('SELECT COUNT(*) AS count')
+			.prepare('SELECT COUNT(*) AS count FROM builds')
 			.get();
+
+		console.log(result);
 
 		const parsed = z
 			.object({
@@ -391,6 +393,25 @@ export const errors_getBuildCount = (): number => {
 
 		throw new Error(
 			'Failed to get the build row count!',
+			{ cause: err }
+		);
+
+	}
+
+};
+export const errors_getRecentBuilds = (count: number): TBuild[] => {
+
+	try {
+
+		return errors_dbAllBuild(
+			'SELECT * FROM builds ORDER BY createdAt DESC LIMIT ?',
+			count
+		);
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to get recent errors!',
 			{ cause: err }
 		);
 

@@ -30,10 +30,10 @@ import {
 import { EventsConfig } from '@/backend/config/events';
 import { BlogConfig } from '@/backend/config/blog';
 import {
-	errors_dbAllBuild,
 	errors_dbGetBuild,
 	errors_dbRun,
-	errors_getBuildCount
+	errors_getBuildCount,
+	errors_getRecentBuilds
 } from '@/backend/database/errors';
 
 const SECRET_KEY = import.meta.env.JWT_KEY as string;
@@ -892,10 +892,7 @@ export async function POST(context: APIContext) {
 
 				}
 
-				const result = errors_dbAllBuild(
-					'SELECT * FROM builds LIMIT ?',
-					parsedBody.data.count
-				);
+				const result = errors_getRecentBuilds(parsedBody.data.count);
 
 				const countResult = errors_getBuildCount();
 
@@ -975,7 +972,6 @@ export async function POST(context: APIContext) {
 
 				}
 
-				console.log(parsedBody);
 				const result = errors_dbRun(
 					'DELETE FROM builds WHERE buildNumber=?',
 					parsedBody.data.buildNumber

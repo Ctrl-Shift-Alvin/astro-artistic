@@ -1,14 +1,18 @@
 import {
-	useLayoutEffect, useState
+	useLayoutEffect,
+	useState
 } from 'react';
+import clsx from 'clsx/lite';
 import { TBuild } from '@/components/types';
 import {
-	getBuildsIndex, removeBuild
+	getBuildsIndex,
+	removeBuild
 } from '@/frontend/adminTools';
 import { ErrorsConfig } from '@/shared/config/errors';
 import { A } from '@/components/components/A';
 import { Dialog } from '@/components/components/DialogProvider';
 import { Monolog } from '@/components/components/MonologProvider';
+import { defaultFormatDateTimeString } from '@/shared/dataParse';
 
 export const AdminBuildEditor = () => {
 
@@ -129,22 +133,26 @@ export const AdminBuildEditor = () => {
 
 							};
 
+							const tdClassName = clsx(
+								'border p-2',
+								entry.buildNumber == window.__BUILD__.buildNumber && 'border-4'
+							);
 							return (
 								<tr key={entry.buildNumber}>
 
-									<td className={'border p-2'}>
+									<td className={tdClassName}>
 										{entry.buildNumber}
 									</td>
 
-									<td className={'border p-2'}>
-										{entry.createdAt}
+									<td className={tdClassName}>
+										{defaultFormatDateTimeString(new Date(entry.createdAt))}
 									</td>
 
-									<td className={'border p-2'}>
+									<td className={tdClassName}>
 										{entry.gitBranch}
 									</td>
 
-									<td className={'border p-2'}>
+									<td className={tdClassName}>
 										{
 											isGitCommitExpanded
 												? entry.gitCommit
@@ -166,7 +174,7 @@ export const AdminBuildEditor = () => {
 										</A>
 									</td>
 
-									<td className={'border p-2'}>
+									<td className={tdClassName}>
 										{
 											entry.isGitDirty
 												? 'Yes'
@@ -174,7 +182,7 @@ export const AdminBuildEditor = () => {
 										}
 									</td>
 
-									<td className={'border p-2'}>
+									<td className={tdClassName}>
 										<A
 											className={'text-red-600 text-center'}
 											onClick={() => void remove(entry.buildNumber)}
@@ -186,8 +194,6 @@ export const AdminBuildEditor = () => {
 									{
 
 										// TODO Add error search based on build
-
-										// TODO Add highlighting of current build
 									}
 								</tr>
 							);
