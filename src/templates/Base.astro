@@ -46,6 +46,7 @@ const { head, translation, noTopPadding } = Astro.props as Props;
 		<script is:inline define:vars={{ translation }}>
 			window.__TRANSLATION__ = translation;
 		</script>
+		<script src="/build.js" is:inline/>
 		<script>
 
 			if ('serviceWorker' in navigator) {

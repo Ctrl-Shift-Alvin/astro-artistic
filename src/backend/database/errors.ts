@@ -20,6 +20,11 @@ process.on(
 	() => db.close()
 );
 
+declare global {
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	interface Window { __BUILD__: TBuild }
+}
+
 const db = new Database(ErrorsConfig.dbPath);
 const CURRENT_VERSION = 0;
 const updateQueries: string[][] = []; // updateQueries[0] updates to 1, updateQueries[1] updates to 2, etc.
@@ -304,89 +309,154 @@ export const errors_dbAllError = (
 
 };
 
-export const errors_getMaxBuildNumber = (): number => {
+export const errors_getLastBuild = (): TBuild | undefined => {
 
 	try {
 
-		const result = db
-			.prepare('SELECT MAX(buildNumber) AS maxBuildNumber FROM builds')
-			.get();
-
-		const parsed = z
-			.object({ maxBuildNumber: z.coerce.number() })
-			.parse(result);
-
-		return parsed.maxBuildNumber;
+		return errors_dbGetBuild('SELECT * FROM builds ORDER BY createdAt DESC LIMIT 1');
 
 	} catch(err: any) {
 
 		throw new Error(
-			'Failed to check for duplicate build number!',
+			'Failed to get latest build number!',
 			{ cause: err }
 		);
 
 	}
 
 };
-export const errors_addBuild = (build: TBuild) => {
+export const errors_addBuild = (build: {
+	createdAt: string;
+	gitBranch: string;
+	gitCommit: string;
+	isGitDirty: boolean;
+}) => {
 
-	return errors_dbRun(
-		'INSERT INTO builds (buildNumber, createdAt, gitBranch, gitCommit, isGitDirty) VALUES (?,?,?,?,?)',
-		build.buildNumber,
-		build.createdAt,
-		build.gitBranch,
-		build.gitCommit,
-		build.isGitDirty
-			? 1
-			: 0
-	);
+	try {
+
+		return errors_dbRun(
+			'INSERT INTO builds (createdAt, gitBranch, gitCommit, isGitDirty) VALUES (?,?,?,?)',
+			build.createdAt,
+			build.gitBranch,
+			build.gitCommit,
+			build.isGitDirty
+				? 1
+				: 0
+		);
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to add a new build!',
+			{ cause: err }
+		);
+
+	}
 
 };
 export const errors_getAllBuilds = (): TBuild[] => {
 
-	return errors_dbAllBuild('SELECT * FROM builds');
+	try {
+
+		return errors_dbAllBuild('SELECT * FROM builds');
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to get all builds!',
+			{ cause: err }
+		);
+
+	}
 
 };
 export const errors_getBuildCount = (): number => {
 
-	const result = db
-		.prepare('SELECT COUNT(*) AS count')
-		.run();
+	try {
 
-	const parsed = z
-		.object({
-			count: z.coerce
-				.number()
-				.default(0)
-		})
-		.parse(result);
-	return parsed.count;
+		const result = db
+			.prepare('SELECT COUNT(*) AS count')
+			.get();
+
+		const parsed = z
+			.object({
+				count: z.coerce
+					.number()
+					.default(0)
+			})
+			.parse(result);
+		return parsed.count;
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to get the build row count!',
+			{ cause: err }
+		);
+
+	}
 
 };
 
 export const errors_addErrorSubmission = (submission: TErrorSubmission) => {
 
-	return errors_dbRun(
+	try {
+
+		return errors_dbRun(
 		// eslint-disable-next-line @stylistic/max-len
-		'INSERT INTO errors (buildNumber, isClient, status, statusText, errorMessage, errorCause, errorStack) VALUES (?,?,?,?,?,?,?)',
-		submission.buildNumber,
-		submission.isClient,
-		submission.status,
-		submission.statusText,
-		submission.errorMessage,
-		submission.errorCause,
-		submission.errorStack
-	);
+			'INSERT INTO errors (buildNumber, isClient, status, statusText, errorMessage, errorCause, errorStack) VALUES (?,?,?,?,?,?,?)',
+			submission.buildNumber,
+			submission.isClient,
+			submission.status,
+			submission.statusText,
+			submission.errorMessage,
+			submission.errorCause,
+			submission.errorStack
+		);
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to add an error submission!',
+			{ cause: err }
+		);
+
+	}
 
 };
 export const errors_getAllErrors = (): TError[] => {
 
-	return errors_dbAllError('SELECT * FROM errors');
+	try {
+
+		return errors_dbAllError('SELECT * FROM errors');
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to get all error submissions!',
+			{ cause: err }
+		);
+
+	}
 
 };
-export const errors_getRecentErrors = (): TError[] => {
+export const errors_getRecentErrors = (count: number): TError[] => {
 
-	return errors_dbAllError('SELECT * FROM errors WHERE createdAt');
+	try {
+
+		return errors_dbAllError(
+			'SELECT * FROM errors ORDER BY createdAt DESC LIMIT ?',
+			count
+		);
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to get recent errors!',
+			{ cause: err }
+		);
+
+	}
 
 };
 

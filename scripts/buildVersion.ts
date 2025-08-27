@@ -1,26 +1,8 @@
 import fs from 'fs';
 import { execSync } from 'child_process';
-import {
-	errors_getMaxBuildNumber,
-	errors_addBuild
-} from '../src/backend/database/errors';
-
-const buildNumber = (errors_getMaxBuildNumber() || 0) + 1;
-
-const swPath = './public/sw.js';
-const swCode = fs
-	.readFileSync(
-		swPath,
-		'utf8'
-	)
-	.replace(
-		/cache-[\w.-]+/,
-		`cache-${buildNumber}`
-	);
-fs.writeFileSync(
-	swPath,
-	swCode
-);
+import path from 'node:path';
+import { errors_addBuild } from '../src/backend/database/errors';
+import { TBuild } from '@/components/types';
 
 const gitBranch = execSync('git rev-parse --abbrev-ref HEAD')
 	.toString()
@@ -30,10 +12,27 @@ const gitCommit = execSync('git rev-parse HEAD')
 	.trim();
 const isGitDirty = execSync('git status --porcelain').toString().length > 0;
 
-errors_addBuild({
-	buildNumber: buildNumber,
+const addResult = errors_addBuild({
 	createdAt: new Date().toISOString(),
 	gitBranch: gitBranch,
 	gitCommit: gitCommit,
 	isGitDirty: isGitDirty
 });
+const build = {
+
+	// Fine in this case, since buildNumber being a INTEGER PRIMARY KEY (ASC) is an alias for rowid: https://www.sqlite.org/lang_createtable.html#rowid
+	buildNumber: addResult.lastInsertRowid,
+	createdAt: new Date().toISOString(),
+	gitBranch: gitBranch,
+	gitCommit: gitCommit,
+	isGitDirty: isGitDirty
+} as TBuild;
+
+const outputPath = path.join(
+	process.cwd(),
+	'public/build.js'
+);
+fs.writeFileSync(
+	outputPath,
+	`self.__BUILD__ = ${JSON.stringify(build)};\n`
+);

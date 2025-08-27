@@ -1,8 +1,9 @@
 /* eslint-disable import-x/unambiguous */
 
-// #region CONFIGURATION
+importScripts('build.js');
 
-const CACHE_NAME = 'cache-0';
+// #region CONFIGURATION
+const CACHE_NAME = `cache-${self.__BUILD__.buildNumber}` || 'cache-0';
 const OFFLINE_URL = '/offline/';
 const FOURTWENTYNINE_URL = '/429/';
 const NAV_URLS = [
