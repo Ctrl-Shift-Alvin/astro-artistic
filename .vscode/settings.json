@@ -9,5 +9,9 @@
   "search.exclude": {
     "package-lock.json": true
   },
-	"files.eol": "\n"
+	"files.eol": "\n",
+	"typescript.tsdk": "node_modules\\typescript\\lib",
+	"tailwindCSS.experimental.classRegex": [
+    ["clsx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ]
 }
