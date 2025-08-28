@@ -119,7 +119,7 @@ export const AdminContactSubmissionTable = () => {
 								</td>
 
 								<td className={'border p-2'}>
-									<A href={`/admin/submission/${entry.id}/`}>
+									<A href={`/admin/submission/contact/${entry.id}/`}>
 										{'A'}
 									</A>
 								</td>
