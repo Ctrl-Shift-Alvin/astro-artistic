@@ -30,6 +30,7 @@
 		"forceConsistentCasingInFileNames": true,
 
 		"jsx": "react-jsx",
+		"jsxImportSource": "react",
 		"isolatedModules": true,
 		"types": ["vite/client"],
 
