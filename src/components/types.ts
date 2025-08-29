@@ -95,7 +95,7 @@ export const ZContactFormSubmission = z.object({
 	),
 	message: z
 		.string()
-		.optional()
+		.nullish()
 });
 export type TContactFormSubmission = z.infer<typeof ZContactFormSubmission>;
 
@@ -176,14 +176,14 @@ export const ZProtectedGetApiResponse = z.union([
 ]);
 export type TProtectedGetApiResponse = z.infer<typeof ZProtectedGetApiResponse>;
 export const ZProtectedPostApiRequestMap = {
-	'forms/index': z.undefined(),
-	'forms/get': z.object({
+	'contact/index': z.undefined(),
+	'contact/get': z.object({
 		id: z
 			.coerce
 			.number()
 			.positive()
 	}),
-	'forms/remove': z.object({
+	'contact/delete': z.object({
 		id: z
 			.coerce
 			.number()
@@ -255,15 +255,15 @@ export const ZProtectedPostApiRequestMap = {
 } as const;
 
 export const TProtectedPostApiResponseMap = {
-	'forms/index': z.union([
+	'contact/index': z.union([
 		ZApiResponseSuccess.extend({ data: ZContactFormEntry.array() }),
 		ZApiResponseError
 	]),
-	'forms/get': z.union([
+	'contact/get': z.union([
 		ZApiResponseSuccess.extend({ data: ZContactFormEntry }),
 		ZApiResponseError
 	]),
-	'forms/remove': ZApiResponse,
+	'contact/delete': ZApiResponse,
 	'events/index': z.union([
 		ZApiResponseSuccess.extend({ data: ZEventsEntry.array() }),
 		ZApiResponseError

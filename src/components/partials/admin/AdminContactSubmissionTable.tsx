@@ -7,7 +7,8 @@ import { Dialog } from '@/components/components/DialogProvider';
 import { Monolog } from '@/components/components/MonologProvider';
 import { type TContactFormEntry } from '@/components/types';
 import {
-	getContactForms, removeContactForm
+	getContactForms,
+	deleteContactForm
 } from '@/frontend/adminTools';
 
 export const AdminContactSubmissionTable = () => {
@@ -37,7 +38,7 @@ export const AdminContactSubmissionTable = () => {
 		)
 			return;
 
-		const result = await removeContactForm(id);
+		const result = await deleteContactForm(id);
 		if (result) {
 
 			Monolog.show({

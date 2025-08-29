@@ -277,7 +277,7 @@ export const removeBlogFile = async(fileName: string): Promise<boolean> => {
 export const getContactForms = async(): Promise<TContactFormEntry[] | null> => {
 
 	const response = await fetch(
-		'/api/protected/?type=forms/index',
+		'/api/protected/?type=contact/index',
 		{
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -285,7 +285,7 @@ export const getContactForms = async(): Promise<TContactFormEntry[] | null> => {
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['forms/index'].safeParseAsync(await response.json());
+	const parsedResponse = await TProtectedPostApiResponseMap['contact/index'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data)
 		return null;
 
@@ -294,12 +294,12 @@ export const getContactForms = async(): Promise<TContactFormEntry[] | null> => {
 };
 export const getContactForm = async(id: string | number): Promise<TContactFormEntry | null> => {
 
-	const requestBody = ZProtectedPostApiRequestMap['forms/get'].safeParse({ id });
+	const requestBody = ZProtectedPostApiRequestMap['contact/get'].safeParse({ id });
 	if (!requestBody.success)
 		return null;
 
 	const response = await fetch(
-		'/api/protected/?type=forms/get',
+		'/api/protected/?type=contact/get',
 		{
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -308,21 +308,21 @@ export const getContactForm = async(id: string | number): Promise<TContactFormEn
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['forms/get'].safeParseAsync(await response.json());
+	const parsedResponse = await TProtectedPostApiResponseMap['contact/get'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data)
 		return null;
 
 	return parsedResponse.data.data;
 
 };
-export const removeContactForm = async(id: string | number): Promise<boolean> => {
+export const deleteContactForm = async(id: string | number): Promise<boolean> => {
 
-	const requestBody = ZProtectedPostApiRequestMap['forms/remove'].safeParse({ id });
+	const requestBody = ZProtectedPostApiRequestMap['contact/delete'].safeParse({ id });
 	if (!requestBody.success)
 		return false;
 
 	const response = await fetch(
-		'/api/protected/?type=forms/remove',
+		'/api/protected/?type=contact/delete',
 		{
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -331,7 +331,7 @@ export const removeContactForm = async(id: string | number): Promise<boolean> =>
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['forms/remove'].safeParseAsync(await response.json());
+	const parsedResponse = await TProtectedPostApiResponseMap['contact/delete'].safeParseAsync(await response.json());
 	return parsedResponse.success;
 
 };

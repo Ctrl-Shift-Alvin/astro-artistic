@@ -36,7 +36,7 @@ export async function POST(context: APIContext) {
 
 	if (contact_isDbDuplicateEntry(
 		data.data.email,
-		data.data.message
+		data.data.message ?? undefined
 	)
 	) {
 

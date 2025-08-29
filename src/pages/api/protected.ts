@@ -166,7 +166,7 @@ export async function POST(context: APIContext) {
 	const requestType = getParam('type');
 	switch (requestType) {
 
-		case 'forms/index': {
+		case 'contact/index': {
 
 			try {
 
@@ -192,7 +192,7 @@ export async function POST(context: APIContext) {
 			}
 
 		}
-		case 'forms/get': {
+		case 'contact/get': {
 
 			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
 			if (!parsedBody.success) {
@@ -212,9 +212,9 @@ export async function POST(context: APIContext) {
 					'SELECT * FROM submissions WHERE id=?',
 					requestDataId
 				);
-				if (!result) {
+				if (result == undefined) {
 
-					const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'not-found' });
+					const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'resource-not-found' });
 					return new Response(
 						JSON.stringify(responseBody),
 						{ status: 404 }
@@ -242,7 +242,7 @@ export async function POST(context: APIContext) {
 			}
 
 		}
-		case 'forms/remove': {
+		case 'contact/delete': {
 
 			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
 			if (!parsedBody.success) {
