@@ -360,7 +360,7 @@ export async function POST(context: APIContext) {
 			}
 
 		}
-		case 'events/remove': {
+		case 'events/delete': {
 
 			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
 			if (!parsedBody.success) {
@@ -430,7 +430,7 @@ export async function POST(context: APIContext) {
 				);
 				if (!existsSync(filePath)) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].safeParse({ error: 'not-found' });
+					const errorBody = TProtectedPostApiResponseMap[requestType].safeParse({ error: 'resource-not-found' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 404 }
@@ -488,10 +488,10 @@ export async function POST(context: APIContext) {
 				);
 				if (!existsSync(filePath)) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'resource-not-found' });
 					return new Response(
 						JSON.stringify(errorBody),
-						{ status: 400 }
+						{ status: 404 }
 					);
 
 				}

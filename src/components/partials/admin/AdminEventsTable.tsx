@@ -8,10 +8,16 @@ import { Button } from '@/components/components/Button';
 import { Dialog } from '@/components/components/DialogProvider';
 import { Monolog } from '@/components/components/MonologProvider';
 import {
-	type TEventsEntry, type TNewEventsEntry
+	type TEventsEntry,
+	type TNewEventsEntry
 } from '@/components/types';
 import {
-	getEventsIndex, addEventsEntry, removeEventsEntry, editEventsEntry, getEvent, saveEvent
+	getEventsIndex,
+	addEventsEntry,
+	deleteEventsEntry,
+	editEventsEntry,
+	getEvent,
+	saveEvent
 } from '@/frontend/adminTools';
 import { cGetUserLanguage } from '@/shared/cookies';
 import { defaultLanguageCode } from '@/backend/i18n';
@@ -129,7 +135,7 @@ export const AdminEventsTable = () => {
 		)
 			return;
 
-		const result = await removeEventsEntry(id);
+		const result = await deleteEventsEntry(id);
 
 		if (result) {
 

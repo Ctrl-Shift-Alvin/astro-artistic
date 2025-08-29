@@ -191,7 +191,7 @@ export const ZProtectedPostApiRequestMap = {
 	}),
 	'events/index': z.undefined(),
 	'events/add': z.object({ data: ZNewEventsEntry }),
-	'events/remove': z.object({
+	'events/delete': z.object({
 		id: z
 			.coerce
 			.number()
@@ -269,7 +269,7 @@ export const TProtectedPostApiResponseMap = {
 		ZApiResponseError
 	]),
 	'events/add': ZApiResponse,
-	'events/remove': ZApiResponse,
+	'events/delete': ZApiResponse,
 	'events/get': z.union([
 		ZApiResponseSuccess.extend({ data: z.string() }),
 		ZApiResponseError
