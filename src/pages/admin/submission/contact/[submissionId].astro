@@ -1,6 +1,6 @@
 ---
 import Section from '@/components/astro-components/Section.astro';
-import { AdminContactSubmission } from '@/components/partials/admin/AdminContactSubmission';
+import { AdminContactSubmissionOverview } from '@/components/partials/admin/AdminContactSubmissionOverview';
 import { AdminLogout } from '@/components/partials/admin/AdminLogout';
 import Base from '@/templates/Base.astro';
 import {
@@ -11,6 +11,7 @@ import {
 import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { adminIsSetup } from '@/backend/admin';
+import { Button } from '@/components/components/Button';
 
 if (!adminIsSetup)
 	return Astro.redirect('/');
@@ -39,6 +40,8 @@ if (token) {
 } else {
 	return Astro.redirect('/admin/login/');
 }
+
+const prevUrl = decodeURIComponent(Astro.url.searchParams.get('prevUrl') ?? '');
 ---
 <Base
 	head={{
@@ -47,8 +50,26 @@ if (token) {
 	}}
 	translation={translation}
 >
-	<Section center>
-		<AdminContactSubmission submissionId={submissionId} client:only="react" />
+	<Section center title={`Contact Submission ID '${submissionId}'`}>
+		<AdminContactSubmissionOverview submissionId={submissionId} client:only="react" />
+		<div class:list={'pt-8'}>
+			<Button
+				actionPayload={{
+					action: 'adminRemoveContactSubmission',
+					args: [submissionId]
+				}}
+				client:only="react"
+			>
+				{'Remove'}
+			</Button>
+
+			<Button
+				href={prevUrl ?? '/admin/home/'}
+				client:only="react"
+			>
+				{'Back'}
+			</Button>
+		</div>
 	</Section>
 	<Section center>
 		<AdminLogout client:only="react" />

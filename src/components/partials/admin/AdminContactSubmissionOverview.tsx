@@ -1,17 +1,11 @@
 import {
 	useState, useLayoutEffect
 } from 'react';
-import { Button } from '@/components/components/Button';
-import { Dialog } from '@/components/components/DialogProvider';
 import { Monolog } from '@/components/components/MonologProvider';
 import { type TContactFormEntry } from '@/components/types';
-import {
-	getContactForm,
-	deleteContactForm
-} from '@/frontend/adminTools';
-import { goto } from '@/frontend/windowTools';
+import { getContactForm } from '@/frontend/adminTools';
 
-export const AdminContactSubmission = ({ submissionId }: { submissionId: string }) => {
+export const AdminContactSubmissionOverview = ({ submissionId }: { submissionId: string }) => {
 
 	const [
 		submission,
@@ -37,36 +31,6 @@ export const AdminContactSubmission = ({ submissionId }: { submissionId: string 
 
 	};
 
-	const remove = async() => {
-
-		if (
-			!await Dialog.yesNo(
-				'Are you sure you want to delete this entry?',
-				`This will irreversibly remove the entry with ID ${submissionId}.`
-			)
-		)
-			return;
-
-		const result = await deleteContactForm(submissionId);
-		if (result) {
-
-			Monolog.show({
-				text: `Successfully deleted form submission with id ${submissionId}!`,
-				durationMs: 2000
-			});
-			setTimeout(
-				() => {
-
-					goto('/admin/home/');
-
-				},
-				2000
-			);
-
-		}
-
-	};
-
 	useLayoutEffect(
 		() => {
 
@@ -78,8 +42,8 @@ export const AdminContactSubmission = ({ submissionId }: { submissionId: string 
 
 	return (
 		<>
-			<div className={'mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6'}>
-				<div className={'sm:col-span-3'}>
+			<div className={'w-full mt-10 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8 text-center text-2xl'}>
+				<div>
 					<h1 className={'font-bold'}>
 						{'ID'}
 					</h1>
@@ -89,7 +53,7 @@ export const AdminContactSubmission = ({ submissionId }: { submissionId: string 
 					</p>
 				</div>
 
-				<div className={'sm:col-span-3'}>
+				<div>
 					<h1 className={'font-bold'}>
 						{'Created at'}
 					</h1>
@@ -99,7 +63,7 @@ export const AdminContactSubmission = ({ submissionId }: { submissionId: string 
 					</p>
 				</div>
 
-				<div className={'sm:col-span-3'}>
+				<div>
 					<h1 className={'font-bold'}>
 						{'First Name'}
 					</h1>
@@ -109,7 +73,7 @@ export const AdminContactSubmission = ({ submissionId }: { submissionId: string 
 					</p>
 				</div>
 
-				<div className={'sm:col-span-3'}>
+				<div>
 					<h1 className={'font-bold'}>
 						{'Last Name'}
 					</h1>
@@ -119,7 +83,7 @@ export const AdminContactSubmission = ({ submissionId }: { submissionId: string 
 					</p>
 				</div>
 
-				<div className={'sm:col-span-3'}>
+				<div>
 					<h1 className={'font-bold'}>
 						{'Email'}
 					</h1>
@@ -129,7 +93,7 @@ export const AdminContactSubmission = ({ submissionId }: { submissionId: string 
 					</p>
 				</div>
 
-				<div className={'sm:col-span-3'}>
+				<div>
 					<h1 className={'font-bold'}>
 						{'Phone Number'}
 					</h1>
@@ -148,18 +112,6 @@ export const AdminContactSubmission = ({ submissionId }: { submissionId: string 
 						{submission?.message}
 					</p>
 				</div>
-			</div>
-
-			<div className={'pt-8'}>
-				<Button
-					onClick={() => void remove()}
-				>
-					{'Remove'}
-				</Button>
-
-				<Button href={'/admin/home/'}>
-					{'Back'}
-				</Button>
 			</div>
 		</>
 	);

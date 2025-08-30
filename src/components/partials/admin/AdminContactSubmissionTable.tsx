@@ -82,10 +82,6 @@ export const AdminContactSubmissionTable = () => {
 						<td className={'border p-2 font-bold'}>
 							{'D'}
 						</td>
-
-						<td className={'border p-2 font-bold'}>
-							{'A'}
-						</td>
 					</tr>
 				</thead>
 
@@ -94,8 +90,10 @@ export const AdminContactSubmissionTable = () => {
 						formSubmissions.map((entry) => (
 							<tr key={entry.id}>
 
-								<td className={'border p-2'}>
-									{entry.id}
+								<td className={'border p-2 underline'}>
+									<A href={`/admin/submission/contact/${entry.id}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}>
+										{entry.id}
+									</A>
 								</td>
 
 								<td className={'border p-2'}>
@@ -116,12 +114,6 @@ export const AdminContactSubmissionTable = () => {
 										onClick={() => void remove(entry.id)}
 									>
 										{'D'}
-									</A>
-								</td>
-
-								<td className={'border p-2'}>
-									<A href={`/admin/submission/contact/${entry.id}/`}>
-										{'A'}
 									</A>
 								</td>
 							</tr>
