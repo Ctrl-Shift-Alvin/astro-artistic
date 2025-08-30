@@ -253,7 +253,6 @@ export function cGetAuthToken(context: APIContext): string | null {
 
 export function cSetIgnoreSizeError(value: boolean | null) {
 
-	console.log('Set to: ' + value);
 	if (!isWindowDefined())
 		return;
 

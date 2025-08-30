@@ -4,17 +4,19 @@ import {
 	windowFadeOut
 } from '@/frontend/windowTools';
 import {
-	getAction,
-	TAction
+	executeAction,
+	executeAsyncAction,
+	isSyncPayload,
+	type TActionPayload
 } from '@/shared/actions';
 
 type IAProps = {
 	children: ReactNode;
 	className?: string;
 	href?: string;
-	target?: '_blank' | '_self' | '_parent' | '_top' | undefined;
+	target?: '_blank' | '_self' | '_parent' | '_top';
 	onClick?: (mouseEvent: React.MouseEvent<HTMLAnchorElement>)=> void;
-	onClickAction?: TAction;
+	actionPayload?: TActionPayload;
 	key?: string;
 };
 
@@ -25,13 +27,24 @@ const hrefClicked = (
 
 	props.onClick?.(clickEvent);
 
-	if (props.onClickAction) {
+	if (props.actionPayload) {
 
-		getAction(props.onClickAction)();
+		if (isSyncPayload(props.actionPayload)) {
+
+			executeAction(props.actionPayload);
+
+		} else {
+
+			void executeAsyncAction(props.actionPayload);
+
+		}
 
 	}
 
 	if (props.href) {
+
+		// Prevent default anchor behavior if we're handling navigation with fades
+		clickEvent.preventDefault();
 
 		void windowFadeOut().then(() => {
 
@@ -42,12 +55,15 @@ const hrefClicked = (
 					'_blank'
 				);
 
+				// Fade the current window back in after opening a new tab
+				windowFadeIn();
+
 			} else {
 
+				// Let the browser navigate, the fade out provides a nice transition
 				window.location.href = props.href || '';
 
 			}
-			windowFadeIn();
 
 		});
 
@@ -58,6 +74,7 @@ const hrefClicked = (
 export const A = (props: IAProps) => (
 	<a
 		key={props.key}
+		href={props.href}
 		className={`cursor-pointer ${props.className}`}
 		target={props.target}
 		onClick={

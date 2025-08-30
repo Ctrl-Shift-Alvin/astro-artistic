@@ -4,19 +4,21 @@ import {
 	windowFadeOut
 } from '@/frontend/windowTools';
 import {
-	getAction,
-	TAction
+	executeAction,
+	executeAsyncAction,
+	isSyncPayload,
+	TActionPayload
 } from '@/shared/actions';
 
 type IButtonProps = {
 	children: ReactNode;
 	className?: string;
 	small?: boolean;
-	type?: 'button' | 'reset' | 'submit' | undefined;
+	type?: 'button' | 'reset' | 'submit';
 	form?: string;
 	href?: string;
 	onClick?: (event: React.MouseEvent<HTMLButtonElement>)=> void;
-	onClickAction?: TAction;
+	actionPayload?: TActionPayload;
 };
 
 const click = (
@@ -26,11 +28,20 @@ const click = (
 
 	props.onClick?.(event);
 
-	if (props.onClickAction) {
+	if (props.actionPayload) {
 
-		getAction(props.onClickAction)();
+		if (isSyncPayload(props.actionPayload)) {
+
+			executeAction(props.actionPayload);
+
+		} else {
+
+			void executeAsyncAction(props.actionPayload);
+
+		}
 
 	}
+
 	if (props.href) {
 
 		void windowFadeOut()

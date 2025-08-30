@@ -68,7 +68,7 @@ if (!translation) {
 		<p class="newlines text-center">{translation.fiveHundreed.body}</p>
 		<Button href="/" className="mt-20" client:only="react">{translation.fiveHundreed.homeButton}</Button>
 
-		<A className="my-10 text-md italic" onClickAction="toggleExpand500ErrorDiv" client:only="react">{translation.fiveHundreed.expandButton}</A>
+		<A className="my-10 text-md italic" actionPayload={{ action: "toggleExpand500ErrorDiv" }} client:only="react">{translation.fiveHundreed.expandButton}</A>
 		<div id="errorDiv" class="w-full text-center text-lg transition-opacity duration-750 opacity-0 newlines">
 			{errorString}
 		</div>
