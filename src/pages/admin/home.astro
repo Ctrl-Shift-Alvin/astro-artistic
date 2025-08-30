@@ -13,7 +13,8 @@ import {
 import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { adminIsSetup } from '@/backend/admin';
-import { AdminBuildEditor } from '@/components/partials/admin/AdminBuildEditor';
+import { AdminBuildsTable } from '@/components/partials/admin/AdminBuildsTable';
+import { AdminErrorsTable } from '@/components/partials/admin/AdminErrorsTable';
 
 if (!adminIsSetup)
 	return Astro.redirect('/');
@@ -59,7 +60,10 @@ if (token) {
 		<AdminBlogEditor client:only="react" />
 	</Section>
 	<Section title="Manage Builds" center>
-		<AdminBuildEditor client:only="react" />
+		<AdminBuildsTable client:only="react" />
+	</Section>
+	<Section title="Manage Errors" center>
+		<AdminErrorsTable client:only="react" />
 	</Section>
 	<Section center>
 		<AdminLogout client:only="react" />

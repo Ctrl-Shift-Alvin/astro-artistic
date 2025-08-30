@@ -1,12 +1,14 @@
 import {
+	useCallback,
 	useLayoutEffect,
 	useState
 } from 'react';
 import clsx from 'clsx/lite';
 import { TBuild } from '@/components/types';
 import {
-	getBuildsIndex,
-	removeBuild
+	getBuildIndex,
+	deleteBuild,
+	countBuilds
 } from '@/frontend/adminTools';
 import { ErrorsConfig } from '@/shared/config/errors';
 import { A } from '@/components/components/A';
@@ -14,7 +16,7 @@ import { Dialog } from '@/components/components/DialogProvider';
 import { Monolog } from '@/components/components/MonologProvider';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 
-export const AdminBuildEditor = () => {
+export const AdminBuildsTable = () => {
 
 	const [
 		buildsIndex,
@@ -22,30 +24,56 @@ export const AdminBuildEditor = () => {
 	] = useState<TBuild[]>([]);
 
 	const [
-		indexSize,
-		setIndexSize
+		fullIndexCount,
+		setFullIndexCount
 	] = useState(0);
 
 	const [
 		buildsCount,
 		setBuildsCount
-	] = useState(ErrorsConfig.tableInitialEntryCount);
+	] = useState(ErrorsConfig.tableInitialBuildCount);
 
 	const [
 		expandedRows,
 		setExpandedRows
 	] = useState<Record<number, boolean>>({});
 
-	const index = async(count: number | string) => {
+	const index = useCallback(
+		async(count: number) => {
 
-		const result = await getBuildsIndex(count);
-		if (!result)
-			return;
+			// If count decreased, just slice the builds index
+			if (buildsIndex.length >= count) {
 
-		setIndexSize(result.count);
-		setBuildsIndex(result.data);
+				setBuildsIndex((prev) => prev.slice(
+					0,
+					count
+				));
+				return;
 
-	};
+			}
+
+			// Otherwise, fetch only missing rows
+			const result = await getBuildIndex(
+				count - buildsIndex.length,
+				buildsIndex.length
+			);
+			if (result === null)
+				return;
+
+			setBuildsIndex((prev) => [
+				...prev,
+				...result
+			].slice(
+				0,
+				buildsCount
+			));
+
+		},
+		[
+			buildsCount,
+			buildsIndex.length
+		]
+	);
 
 	const remove = async(buildNumber: number | string) => {
 
@@ -57,7 +85,7 @@ export const AdminBuildEditor = () => {
 		)
 			return;
 
-		const result = await removeBuild(buildNumber);
+		const result = await deleteBuild(buildNumber);
 		if (result) {
 
 			Monolog.show({ text: `Successfully deleted build '${buildNumber}'!` });
@@ -72,11 +100,36 @@ export const AdminBuildEditor = () => {
 
 	};
 
-	const increaseCount = () => {
+	const count = async() => {
 
-		setBuildsCount((prev) => prev + ErrorsConfig.tableInitialEntryCount);
+		const result = await countBuilds();
+		if (result === null)
+			return;
+
+		setFullIndexCount(result);
 
 	};
+
+	const increaseCount = () => {
+
+		setBuildsCount((prev) => prev + ErrorsConfig.tableInitialBuildCount);
+
+	};
+
+	const decreaseCount = () => {
+
+		setBuildsCount((prev) => prev - ErrorsConfig.tableInitialBuildCount);
+
+	};
+
+	useLayoutEffect(
+		() => {
+
+			void count();
+
+		},
+		[]
+	);
 
 	useLayoutEffect(
 		() => {
@@ -84,6 +137,7 @@ export const AdminBuildEditor = () => {
 			void index(buildsCount);
 
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ buildsCount ]
 	);
 
@@ -204,7 +258,24 @@ export const AdminBuildEditor = () => {
 			</table>
 
 			{
-				indexSize > buildsCount
+				buildsCount >= ErrorsConfig.tableInitialBuildCount * 2
+				&& (
+					<A
+						onClick={
+							() => {
+
+								decreaseCount();
+
+							}
+						}
+					>
+						{'Show less...'}
+					</A>
+				)
+			}
+
+			{
+				fullIndexCount > buildsCount
 				&& (
 					<A
 						onClick={

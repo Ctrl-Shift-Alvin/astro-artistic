@@ -2,6 +2,8 @@
 
 importScripts('build.js');
 
+// FIXME css fetch error on hot reload
+
 // #region CONFIGURATION
 const CACHE_NAME = `cache-${self.__BUILD__.buildNumber}` || 'cache-0';
 const OFFLINE_URL = '/offline/';

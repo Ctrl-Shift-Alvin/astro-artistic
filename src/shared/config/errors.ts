@@ -4,5 +4,6 @@ export const ErrorsConfig = ZErrorsConfig.parse({
 	enable: true,
 	enableUserLogging: true,
 	enableApiLogging: true,
-	tableInitialEntryCount: 5
+	tableInitialBuildCount: 2,
+	tableInitialErrorCount: 2
 });
