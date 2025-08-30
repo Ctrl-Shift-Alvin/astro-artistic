@@ -147,22 +147,38 @@ export const ZError = z.object({
 	createdAt: z.string(),
 	buildNumber: z.coerce.number(),
 	isClient: z.coerce.boolean(),
-	status: ZStatusCode,
-	statusText: z.string(),
-	errorMessage: z.string(),
-	errorCause: z.string(),
-	errorStack: z.string()
+	status: ZStatusCode.nullish(),
+	statusText: z
+		.string()
+		.nullish(),
+	errorMessage: z
+		.string()
+		.nullish(),
+	errorCause: z
+		.string()
+		.nullish(),
+	errorStack: z
+		.string()
+		.nullish()
 });
 export type TError = z.infer<typeof ZError>;
 
 export const ZErrorSubmission = z.object({
 	buildNumber: z.coerce.number(),
 	isClient: z.coerce.boolean(),
-	status: ZStatusCode,
-	statusText: z.string(),
-	errorMessage: z.string(),
-	errorCause: z.string(),
-	errorStack: z.string()
+	status: ZStatusCode.nullish(),
+	statusText: z
+		.string()
+		.nullish(),
+	errorMessage: z
+		.string()
+		.nullish(),
+	errorCause: z
+		.string()
+		.nullish(),
+	errorStack: z
+		.string()
+		.nullish()
 });
 export type TErrorSubmission = z.infer<typeof ZErrorSubmission>;
 
@@ -249,9 +265,32 @@ export const ZProtectedPostApiRequestMap = {
 			.nonempty()
 			.endsWith('.md')
 	}),
-	'builds/index': z.object({ count: z.coerce.number() }),
+	'builds/index': z.object({
+		count: z.coerce.number(),
+		offset: z.coerce
+			.number()
+			.optional()
+	}),
+	'builds/count': z.undefined(),
 	'builds/get': z.object({ buildNumber: z.coerce.number() }),
-	'builds/remove': z.object({ buildNumber: z.coerce.number() })
+	'builds/delete': z.object({ buildNumber: z.coerce.number() }),
+	'errors/index': z.object({
+		count: z.coerce.number(),
+		offset: z.coerce
+			.number()
+			.optional()
+	}),
+	'errors/count': z.undefined(),
+	'errors/indexBuild': z.object({
+		buildNumber: z.coerce.number(),
+		count: z.coerce.number(),
+		offset: z.coerce
+			.number()
+			.optional()
+	}),
+	'errors/countBuild': z.object({ buildNumber: z.coerce.number() }),
+	'errors/get': z.object({ id: z.coerce.number() }),
+	'errors/delete': z.object({ id: z.coerce.number() })
 } as const;
 
 export const TProtectedPostApiResponseMap = {
@@ -293,17 +332,39 @@ export const TProtectedPostApiResponseMap = {
 	'blog/new': ZApiResponse,
 	'blog/remove': ZApiResponse,
 	'builds/index': z.union([
-		ZApiResponseSuccess.extend({
-			data: ZBuild.array(),
-			count: z.coerce.number()
-		}),
+		ZApiResponseSuccess.extend({ data: ZBuild.array() }),
+		ZApiResponseError
+	]),
+	'builds/count': z.union([
+		ZApiResponseSuccess.extend({ count: z.coerce.number() }),
 		ZApiResponseError
 	]),
 	'builds/get': z.union([
 		ZApiResponseSuccess.extend({ data: ZBuild }),
 		ZApiResponseError
 	]),
-	'builds/remove': ZApiResponse
+	'builds/delete': ZApiResponse,
+	'errors/index': z.union([
+		ZApiResponseSuccess.extend({ data: ZError.array() }),
+		ZApiResponseError
+	]),
+	'errors/count': z.union([
+		ZApiResponseSuccess.extend({ count: z.coerce.number() }),
+		ZApiResponseError
+	]),
+	'errors/indexBuild': z.union([
+		ZApiResponseSuccess.extend({ data: ZError.array() }),
+		ZApiResponseError
+	]),
+	'errors/countBuild': z.union([
+		ZApiResponseSuccess.extend({ count: z.coerce.number() }),
+		ZApiResponseError
+	]),
+	'errors/get': z.union([
+		ZApiResponseSuccess.extend({ data: ZError }),
+		ZApiResponseError
+	]),
+	'errors/delete': ZApiResponse
 } as const;
 
 // #endregion

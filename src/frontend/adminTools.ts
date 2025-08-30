@@ -7,7 +7,8 @@ import {
 	ZProtectedGetApiResponse,
 	ZProtectedPostApiRequestMap,
 	TProtectedPostApiResponseMap,
-	TBuild
+	TBuild,
+	TError
 } from '@/components/types';
 import {
 	lsGetAuthTokenExpiry,
@@ -378,14 +379,14 @@ export const addEventsEntry = async(newEntry: TNewEventsEntry): Promise<boolean>
 	return parsedResponse.success && !('error' in parsedResponse.data);
 
 };
-export const removeEventsEntry = async(id: string | number): Promise<boolean> => {
+export const deleteEventsEntry = async(id: string | number): Promise<boolean> => {
 
-	const requestBody = ZProtectedPostApiRequestMap['events/remove'].safeParse({ id });
+	const requestBody = ZProtectedPostApiRequestMap['events/delete'].safeParse({ id });
 	if (!requestBody.success)
 		return false;
 
 	const response = await fetch(
-		'/api/protected/?type=events/remove',
+		'/api/protected/?type=events/delete',
 		{
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -394,7 +395,7 @@ export const removeEventsEntry = async(id: string | number): Promise<boolean> =>
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['events/remove'].safeParseAsync(await response.json());
+	const parsedResponse = await TProtectedPostApiResponseMap['events/delete'].safeParseAsync(await response.json());
 	return parsedResponse.success && !('error' in parsedResponse.data);
 
 };
@@ -424,7 +425,6 @@ export const editEventsEntry = async(
 	return parsedResponse.success && !('error' in parsedResponse.data);
 
 };
-
 export const getEvent = async(id: string | number): Promise<string | null> => {
 
 	const requestBody = ZProtectedPostApiRequestMap['events/get'].safeParse({ id });
@@ -478,12 +478,15 @@ export const saveEvent = async(
 
 // #region Errors & Builds
 
-export const getBuildsIndex = async(count: number | string): Promise<{
-	data: TBuild[];
-	count: number;
-} | null> => {
+export const getBuildIndex = async(
+	count: number | string,
+	offset?: number | string
+): Promise<TBuild[] | null> => {
 
-	const requestBody = ZProtectedPostApiRequestMap['builds/index'].safeParse({ count });
+	const requestBody = ZProtectedPostApiRequestMap['builds/index'].safeParse({
+		count,
+		offset
+	});
 	if (!requestBody.success)
 		return null;
 
@@ -499,7 +502,7 @@ export const getBuildsIndex = async(count: number | string): Promise<{
 
 	const parsedResponse = await TProtectedPostApiResponseMap['builds/index'].safeParseAsync(await response.json());
 	return parsedResponse.success && !('error' in parsedResponse.data)
-		? parsedResponse.data
+		? parsedResponse.data.data
 		: null;
 
 };
@@ -525,14 +528,31 @@ export const getBuild = async(buildNumber: number | string): Promise<TBuild | nu
 		: null;
 
 };
-export const removeBuild = async(buildNumber: number | string): Promise<boolean> => {
+export const countBuilds = async(): Promise<number | null> => {
 
-	const requestBody = ZProtectedPostApiRequestMap['builds/remove'].safeParse({ buildNumber });
+	const response = await fetch(
+		'/api/protected/?type=builds/count',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'include'
+		}
+	);
+
+	const parsedResponse = await TProtectedPostApiResponseMap['builds/count'].safeParseAsync(await response.json());
+	return parsedResponse.success && !('error' in parsedResponse.data)
+		? parsedResponse.data.count
+		: null;
+
+};
+export const deleteBuild = async(buildNumber: number | string): Promise<boolean> => {
+
+	const requestBody = ZProtectedPostApiRequestMap['builds/delete'].safeParse({ buildNumber });
 	if (!requestBody.success)
 		return false;
 
 	const response = await fetch(
-		'/api/protected/?type=builds/remove',
+		'/api/protected/?type=builds/delete',
 		{
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -541,7 +561,145 @@ export const removeBuild = async(buildNumber: number | string): Promise<boolean>
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['builds/remove'].safeParseAsync(await response.json());
+	const parsedResponse = await TProtectedPostApiResponseMap['builds/delete'].safeParseAsync(await response.json());
+	return parsedResponse.success && !('error' in parsedResponse.data);
+
+};
+export const getErrorIndex = async(
+	count: number | string,
+	offset?: number | string
+): Promise<TError[] | null> => {
+
+	const requestBody = ZProtectedPostApiRequestMap['errors/index'].safeParse({
+		count,
+		offset
+	});
+	if (!requestBody.success)
+		return null;
+
+	const response = await fetch(
+		'/api/protected/?type=errors/index',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestBody.data),
+			credentials: 'include'
+		}
+	);
+
+	const parsedResponse = await TProtectedPostApiResponseMap['errors/index'].safeParseAsync(await response.json());
+	return parsedResponse.success && !('error' in parsedResponse.data)
+		? parsedResponse.data.data
+		: null;
+
+};
+export const countErrors = async(): Promise<number | null> => {
+
+	const response = await fetch(
+		'/api/protected/?type=errors/count',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'include'
+		}
+	);
+
+	const parsedResponse = await TProtectedPostApiResponseMap['errors/count'].safeParseAsync(await response.json());
+	return parsedResponse.success && !('error' in parsedResponse.data)
+		? parsedResponse.data.count
+		: null;
+
+};
+export const getErrorIndexByBuild = async(
+	buildNumber: number | string,
+	count: number | string,
+	offset?: number | string
+): Promise<TError[] | null> => {
+
+	const requestBody = ZProtectedPostApiRequestMap['errors/indexBuild'].safeParse({
+		buildNumber,
+		count,
+		offset
+	});
+	if (!requestBody.success)
+		return null;
+
+	const response = await fetch(
+		'/api/protected/?type=errors/indexBuild',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestBody.data),
+			credentials: 'include'
+		}
+	);
+
+	const parsedResponse = await TProtectedPostApiResponseMap['errors/indexBuild'].safeParseAsync(await response.json());
+	return parsedResponse.success && !('error' in parsedResponse.data)
+		? parsedResponse.data.data
+		: null;
+
+};
+export const countErrorsByBuild = async(buildNumber: number | string): Promise<number | null> => {
+
+	const requestBody = ZProtectedPostApiRequestMap['errors/countBuild'].safeParse({ buildNumber });
+	if (!requestBody.success)
+		return null;
+
+	const response = await fetch(
+		'/api/protected/?type=errors/countBuild',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'include'
+		}
+	);
+
+	const parsedResponse = await TProtectedPostApiResponseMap['errors/countBuild'].safeParseAsync(await response.json());
+	return parsedResponse.success && !('error' in parsedResponse.data)
+		? parsedResponse.data.count
+		: null;
+
+};
+export const getError = async(id: number | string): Promise<TError | null> => {
+
+	const requestBody = ZProtectedPostApiRequestMap['errors/get'].safeParse({ id });
+	if (!requestBody.success)
+		return null;
+
+	const response = await fetch(
+		'/api/protected/?type=errors/get',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestBody.data),
+			credentials: 'include'
+		}
+	);
+
+	const parsedResponse = await TProtectedPostApiResponseMap['errors/get'].safeParseAsync(await response.json());
+	return parsedResponse.success && !('error' in parsedResponse.data)
+		? parsedResponse.data.data
+		: null;
+
+};
+export const deleteError = async(id: number | string): Promise<boolean> => {
+
+	const requestBody = ZProtectedPostApiRequestMap['errors/delete'].safeParse({ id });
+	if (!requestBody.success)
+		return false;
+
+	const response = await fetch(
+		'/api/protected/?type=errors/delete',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestBody.data),
+			credentials: 'include'
+		}
+	);
+
+	const parsedResponse = await TProtectedPostApiResponseMap['errors/delete'].safeParseAsync(await response.json());
 	return parsedResponse.success && !('error' in parsedResponse.data);
 
 };

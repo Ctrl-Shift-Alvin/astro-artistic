@@ -60,7 +60,7 @@ const errors_createDbIfNotExists = (): boolean => {
 				+ ');'
 
 				+ 'CREATE TABLE IF NOT EXISTS errors ('
-				+ 'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+				+ 'id INTEGER PRIMARY KEY,'
 				+ 'createdAt DATETIME DEFAULT (strftime(\'%Y-%m-%d %H:%M:%f\', \'now\')),'
 				+ 'buildNumber INTEGER NOT NULL,'
 				+ 'isClient BOOLEAN NOT NULL CHECK (isClient IN (0, 1)),'
@@ -139,7 +139,7 @@ const errors_updateDb = () => {
 	} catch(err: any) {
 
 		throw new Error(
-			`Couldn\'t update errors database: ${err}`,
+			`Couldn't update errors database: ${err}`,
 			{ cause: err }
 		);
 
@@ -309,22 +309,6 @@ export const errors_dbAllError = (
 
 };
 
-export const errors_getLastBuild = (): TBuild | undefined => {
-
-	try {
-
-		return errors_dbGetBuild('SELECT * FROM builds ORDER BY buildNumber DESC LIMIT 1');
-
-	} catch(err: any) {
-
-		throw new Error(
-			'Failed to get latest build number!',
-			{ cause: err }
-		);
-
-	}
-
-};
 export const errors_addBuild = (build: {
 	createdAt: string;
 	gitBranch: string;
@@ -354,6 +338,25 @@ export const errors_addBuild = (build: {
 	}
 
 };
+export const errors_getBuild = (buildNumber: number): TBuild | undefined => {
+
+	try {
+
+		return errors_dbGetBuild(
+			'SELECT * FROM builds WHERE buildNumber=?',
+			buildNumber
+		);
+
+	} catch(err: any) {
+
+		throw new Error(
+			`Failed to get build with ID '${buildNumber}'!`,
+			{ cause: err }
+		);
+
+	}
+
+};
 export const errors_getAllBuilds = (): TBuild[] => {
 
 	try {
@@ -370,7 +373,50 @@ export const errors_getAllBuilds = (): TBuild[] => {
 	}
 
 };
-export const errors_getBuildCount = (): number => {
+export const errors_getFewBuilds = (
+	count: number,
+	offset: number = 0
+): TBuild[] => {
+
+	try {
+
+		const result = errors_dbAllBuild(
+			'SELECT * FROM builds ORDER BY createdAt DESC LIMIT ? OFFSET ?',
+			count,
+			offset
+		);
+		return result;
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to get few builds!',
+			{ cause: err }
+		);
+
+	}
+
+};
+export const errors_deleteBuild = (buildNumber: number) => {
+
+	try {
+
+		return errors_dbRun(
+			'DELETE FROM builds WHERE buildNumber=?',
+			buildNumber
+		);
+
+	} catch(err: any) {
+
+		throw new Error(
+			`Failed to delete build '${buildNumber}'!`,
+			{ cause: err }
+		);
+
+	}
+
+};
+export const errors_countBuilds = (): number => {
 
 	try {
 
@@ -378,40 +424,20 @@ export const errors_getBuildCount = (): number => {
 			.prepare('SELECT COUNT(*) AS count FROM builds')
 			.get();
 
-		console.log(result);
-
-		const parsed = z
+		const parsedResult = z
 			.object({
 				count: z.coerce
 					.number()
 					.default(0)
 			})
 			.parse(result);
-		return parsed.count;
+
+		return parsedResult.count;
 
 	} catch(err: any) {
 
 		throw new Error(
-			'Failed to get the build row count!',
-			{ cause: err }
-		);
-
-	}
-
-};
-export const errors_getRecentBuilds = (count: number): TBuild[] => {
-
-	try {
-
-		return errors_dbAllBuild(
-			'SELECT * FROM builds ORDER BY createdAt DESC LIMIT ?',
-			count
-		);
-
-	} catch(err: any) {
-
-		throw new Error(
-			'Failed to get recent errors!',
+			'Failed to count all builds!',
 			{ cause: err }
 		);
 
@@ -445,6 +471,25 @@ export const errors_addErrorSubmission = (submission: TErrorSubmission) => {
 	}
 
 };
+export const errors_getError = (id: number): TError | undefined => {
+
+	try {
+
+		return errors_dbGetError(
+			'SELECT * FROM errors WHERE id=?',
+			id
+		);
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to get all errors!',
+			{ cause: err }
+		);
+
+	}
+
+};
 export const errors_getAllErrors = (): TError[] => {
 
 	try {
@@ -454,26 +499,133 @@ export const errors_getAllErrors = (): TError[] => {
 	} catch(err: any) {
 
 		throw new Error(
-			'Failed to get all error submissions!',
+			'Failed to get all errors!',
 			{ cause: err }
 		);
 
 	}
 
 };
-export const errors_getRecentErrors = (count: number): TError[] => {
+export const errors_getFewErrors = (
+	count: number,
+	offset: number = 0
+): TError[] => {
 
 	try {
 
-		return errors_dbAllError(
-			'SELECT * FROM errors ORDER BY createdAt DESC LIMIT ?',
-			count
+		const result = errors_dbAllError(
+			'SELECT * FROM errors ORDER BY createdAt DESC LIMIT ? OFFSET ?',
+			count,
+			offset
+		);
+
+		return result;
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to get few errors!',
+			{ cause: err }
+		);
+
+	}
+
+};
+export const errors_getFewErrorsByBuild = (
+	buildNumber: number,
+	count: number,
+	offset: number = 0
+): TError[] => {
+
+	try {
+
+		const result = errors_dbAllError(
+			'SELECT * FROM errors WHERE buildNumber=? ORDER BY createdAt DESC LIMIT ? OFFSET ?',
+			buildNumber,
+			count,
+			offset
+		);
+
+		return result;
+
+	} catch(err: any) {
+
+		throw new Error(
+			`Failed to get few errors from build '${buildNumber}'!`,
+			{ cause: err }
+		);
+
+	}
+
+};
+export const errors_deleteError = (id: number) => {
+
+	try {
+
+		return errors_dbRun(
+			'DELETE FROM errors WHERE id=?',
+			id
 		);
 
 	} catch(err: any) {
 
 		throw new Error(
-			'Failed to get recent errors!',
+			`Failed to delete error with ID '${id}'!`,
+			{ cause: err }
+		);
+
+	}
+
+};
+export const errors_countErrors = (): number => {
+
+	try {
+
+		const result = db
+			.prepare('SELECT COUNT(*) AS count FROM errors')
+			.get();
+
+		const parsedResult = z
+			.object({
+				count: z.coerce
+					.number()
+					.default(0)
+			})
+			.parse(result);
+
+		return parsedResult.count;
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to count all errors!',
+			{ cause: err }
+		);
+
+	}
+
+};
+export const errors_countErrorsByBuild = (buildNumber: number): number => {
+
+	try {
+
+		const result = db
+			.prepare('SELECT COUNT(*) AS count FROM errors WHERE buildNumber=?')
+			.get(buildNumber);
+
+		const parsedResult = z
+			.object({
+				count: z.coerce
+					.number()
+					.default(0)
+			})
+			.parse(result);
+		return parsedResult.count;
+
+	} catch(err: any) {
+
+		throw new Error(
+			`Failed to count errors of build '${buildNumber}'!`,
 			{ cause: err }
 		);
 

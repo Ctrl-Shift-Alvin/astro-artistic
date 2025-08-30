@@ -30,10 +30,16 @@ import {
 import { EventsConfig } from '@/backend/config/events';
 import { BlogConfig } from '@/backend/config/blog';
 import {
-	errors_dbGetBuild,
-	errors_dbRun,
-	errors_getBuildCount,
-	errors_getRecentBuilds
+	errors_countBuilds,
+	errors_countErrors,
+	errors_countErrorsByBuild,
+	errors_deleteBuild,
+	errors_deleteError,
+	errors_getBuild,
+	errors_getError,
+	errors_getFewBuilds,
+	errors_getFewErrors,
+	errors_getFewErrorsByBuild
 } from '@/backend/database/errors';
 
 const SECRET_KEY = import.meta.env.JWT_KEY as string;
@@ -892,14 +898,51 @@ export async function POST(context: APIContext) {
 
 				}
 
-				const result = errors_getRecentBuilds(parsedBody.data.count);
-
-				const countResult = errors_getBuildCount();
+				const result = errors_getFewBuilds(
+					parsedBody.data.count,
+					parsedBody.data.offset
+				);
 
 				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
-					count: countResult,
 					data: result
+				});
+				return new Response(
+					JSON.stringify(responseBody),
+					{ status: 200 }
+				);
+
+			} catch {
+
+				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+				return new Response(
+					JSON.stringify(errorBody),
+					{ status: 500 }
+				);
+
+			}
+
+		}
+		case 'builds/count': {
+
+			try {
+
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
+
+					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				const result = errors_countBuilds();
+
+				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+					message: 'success',
+					count: result
 				});
 				return new Response(
 					JSON.stringify(responseBody),
@@ -932,9 +975,91 @@ export async function POST(context: APIContext) {
 
 				}
 
-				const result = errors_dbGetBuild(
-					'SELECT * FROM builds WHERE buildNumber=?',
-					parsedBody.data.buildNumber
+				const result = errors_getBuild(parsedBody.data.buildNumber);
+
+				if (result == undefined) {
+
+					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'resource-not-found' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 404 }
+					);
+
+				}
+
+				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+					message: 'success',
+					data: result
+				});
+				return new Response(
+					JSON.stringify(responseBody),
+					{ status: 200 }
+				);
+
+			} catch {
+
+				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+				return new Response(
+					JSON.stringify(errorBody),
+					{ status: 500 }
+				);
+
+			}
+
+		}
+		case 'builds/delete': {
+
+			try {
+
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
+
+					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				errors_deleteBuild(parsedBody.data.buildNumber);
+
+				const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
+				return new Response(
+					JSON.stringify(responseBody),
+					{ status: 200 }
+				);
+
+			} catch {
+
+				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+				return new Response(
+					JSON.stringify(errorBody),
+					{ status: 500 }
+				);
+
+			}
+
+		}
+
+		case 'errors/index': {
+
+			try {
+
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
+
+					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				const result = errors_getFewErrors(
+					parsedBody.data.count,
+					parsedBody.data.offset
 				);
 
 				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
@@ -957,7 +1082,7 @@ export async function POST(context: APIContext) {
 			}
 
 		}
-		case 'builds/remove': {
+		case 'errors/count': {
 
 			try {
 
@@ -972,15 +1097,171 @@ export async function POST(context: APIContext) {
 
 				}
 
-				const result = errors_dbRun(
-					'DELETE FROM builds WHERE buildNumber=?',
-					parsedBody.data.buildNumber
+				const result = errors_countErrors();
+
+				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+					message: 'success',
+					count: result
+				});
+				return new Response(
+					JSON.stringify(responseBody),
+					{ status: 200 }
+				);
+
+			} catch {
+
+				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+				return new Response(
+					JSON.stringify(errorBody),
+					{ status: 500 }
+				);
+
+			}
+
+		}
+		case 'errors/indexBuild': {
+
+			try {
+
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
+
+					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				const result = errors_getFewErrorsByBuild(
+					parsedBody.data.buildNumber,
+					parsedBody.data.count,
+					parsedBody.data.offset
 				);
 
 				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					data: result
 				});
+				return new Response(
+					JSON.stringify(responseBody),
+					{ status: 200 }
+				);
+
+			} catch {
+
+				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+				return new Response(
+					JSON.stringify(errorBody),
+					{ status: 500 }
+				);
+
+			}
+
+		}
+		case 'errors/countBuild': {
+
+			try {
+
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
+
+					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				const result = errors_countErrorsByBuild(parsedBody.data.buildNumber);
+
+				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+					message: 'success',
+					count: result
+				});
+				return new Response(
+					JSON.stringify(responseBody),
+					{ status: 200 }
+				);
+
+			} catch {
+
+				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+				return new Response(
+					JSON.stringify(errorBody),
+					{ status: 500 }
+				);
+
+			}
+
+		}
+		case 'errors/get': {
+
+			try {
+
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
+
+					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				const result = errors_getError(parsedBody.data.id);
+
+				if (result == undefined) {
+
+					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'resource-not-found' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 404 }
+					);
+
+				}
+
+				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+					message: 'success',
+					data: result
+				});
+				return new Response(
+					JSON.stringify(responseBody),
+					{ status: 200 }
+				);
+
+			} catch {
+
+				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+				return new Response(
+					JSON.stringify(errorBody),
+					{ status: 500 }
+				);
+
+			}
+
+		}
+		case 'errors/delete': {
+
+			try {
+
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
+
+					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				errors_deleteError(parsedBody.data.id);
+
+				const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
 				return new Response(
 					JSON.stringify(responseBody),
 					{ status: 200 }
