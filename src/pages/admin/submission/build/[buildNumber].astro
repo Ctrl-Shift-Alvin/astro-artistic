@@ -13,6 +13,7 @@ import { adminIsSetup } from '@/backend/admin';
 import { AdminErrorsTable } from '@/components/partials/admin/AdminErrorsTable';
 import { Button } from '@/components/components/Button';
 import { AdminBuildOverview } from '@/components/partials/admin/AdminBuildOverview';
+import { AdminOverviewButtons } from '@/components/partials/admin/AdminOverviewButtons';
 
 if (!adminIsSetup)
 	return Astro.redirect('/');
@@ -55,9 +56,6 @@ if (token) {
 } else {
 	return Astro.redirect('/admin/login/');
 }
-
-const prevUrl = decodeURIComponent(Astro.url.searchParams.get('prevUrl') ?? '');
-
 ---
 <Base
 	head={{
@@ -72,24 +70,15 @@ const prevUrl = decodeURIComponent(Astro.url.searchParams.get('prevUrl') ?? '');
 	<Section center title={`Errors`}>
 		<AdminErrorsTable buildNumber={buildNumberInt} client:only="react" />
 	</Section>
-	<Section center className="pt-8">
-			<Button
-				actionPayload={{
-					action: 'adminDeleteBuild',
-					args: [buildNumber]
-				}}
-				client:only="react"
-			>
-				{'Remove'}
-			</Button>
-
-			<Button
-				href={prevUrl ?? '/admin/home/'}
-				client:only="react"
-			>
-				{'Back'}
-			</Button>
-		</Section>
+	<Section>
+		<AdminOverviewButtons
+			removeButtonPayload={{
+				action: 'adminDeleteBuild',
+				args: [buildNumber]
+			}}
+			client:only="react"
+		/>
+	</Section>
 	<Section center>
 		<AdminLogout client:only="react" />
 	</Section>

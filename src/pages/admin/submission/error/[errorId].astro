@@ -13,6 +13,7 @@ import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { adminIsSetup } from '@/backend/admin';
 import { Button } from '@/components/components/Button';
 import { AdminErrorSubmissionOverview } from '@/components/partials/admin/AdminErrorSubmissionOverview';
+import { AdminOverviewButtons } from '@/components/partials/admin/AdminOverviewButtons';
 
 if (!adminIsSetup)
 	return Astro.redirect('/');
@@ -41,8 +42,6 @@ if (token) {
 } else {
 	return Astro.redirect('/admin/login/');
 }
-
-const prevUrl = decodeURIComponent(Astro.url.searchParams.get('prevUrl') ?? '');
 ---
 <Base
 	head={{
@@ -54,24 +53,15 @@ const prevUrl = decodeURIComponent(Astro.url.searchParams.get('prevUrl') ?? '');
 	<Section center title={`Contact Submission ID '${errorId}'`}>
 		<AdminErrorSubmissionOverview submissionId={errorId} client:only="react" />
 	</Section>
-	<Section center className="pt-8">
-			<Button
-				actionPayload={{
-					action: 'adminDeleteError',
-					args: [errorId]
-				}}
-				client:only="react"
-			>
-				{'Remove'}
-			</Button>
-
-			<Button
-				href={prevUrl ?? '/admin/home/'}
-				client:only="react"
-			>
-				{'Back'}
-			</Button>
-		</Section>
+	<Section>
+		<AdminOverviewButtons
+			removeButtonPayload={{
+				action: 'adminDeleteError',
+				args: [errorId]
+			}}
+			client:only="react"
+		/>
+	</Section>
 	<Section center>
 		<AdminLogout client:only="react" />
 	</Section>
