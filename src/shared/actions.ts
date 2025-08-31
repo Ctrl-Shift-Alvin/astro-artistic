@@ -1,6 +1,10 @@
 import { Dialog } from '@/components/components/DialogProvider';
 import { Monolog } from '@/components/components/MonologProvider';
-import { deleteContactForm } from '@/frontend/adminTools';
+import {
+	deleteBuild,
+	deleteContactForm,
+	deleteError
+} from '@/frontend/adminTools';
 import {
 	goto,
 	windowRefresh
@@ -40,22 +44,22 @@ const actions = {
 		}
 
 	},
-	adminRemoveContactSubmission: async(submissionId: number | string) => {
+	adminDeleteContactSubmission: async(id: number | string) => {
 
 		const result = await Dialog.yesNo(
-			'Are you sure you want to delete this entry?',
-			`This will irreversibly remove the entry with ID ${submissionId}.`
+			'Are you sure you want to delete this contact submission?',
+			`This will irreversibly remove the contact submission with ID ${id}.`
 		);
 
 		if (!result)
 			return;
 
-		const deleteResult = await deleteContactForm(submissionId);
+		const deleteResult = await deleteContactForm(id);
 
 		if (deleteResult) {
 
 			Monolog.show({
-				text: `Successfully deleted contact submission with ID '${submissionId}'!`,
+				text: `Successfully deleted contact submission with ID '${id}'!`,
 				durationMs: 2000
 			});
 			setTimeout(
@@ -70,7 +74,84 @@ const actions = {
 		} else {
 
 			Monolog.show({
-				text: `Failed to delete contact submission with ID '${submissionId}'!`,
+				text: `Failed to delete contact submission with ID '${id}'!`,
+				durationMs: 2000
+			});
+
+		}
+
+	},
+	adminDeleteBuild: async(buildNumber: number | string) => {
+
+		const result = await Dialog.yesNo(
+			'Are you sure you want to delete this build?',
+			`This will irreversibly remove the build with ID ${buildNumber}.`
+			+ (window.__BUILD__.buildNumber === buildNumber
+				? ' This is the current running build!'
+				: '')
+		);
+
+		if (!result)
+			return;
+
+		const deleteResult = await deleteBuild(buildNumber);
+
+		if (deleteResult) {
+
+			Monolog.show({
+				text: `Successfully deleted build with ID '${buildNumber}'!`,
+				durationMs: 2000
+			});
+			setTimeout(
+				() => {
+
+					goto('/admin/home/');
+
+				},
+				2000
+			);
+
+		} else {
+
+			Monolog.show({
+				text: `Failed to delete build with ID '${buildNumber}'!`,
+				durationMs: 2000
+			});
+
+		}
+
+	},
+	adminDeleteError: async(id: number | string) => {
+
+		const result = await Dialog.yesNo(
+			'Are you sure you want to delete this error?',
+			`This will irreversibly remove the error with ID ${id}.`
+		);
+
+		if (!result)
+			return;
+
+		const deleteResult = await deleteError(id);
+
+		if (deleteResult) {
+
+			Monolog.show({
+				text: `Successfully deleted error with ID '${id}'!`,
+				durationMs: 2000
+			});
+			setTimeout(
+				() => {
+
+					goto('/admin/home/');
+
+				},
+				2000
+			);
+
+		} else {
+
+			Monolog.show({
+				text: `Failed to delete error with ID '${id}'!`,
 				durationMs: 2000
 			});
 

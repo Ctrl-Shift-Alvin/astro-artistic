@@ -1,11 +1,13 @@
 import {
-	useState, useLayoutEffect
+	useState,
+	useLayoutEffect
 } from 'react';
 import { Monolog } from '@/components/components/MonologProvider';
 import { type TContactFormEntry } from '@/components/types';
 import { getContactForm } from '@/frontend/adminTools';
+import { defaultFormatDateTimeString } from '@/shared/dataParse';
 
-export const AdminContactSubmissionOverview = ({ submissionId }: { submissionId: string }) => {
+export const AdminContactSubmissionOverview = ({ submissionId }: { submissionId: number | string }) => {
 
 	const [
 		submission,
@@ -55,11 +57,11 @@ export const AdminContactSubmissionOverview = ({ submissionId }: { submissionId:
 
 				<div>
 					<h1 className={'font-bold'}>
-						{'Created at'}
+						{'Created At'}
 					</h1>
 
 					<p>
-						{submission?.createdAt}
+						{defaultFormatDateTimeString(new Date(submission?.createdAt ?? ''))}
 					</p>
 				</div>
 

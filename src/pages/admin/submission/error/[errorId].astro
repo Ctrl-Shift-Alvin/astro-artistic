@@ -12,11 +12,12 @@ import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { adminIsSetup } from '@/backend/admin';
 import { Button } from '@/components/components/Button';
+import { AdminErrorSubmissionOverview } from '@/components/partials/admin/AdminErrorSubmissionOverview';
 
 if (!adminIsSetup)
 	return Astro.redirect('/');
 
-const { submissionId = '-1' } = Astro.params;
+const { errorId = '-1' } = Astro.params;
 
 const translation = getTranslation(
 	cGetUserLanguage(Astro) || defaultLanguageCode
@@ -45,19 +46,19 @@ const prevUrl = decodeURIComponent(Astro.url.searchParams.get('prevUrl') ?? '');
 ---
 <Base
 	head={{
-		title: 'Submission ' + submissionId,
-		description: 'Seeing submission ' + submissionId
+		title: 'Submission ' + errorId,
+		description: 'Seeing submission ' + errorId
 	}}
 	translation={translation}
 >
-	<Section center title={`Contact Submission ID '${submissionId}'`}>
-		<AdminContactSubmissionOverview submissionId={submissionId} client:only="react" />
+	<Section center title={`Contact Submission ID '${errorId}'`}>
+		<AdminErrorSubmissionOverview submissionId={errorId} client:only="react" />
 	</Section>
 	<Section center className="pt-8">
 			<Button
 				actionPayload={{
-					action: 'adminDeleteContactSubmission',
-					args: [submissionId]
+					action: 'adminDeleteError',
+					args: [errorId]
 				}}
 				client:only="react"
 			>

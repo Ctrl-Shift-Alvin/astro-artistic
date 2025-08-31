@@ -1,0 +1,9 @@
+/*
+* // TODO Add missing overview pages
+* // TODO Abstract BaseAdmin
+* // TODO Check React patterns for better usage of useCallback
+* // TODO Implement errors API
+* // TODO Implement middleware for error submission
+* // TODO Add useful comments throughout project
+* // TODO Fix sizeError threashold
+*/

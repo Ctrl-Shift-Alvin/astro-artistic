@@ -222,7 +222,7 @@ export const AdminErrorsTable = ({ buildNumber }: { buildNumber?: number }) => {
 										<td className={tdClassName}>
 											<A
 												className={'text-center underline'}
-												href={`/admin/submission/errors/${entry.id}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
+												href={`/admin/submission/error/${entry.id}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
 											>
 												{entry.id}
 											</A>
@@ -234,7 +234,12 @@ export const AdminErrorsTable = ({ buildNumber }: { buildNumber?: number }) => {
 										</td>
 
 										<td className={tdClassName}>
-											{entry.buildNumber}
+											<A
+												className={'underline'}
+												href={`/admin/submission/build/${entry.buildNumber}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
+											>
+												{entry.buildNumber}
+											</A>
 										</td>
 
 										<td className={tdClassName}>
@@ -273,11 +278,6 @@ export const AdminErrorsTable = ({ buildNumber }: { buildNumber?: number }) => {
 											</A>
 										</td>
 
-										{
-
-											// TODO Add error search based on build
-
-										}
 									</tr>
 
 									<tr>
@@ -352,12 +352,6 @@ export const AdminErrorsTable = ({ buildNumber }: { buildNumber?: number }) => {
 						{'Show more...'}
 					</A>
 				)
-			}
-
-			{
-
-				// TODO Add submission page
-
 			}
 
 		</>

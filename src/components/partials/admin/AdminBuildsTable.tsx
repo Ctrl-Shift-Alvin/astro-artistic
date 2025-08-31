@@ -7,14 +7,12 @@ import clsx from 'clsx/lite';
 import { TBuild } from '@/components/types';
 import {
 	getBuildIndex,
-	deleteBuild,
 	countBuilds
 } from '@/frontend/adminTools';
 import { ErrorsConfig } from '@/shared/config/errors';
 import { A } from '@/components/components/A';
-import { Dialog } from '@/components/components/DialogProvider';
-import { Monolog } from '@/components/components/MonologProvider';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
+import { executeAsyncAction } from '@/shared/actions';
 
 export const AdminBuildsTable = () => {
 
@@ -77,24 +75,10 @@ export const AdminBuildsTable = () => {
 
 	const remove = async(buildNumber: number | string) => {
 
-		if (
-			!await Dialog.yesNo(
-				'Are you sure you want to delete this build?',
-				`This will irreversibly remove the build with the build number '${buildNumber}'.`
-			)
-		)
-			return;
-
-		const result = await deleteBuild(buildNumber);
-		if (result) {
-
-			Monolog.show({ text: `Successfully deleted build '${buildNumber}'!` });
-
-		} else {
-
-			Monolog.show({ text: `Failed deleting build '${buildNumber}'!` });
-
-		}
+		await executeAsyncAction({
+			action: 'adminDeleteBuild',
+			args: [ buildNumber ]
+		});
 
 		void index(buildsCount);
 
@@ -195,7 +179,12 @@ export const AdminBuildsTable = () => {
 								<tr key={entry.buildNumber}>
 
 									<td className={tdClassName}>
-										{entry.buildNumber}
+										<A
+											className={'text-center underline'}
+											href={`/admin/submission/build/${entry.buildNumber}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
+										>
+											{entry.buildNumber}
+										</A>
 									</td>
 
 									<td className={tdClassName}>
@@ -244,11 +233,6 @@ export const AdminBuildsTable = () => {
 											{'D'}
 										</A>
 									</td>
-
-									{
-
-										// TODO Add error search based on build
-									}
 								</tr>
 							);
 
