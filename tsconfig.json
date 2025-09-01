@@ -4,14 +4,12 @@
 		"module": "esnext",
 		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
-
 		"removeComments": true,
 		"preserveConstEnums": true,
 		"strict": true,
 		"alwaysStrict": true,
 		"strictNullChecks": true,
 		"noUncheckedIndexedAccess": true,
-
 		"noImplicitAny": true,
 		"noImplicitReturns": true,
 		"noImplicitThis": true,
@@ -20,23 +18,20 @@
 		"allowUnreachableCode": false,
 		"noFallthroughCasesInSwitch": true,
 		"noEmit": true,
-
 		"declaration": true,
-
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"allowJs": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
-
 		"jsx": "react-jsx",
 		"jsxImportSource": "react",
 		"isolatedModules": true,
-		"types": ["vite/client"],
-
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": [
+				"./src/*"
+			]
 		}
 	},
 	"include": [

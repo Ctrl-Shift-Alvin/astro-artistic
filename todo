@@ -1,9 +1,11 @@
-/*
-* // TODO Add event overview page
-* // TODO Abstract BaseAdmin
-* // TODO Check React patterns for better usage of useCallback
-* // TODO Implement errors API
-* // TODO Implement middleware for error submission
-* // TODO Add useful comments throughout project
-* // TODO Fix sizeError threashold
-*/
+TODO Remove boilerplate 'translation fetch' code in .astro pages (use callback prop with translation args instead)... WORKS, but how to 'propagate' translation back upwards
+TODO Add timeout to Loader
+TODO Astro template for light pages (for caching)
+TODO Add event overview page
+TODO Abstract BaseAdmin
+TODO Check React patterns for better usage of useCallback
+TODO Change class and className patterns, and replace with clsx
+TODO Implement errors API
+TODO Implement middleware for error submission
+TODO Add useful comments throughout project
+TODO Fix sizeError threashold

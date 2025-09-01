@@ -85,7 +85,7 @@ export const logout = async() => {
 		lsSetAuthTokenExpiry(null);
 		clearTimeout(currentTimeout);
 		logoutCallback();
-		logoutCallback = () => {};
+		logoutCallback = () => { /* noop */ };
 
 	}
 

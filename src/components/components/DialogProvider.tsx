@@ -99,6 +99,7 @@ export class Dialog {
 	/**
 	 * Closes the currently open dialog.
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	static close = () => {};
 
 	/**

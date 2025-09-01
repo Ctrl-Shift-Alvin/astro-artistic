@@ -393,6 +393,8 @@ export default eslintTs.config([
         extraFileExtensions: ['.astro'],
         sourceType: 'module',
         ecmaVersion: 'latest',
+				project: './tsconfig.json',
+				tsconfigRootDir: import.meta.dirname
       },
     },
 		rules: {
@@ -606,9 +608,26 @@ export default eslintTs.config([
         onlyOneSimpleParam: false
       }],
       '@stylistic/no-extra-parens': ['error', 'all', {
-        ignoreJSX: 'all',
-        enforceForArrowConditionals: false,
-				nestedBinaryExpressions: false
+        ignoreJSX: 'multi-line',
+				ignoredNodes: [
+
+					// Arrow function ternaries
+					'ArrowFunctionExpression[body.type="ConditionalExpression"]',
+					'ArrowFunctionExpression > ParenthesizedExpression > ConditionalExpression',
+
+					// Nested binary expressions (direct child)
+					'BinaryExpression > BinaryExpression',
+
+					// Triple-nested or deeply nested inside another expression
+					'BinaryExpression > BinaryExpression > BinaryExpression',
+
+					// Specifically ignore parenthesized binary expressions used as the RHS of assignments
+					'AssignmentExpression > ParenthesizedExpression > BinaryExpression',
+
+					// Also ignore parenthesized binary expressions used as operands of bitwise expressions
+					'BinaryExpression > ParenthesizedExpression > BinaryExpression'
+
+				]
       }],
       '@stylistic/no-extra-semi': ['error'],
       '@stylistic/no-floating-decimal': ['error'],

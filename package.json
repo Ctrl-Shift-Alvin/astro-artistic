@@ -78,6 +78,6 @@
 	"type": "module",
 	"version": "1.0.0",
 	"volta": {
-		"node": "16.15.1"
+		"node": "20.3.0"
 	}
 }

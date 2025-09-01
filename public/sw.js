@@ -200,7 +200,7 @@ function calculateHash(buffer) {
 	for (let i = 0; i < view.length; i++) {
 
 		// hash * 33 + current byte -> truncate
-		hash = (((hash << 5) + hash) + view[i]) | 0;
+		hash = (((hash << 5) + hash) + view[i]) | 0; /* eslint-disable-line @stylistic/no-extra-parens */
 
 	}
 
