@@ -2,24 +2,17 @@
 import PaginationButtons from '@/components/astro-components/PaginationButtons.astro';
 import Section from '@/components/astro-components/Section.astro';
 import { BlogGallery } from '@/components/partials/BlogGallery';
-import { IBlogFrontmatter, IBlogMarkdownInstance } from '@/components/types';
+import {
+	IBlogFrontmatter,
+	IBlogMarkdownInstance
+} from '@/components/types';
 import { BlogConfig } from '@/shared/config/blog';
 import { GlobalTranslation } from '@/locales/global';
 import Base from '@/templates/Base.astro';
-import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
-import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
 import { getSortedBlogs } from '@/backend/blogs';
 
-const translation = getTranslation(
-	cGetUserLanguage(Astro) || defaultLanguageCode
-);
-if (!translation) {
-	if (cGetUserLanguage(Astro) === null) {
-		throw new Error('Could not load translations.');
-	} else {
-		cSetUserLanguage(null);
-	}
-}
+const translation = Astro.locals.translation;
+
 const config = BlogConfig(translation);
 
 const getPageUrl = (page: number) => {
@@ -50,7 +43,7 @@ const title = `${config.title}${Number(page) > 1 ? ` ${translation.pagination.pa
 const description = config.description;
 ---
 
-<Base head={{ title, description }} translation={translation}>
+<Base head={{ title, description }}>
 	<Section title={config.title}>
 		<div class="w-full text-center mt-2">
 			{description}

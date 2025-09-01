@@ -1,6 +1,9 @@
 ---
-import { availableLanguages, defaultLanguageCode } from '@/backend/i18n';
-import { GlobalTranslation, ITranslation } from '@/locales/global';
+import {
+	availableLanguages,
+	defaultLanguageCode
+} from '@/backend/i18n';
+import { GlobalTranslation } from '@/locales/global';
 import '@/styles/global.css';
 import { DialogProvider } from '@/components/components/DialogProvider';
 import Loader from '@/components/astro-components/Loader.astro';
@@ -12,12 +15,14 @@ import { ScrollUp } from '@/components/components/ScrollUp';
 import { Navbar } from '@/components/partials/Navbar';
 
 export interface Props {
-	head: { title: string; description: string };
-	translation: ITranslation;
-	className?: string;
+	head: {
+		title: string;
+		description: string
+	};
 	noTopPadding?: boolean;
 }
-const { head, translation, noTopPadding } = Astro.props as Props;
+const { head, noTopPadding } = Astro.props as Props;
+const translation = Astro.locals.translation;
 ---
 
 <html class="bg-gradient-to-b from-black via-black to-gray-900 text-gray-100">

@@ -2,16 +2,10 @@
 import Section from '@/components/astro-components/Section.astro';
 import { AdminLogout } from '@/components/partials/admin/AdminLogout';
 import Base from '@/templates/Base.astro';
-import {
-	cGetAuthToken,
-	cGetUserLanguage,
-	cSetUserLanguage
-} from '@/shared/cookies';
-import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
+import { cGetAuthToken } from '@/shared/cookies';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { adminIsSetup } from '@/backend/admin';
 import { AdminErrorsTable } from '@/components/partials/admin/AdminErrorsTable';
-import { Button } from '@/components/components/Button';
 import { AdminBuildOverview } from '@/components/partials/admin/AdminBuildOverview';
 import { AdminOverviewButtons } from '@/components/partials/admin/AdminOverviewButtons';
 
@@ -34,17 +28,6 @@ try {
 
 }
 
-const translation = getTranslation(
-	cGetUserLanguage(Astro) || defaultLanguageCode
-);
-if (!translation) {
-	if (cGetUserLanguage(Astro) === null) {
-		throw new Error('Could not load translations.');
-	} else {
-		cSetUserLanguage(null);
-	}
-}
-
 const token = cGetAuthToken(Astro);
 if (token) {
 	const tokenExpiry = ((await jwtDecode(token)) as JwtPayload).exp;
@@ -62,7 +45,6 @@ if (token) {
 		title: 'Submission ' + buildNumber,
 		description: 'Seeing submission ' + buildNumber
 	}}
-	translation={translation}
 >
 	<Section center title={`Build ID '${buildNumber}' Overview`}>
 		<AdminBuildOverview buildNumber={buildNumber} client:only="react" />

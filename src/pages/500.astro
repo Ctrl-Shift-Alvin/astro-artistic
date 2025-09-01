@@ -2,8 +2,6 @@
 import Section from '@/components/astro-components/Section.astro';
 import { Button } from '@/components/components/Button';
 import Base from '@/templates/Base.astro';
-import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
-import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
 import { A } from '@/components/components/A';
 
 interface Props {
@@ -44,16 +42,8 @@ try { // Cannot let 500 page fail, so just to be sure, use try block
 
 }
 
-const translation = getTranslation(
-	cGetUserLanguage(Astro) || defaultLanguageCode
-);
-if (!translation) {
-	if (cGetUserLanguage(Astro) === null) {
-		console.log('Could not load translations.'); // Don't throw error on 500 page, just log it and pray to God
-	} else {
-		cSetUserLanguage(null);
-	}
-}
+const translation = Astro.locals.translation;
+
 ---
 
 <Base
@@ -61,7 +51,6 @@ if (!translation) {
 		title: translation.fiveHundreed.title,
 		description: translation.fiveHundreed.description
 	}}
-	translation={translation}
 >
 	<Section center={true} title={translation.fiveHundreed.title}>
 

@@ -1,4 +1,3 @@
-TODO Remove boilerplate 'translation fetch' code in .astro pages (use callback prop with translation args instead)... WORKS, but how to 'propagate' translation back upwards
 TODO Add timeout to Loader
 TODO Astro template for light pages (for caching)
 TODO Add event overview page

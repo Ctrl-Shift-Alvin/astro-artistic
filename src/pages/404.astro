@@ -2,21 +2,9 @@
 import Section from '@/components/astro-components/Section.astro';
 import { A } from '@/components/components/A';
 import { Button } from '@/components/components/Button';
+import { ITranslation } from '@/locales/global';
 import Base from '@/templates/Base.astro';
-import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
-import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
 import { distance } from 'fastest-levenshtein';
-
-const translation = getTranslation(
-	cGetUserLanguage(Astro) || defaultLanguageCode
-);
-if (!translation) {
-	if (cGetUserLanguage(Astro) === null) {
-		throw new Error('Could not load translations.');
-	} else {
-		cSetUserLanguage(null);
-	}
-}
 
 const pageModules = import.meta.glob('./**/*.astro', { eager: true });
 const allRoutes = Object.keys(pageModules)
@@ -57,11 +45,10 @@ const suggestions = getSuggestions(requestedPath, allRoutes);
 ---
 
 <Base
-	head={{
+	head={(translation: ITranslation) => ({
 		title: translation.fourOfour.title,
 		description: translation.fourOfour.description
-	}}
-	translation={translation}
+	})}
 >
 	<Section center={true} title={translation.fourOfour.title}>
 		<p class="newlines text-center">{translation.fourOfour.description}</p>

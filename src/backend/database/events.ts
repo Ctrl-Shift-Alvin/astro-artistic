@@ -31,14 +31,14 @@ const events_createDbIfNotExists = (): boolean => {
 	try {
 
 		const dbSetupQuery
-		= 'CREATE TABLE IF NOT EXISTS events ('
-			+ 'id INTEGER PRIMARY KEY AUTOINCREMENT,'
-			+ 'title TEXT NOT NULL,'
-			+ 'dateTime TEXT NOT NULL,'
-			+ 'location TEXT NOT NULL,'
-			+ 'enablePage BOOLEAN NOT NULL CHECK (enablePage IN (0, 1)),'
-			+ 'createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
-			+ ');';
+			= 'CREATE TABLE IF NOT EXISTS events ('
+				+ 'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+				+ 'title TEXT NOT NULL,'
+				+ 'dateTime TEXT NOT NULL,'
+				+ 'location TEXT NOT NULL,'
+				+ 'enablePage BOOLEAN NOT NULL CHECK (enablePage IN (0, 1)),'
+				+ 'createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+				+ ');';
 		const dbVersionQuery = 'user_version = 0;';
 
 		db

@@ -1,13 +1,6 @@
 import { type ILocale } from '../locales/locales.config';
 import { type ITranslation } from '@/locales/global';
 
-declare global {
-	interface Window {
-		// eslint-disable-next-line @typescript-eslint/naming-convention
-		__TRANSLATION__: ITranslation;
-	}
-}
-
 // Get locales config json file and parse
 const localesModule = await import('../locales/locales.config');
 const locales = localesModule.LocalesConfig;
@@ -35,11 +28,9 @@ const promises = locales.languages.map(async(lang) => {
 // Wait for all translation files to be loaded
 await Promise.all(promises);
 
-export function getTranslation(langCode: string): ITranslation {
+export function getTranslation(langCode: string): ITranslation | undefined {
 
 	const translation = translations[langCode];
-	if (!translation)
-		throw new Error('Failed to load default translation!');
 	return translation;
 
 }
@@ -50,6 +41,10 @@ export const defaultLanguageCode = preferredCode;
 
 export function getDefaultTranslation(): ITranslation {
 
-	return getTranslation(defaultLanguageCode);
+	const translation = getTranslation(defaultLanguageCode);
+	if (!translation)
+		throw new Error('Couldn\'t get default translation!');
+
+	return translation;
 
 }

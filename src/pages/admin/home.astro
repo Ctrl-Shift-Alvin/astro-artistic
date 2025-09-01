@@ -5,30 +5,17 @@ import { AdminContactSubmissionTable } from '@/components/partials/admin/AdminCo
 import { AdminEventsTable } from '@/components/partials/admin/AdminEventsTable';
 import { AdminLogout } from '@/components/partials/admin/AdminLogout';
 import Base from '@/templates/Base.astro';
+import { cGetAuthToken } from '@/shared/cookies';
 import {
-	cGetAuthToken,
-	cGetUserLanguage,
-	cSetUserLanguage
-} from '@/shared/cookies';
-import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
-import { jwtDecode, JwtPayload } from 'jwt-decode';
+	jwtDecode,
+	JwtPayload
+} from 'jwt-decode';
 import { adminIsSetup } from '@/backend/admin';
 import { AdminBuildsTable } from '@/components/partials/admin/AdminBuildsTable';
 import { AdminErrorsTable } from '@/components/partials/admin/AdminErrorsTable';
 
 if (!adminIsSetup)
 	return Astro.redirect('/');
-
-const translation = getTranslation(
-	cGetUserLanguage(Astro) || defaultLanguageCode
-);
-if (!translation) {
-	if (cGetUserLanguage(Astro) === null) {
-		throw new Error('Could not load translations.');
-	} else {
-		cSetUserLanguage(null);
-	}
-}
 
 const token = cGetAuthToken(Astro);
 if (token) {
@@ -48,7 +35,6 @@ if (token) {
 		title: 'Admin',
 		description: 'Admin page'
 	}}
-	translation={translation}
 >
 	<Section center title="Contact Form Submissions">
 		<AdminContactSubmissionTable client:only="react" />

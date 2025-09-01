@@ -20,7 +20,7 @@ export async function GET(context: APIContext) {
 	const rssResponse = await rss({
 		title: `${GlobalTranslation.author}'s Events`,
 		description: `${GlobalTranslation.author} event schedule.`,
-		site: context.site?.href || import.meta.env.SITE as string,
+		site: context.site?.href || import.meta.env.SITE,
 		items: items,
 		stylesheet: 'style.xsl',
 		customData: '<language>en-gb</language>'

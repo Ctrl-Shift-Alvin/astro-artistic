@@ -1,20 +1,9 @@
 ---
-import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
-import { getTranslation, defaultLanguageCode } from '@/backend/i18n';
-import { GlobalTranslation, type ITranslation } from '@/locales/global';
-
+import { GlobalTranslation } from '@/locales/global';
 import '@/styles/global.css';
 
-const translation: ITranslation = getTranslation(
-	cGetUserLanguage(Astro) || defaultLanguageCode
-);
-if (!translation) {
-	if (cGetUserLanguage(Astro) === null) {
-		throw new Error('Could not load translations.');
-	} else {
-		cSetUserLanguage(null);
-	}
-}
+const translation = Astro.locals.translation;
+
 ---
 
 <head>

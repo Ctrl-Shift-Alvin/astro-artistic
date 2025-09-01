@@ -4,19 +4,9 @@ import Section from '@/components/astro-components/Section.astro';
 import { A } from '@/components/components/A';
 import { GlobalTranslation } from '@/locales/global';
 import Base from '@/templates/Base.astro';
-import { cGetUserLanguage, cSetUserLanguage } from '@/shared/cookies';
-import { defaultLanguageCode, getTranslation } from '@/backend/i18n';
 
-const translation = getTranslation(
-	cGetUserLanguage(Astro) || defaultLanguageCode
-);
-if (!translation) {
-	if (cGetUserLanguage(Astro) === null) {
-		throw new Error('Could not load translations.');
-	} else {
-		cSetUserLanguage(null);
-	}
-}
+const translation = Astro.locals.translation;
+
 ---
 
 <Base
@@ -24,7 +14,6 @@ if (!translation) {
 		title: translation.siteInfo.title,
 		description: translation.siteInfo.title
 	}}
-	translation={translation}
 >
 	<Section>
 		<Card title={translation.siteInfo.title}>
