@@ -1,8 +1,6 @@
 {
+	"extends": "astro/tsconfigs/strict",
 	"compilerOptions": {
-		"target": "esnext",
-		"module": "esnext",
-		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
 		"removeComments": true,
 		"preserveConstEnums": true,
@@ -26,7 +24,7 @@
 		"forceConsistentCasingInFileNames": true,
 		"jsx": "react-jsx",
 		"jsxImportSource": "react",
-		"isolatedModules": true,
+		"isolatedModules": false,
 		"baseUrl": ".",
 		"paths": {
 			"@/*": [

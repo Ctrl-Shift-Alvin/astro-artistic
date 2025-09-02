@@ -3,7 +3,7 @@ import {
 	useLayoutEffect
 } from 'react';
 import { Monolog } from '@/components/components/MonologProvider';
-import { TBuild } from '@/components/types';
+import { type TBuild } from '@/components/types';
 import { getBuild } from '@/frontend/adminTools';
 import { A } from '@/components/components/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';

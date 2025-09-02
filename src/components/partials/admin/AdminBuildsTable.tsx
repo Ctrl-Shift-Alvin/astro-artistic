@@ -4,7 +4,7 @@ import {
 	useState
 } from 'react';
 import clsx from 'clsx/lite';
-import { TBuild } from '@/components/types';
+import { type TBuild } from '@/components/types';
 import {
 	getBuildIndex,
 	countBuilds

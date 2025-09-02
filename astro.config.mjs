@@ -33,10 +33,6 @@ export default defineConfig({
 				'nasty', 'testsite.local'
 			],
 			cors: true,
-			plugins: [
-				tailwindcss(),
-				react({ include: /\.(mdx|js|jsx|ts|tsx)$/ })
-			],
 			hmr: true
 		},
 		resolve: {

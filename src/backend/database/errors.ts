@@ -5,10 +5,12 @@ import z from 'zod';
 import { ErrorsConfig as SharedErrorsConfig } from '@/shared/config/errors';
 import { ErrorsConfig } from '@/backend/config/errors';
 import {
-	TError,
+	type TError,
+	type TErrorSubmission,
+	type TBuild
+} from '@/components/types';
+import {
 	ZError,
-	TErrorSubmission,
-	TBuild,
 	ZBuild
 } from '@/components/types';
 

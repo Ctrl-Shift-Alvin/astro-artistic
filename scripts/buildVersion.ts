@@ -2,7 +2,7 @@ import fs from 'fs';
 import { execSync } from 'child_process';
 import path from 'node:path';
 import { errors_addBuild } from '../src/backend/database/errors';
-import { TBuild } from '@/components/types';
+import { type TBuild } from '@/components/types';
 
 const gitBranch = execSync('git rev-parse --abbrev-ref HEAD')
 	.toString()

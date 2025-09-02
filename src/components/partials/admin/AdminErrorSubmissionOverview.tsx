@@ -3,7 +3,7 @@ import {
 	useLayoutEffect
 } from 'react';
 import { Monolog } from '@/components/components/MonologProvider';
-import { TError } from '@/components/types';
+import { type TError } from '@/components/types';
 import { getError } from '@/frontend/adminTools';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 import { A } from '@/components/components/A';

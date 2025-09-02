@@ -7,7 +7,7 @@ import {
 	executeAction,
 	executeAsyncAction,
 	isSyncPayload,
-	TActionPayload
+	type TActionPayload
 } from '@/shared/actions';
 
 type IButtonProps = {

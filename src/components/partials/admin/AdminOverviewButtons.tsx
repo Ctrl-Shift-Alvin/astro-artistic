@@ -1,5 +1,5 @@
 import { Button } from '@/components/components/Button';
-import { TActionPayload } from '@/shared/actions';
+import { type TActionPayload } from '@/shared/actions';
 
 export const AdminOverviewButtons = ({ removeButtonPayload }: { removeButtonPayload?: TActionPayload }) => {
 

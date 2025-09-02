@@ -3,7 +3,7 @@ import React, {
 	useLayoutEffect,
 	useState
 } from 'react';
-import { TError } from '@/components/types';
+import { type TError } from '@/components/types';
 import {
 	getErrorIndex,
 	deleteError,

@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
-import { TEventsEntry } from '@/components/types';
+import { type TEventsEntry } from '@/components/types';
 
 export const EventsPost = ({
 	eventEntry,

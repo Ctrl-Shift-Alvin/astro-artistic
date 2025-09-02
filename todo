@@ -1,10 +1,10 @@
-TODO Add timeout to Loader
-TODO Astro template for light pages (for caching)
-TODO Add event overview page
 TODO Abstract BaseAdmin
+TODO Astro template for light pages (for caching)
+TODO Add timeout to Loader
+TODO Fix sizeError threashold
+TODO Add event overview page
 TODO Check React patterns for better usage of useCallback
 TODO Change class and className patterns, and replace with clsx
 TODO Implement errors API
 TODO Implement middleware for error submission
 TODO Add useful comments throughout project
-TODO Fix sizeError threashold
