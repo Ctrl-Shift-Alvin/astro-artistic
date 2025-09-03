@@ -1,34 +1,27 @@
 ---
 import Section from '@/components/astro-components/Section.astro';
-import { AdminLogout } from '@/components/partials/admin/AdminLogout';
-import Base from '@/templates/Base.astro';
-import { cGetAuthToken } from '@/shared/cookies';
-import {
-	jwtDecode,
-	JwtPayload
-} from 'jwt-decode';
-import { adminIsSetup } from '@/backend/admin';
 import { AdminErrorSubmissionOverview } from '@/components/partials/admin/AdminErrorSubmissionOverview';
 import { AdminOverviewButtons } from '@/components/partials/admin/AdminOverviewButtons';
-
-if (!adminIsSetup)
-	return Astro.redirect('/');
+import BaseAdmin from '@/templates/BaseAdmin.astro';
 
 const { errorId = '-1' } = Astro.params;
 
-const token = cGetAuthToken(Astro);
-if (token) {
-	const tokenExpiry = ((await jwtDecode(token)) as JwtPayload).exp;
-	if (tokenExpiry) {
-		if (Date.now() - tokenExpiry * 1000 > 0) {
-			return Astro.redirect('/admin/login/');
-		}
-	}
-} else {
-	return Astro.redirect('/admin/login/');
+let errorIdInt;
+try {
+
+	errorIdInt = parseInt(errorId);
+	if (!errorIdInt)
+		throw new Error();
+
+} catch {
+
+	Astro.response.status = 400;
+	Astro.response.statusText = 'bad-request';
+
 }
+
 ---
-<Base
+<BaseAdmin
 	head={{
 		title: 'Submission ' + errorId,
 		description: 'Seeing submission ' + errorId
@@ -46,7 +39,4 @@ if (token) {
 			client:only="react"
 		/>
 	</Section>
-	<Section center>
-		<AdminLogout client:only="react" />
-	</Section>
-</Base>
+</BaseAdmin>

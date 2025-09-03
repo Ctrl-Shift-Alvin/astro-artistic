@@ -6,9 +6,9 @@ import { cSetAuthToken } from '@/shared/cookies';
 import {
 	ZAuthDeleteApiResponse, ZAuthPostApiRequest, ZAuthPostApiResponse
 } from '@/components/types';
-import { adminIsSetup } from '@/backend/admin';
+import { isAdminSetup } from '@/backend/admin';
 
-if (!adminIsSetup)
+if (!isAdminSetup)
 	throw new Error('Admin page is not setup but accessed!');
 
 const ADMIN_PASSWORD_HASH = import.meta.env.ADMIN_PASSWORD_HASH as string;

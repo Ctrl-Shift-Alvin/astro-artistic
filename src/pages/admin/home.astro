@@ -3,34 +3,12 @@ import Section from '@/components/astro-components/Section.astro';
 import { AdminBlogEditor } from '@/components/partials/admin/AdminBlogEditor';
 import { AdminContactSubmissionTable } from '@/components/partials/admin/AdminContactSubmissionTable';
 import { AdminEventsTable } from '@/components/partials/admin/AdminEventsTable';
-import { AdminLogout } from '@/components/partials/admin/AdminLogout';
-import Base from '@/templates/Base.astro';
-import { cGetAuthToken } from '@/shared/cookies';
-import {
-	jwtDecode,
-	JwtPayload
-} from 'jwt-decode';
-import { adminIsSetup } from '@/backend/admin';
+import BaseAdmin from '@/templates/BaseAdmin.astro';
 import { AdminBuildsTable } from '@/components/partials/admin/AdminBuildsTable';
 import { AdminErrorsTable } from '@/components/partials/admin/AdminErrorsTable';
-
-if (!adminIsSetup)
-	return Astro.redirect('/');
-
-const token = cGetAuthToken(Astro);
-if (token) {
-	const tokenExpiry = ((await jwtDecode(token)) as JwtPayload).exp;
-	if (tokenExpiry) {
-		if (Date.now() - tokenExpiry * 1000 > 0) {
-			return Astro.redirect('/admin/login/');
-		}
-	}
-} else {
-	return Astro.redirect('/admin/login/');
-}
 ---
 
-<Base
+<BaseAdmin
 	head={{
 		title: 'Admin',
 		description: 'Admin page'
@@ -51,7 +29,4 @@ if (token) {
 	<Section title="Manage Errors" center>
 		<AdminErrorsTable client:only="react" />
 	</Section>
-	<Section center>
-		<AdminLogout client:only="react" />
-	</Section>
-</Base>
+</BaseAdmin>

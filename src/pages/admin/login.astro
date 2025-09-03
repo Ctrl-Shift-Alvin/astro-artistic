@@ -1,33 +1,17 @@
 ---
 import Section from '@/components/astro-components/Section.astro';
 import { AdminLoginForm } from '@/components/partials/admin/AdminLoginForm';
-import Base from '@/templates/Base.astro';
-import { cGetAuthToken } from '@/shared/cookies';
-import { JwtPayload } from 'jsonwebtoken';
-import { jwtDecode } from 'jwt-decode';
-import { adminIsSetup } from '@/backend/admin';
-
-if (!adminIsSetup)
-	return Astro.redirect('/');
-
-const token = cGetAuthToken(Astro);
-if (token) {
-	const tokenExpiry = ((await jwtDecode(token)) as JwtPayload).exp;
-	if (tokenExpiry) {
-		if (Date.now() - tokenExpiry * 1000 <= 0) {
-			return Astro.redirect('/admin/home/');
-		}
-	}
-}
+import BaseAdmin from '@/templates/BaseAdmin.astro';
 ---
 
-<Base
+<BaseAdmin
 	head={{
 		title: 'Admin',
 		description: 'Admin page'
 	}}
+	noLogoutComponent={true}
 >
 	<Section id="auth-form">
 		<AdminLoginForm client:only="react" />
 	</Section>
-</Base>
+</BaseAdmin>

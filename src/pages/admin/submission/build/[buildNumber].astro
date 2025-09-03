@@ -1,16 +1,9 @@
 ---
 import Section from '@/components/astro-components/Section.astro';
-import { AdminLogout } from '@/components/partials/admin/AdminLogout';
-import Base from '@/templates/Base.astro';
-import { cGetAuthToken } from '@/shared/cookies';
-import { jwtDecode, JwtPayload } from 'jwt-decode';
-import { adminIsSetup } from '@/backend/admin';
 import { AdminErrorsTable } from '@/components/partials/admin/AdminErrorsTable';
 import { AdminBuildOverview } from '@/components/partials/admin/AdminBuildOverview';
 import { AdminOverviewButtons } from '@/components/partials/admin/AdminOverviewButtons';
-
-if (!adminIsSetup)
-	return Astro.redirect('/');
+import BaseAdmin from '@/templates/BaseAdmin.astro';
 
 const { buildNumber = '-1' } = Astro.params;
 
@@ -27,20 +20,8 @@ try {
 	Astro.response.statusText = 'bad-request';
 
 }
-
-const token = cGetAuthToken(Astro);
-if (token) {
-	const tokenExpiry = ((await jwtDecode(token)) as JwtPayload).exp;
-	if (tokenExpiry) {
-		if (Date.now() - tokenExpiry * 1000 > 0) {
-			return Astro.redirect('/admin/login/');
-		}
-	}
-} else {
-	return Astro.redirect('/admin/login/');
-}
 ---
-<Base
+<BaseAdmin
 	head={{
 		title: 'Submission ' + buildNumber,
 		description: 'Seeing submission ' + buildNumber
@@ -61,7 +42,4 @@ if (token) {
 			client:only="react"
 		/>
 	</Section>
-	<Section center>
-		<AdminLogout client:only="react" />
-	</Section>
-</Base>
+</BaseAdmin>
