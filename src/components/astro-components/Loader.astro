@@ -28,45 +28,43 @@
 			fill="currentColor"
 			d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
 	</svg>
-	<script> // Removes loader when react is hydrated
+	<script is:inline> // Removes loader when react is hydrated
 
-		let loaderRemoved = false;
 		const loader = document.getElementById('loader');
 		if (!loader) {
 			throw new Error('Could not find \'loader\' element!');
 		}
 
-		const removeLoader = () => {
+		window.removeLoader = () => {
 
-			if (loaderRemoved)
+			if (window.loaderRemoved == true)
 				return;
 
 			loader.classList.replace('opacity-100', 'opacity-0');
 			loader.classList.add('pointer-events-none');
 			setTimeout(() => loader.remove(), 1000);
-			loaderRemoved = true;
+
+			window.removeEventListener('react-hydrated', window.removeLoader);
+
+			window.loaderRemoved = true;
+			window.removeLoader = undefined;
 
 		};
 
-		window.addEventListener('react-hydrated', () => {
+		window.addEventListener('react-hydrated', window.removeLoader);
 
-			removeLoader();
-			window.removeEventListener('react-hydrated', removeLoader);
+	</script>
 
-		});
+	<script is:inline> // Removes loader if it times out (after 2s)
 		setTimeout(() => {
 
-			if (!loaderRemoved) {
+			if (window.loaderRemoved == false) {
 
-				removeLoader();
-				window.removeEventListener('react-hydrated', removeLoader);
+				window.removeLoader();
 				console.error('Loader timed out after 2 seconds!');
 
 			}
 
 		}, 2000); // Timeout after 2s
-
-		
-
 	</script>
 </div>

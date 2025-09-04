@@ -1,4 +1,3 @@
-TODO Add timeout to Loader
 TODO Fix sizeError threashold
 TODO Add event overview page
 TODO Check React patterns for better usage of useCallback
