@@ -1,0 +1,41 @@
+---
+import { GlobalTranslation } from '@/locales/global';
+
+import '@/styles/global.css';
+
+const translation = Astro.locals.translation;
+
+---
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>{translation.fourTwentyNine.title}</title>
+	<meta name="description" content={translation.fourTwentyNine.description} />
+	<meta name="author" content={GlobalTranslation.author} />
+	<meta name="theme-color" content="#000000" />
+
+	<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+	<script is:inline define:vars={{ translation }}>
+		window.__TRANSLATION__ = translation;
+	</script>
+</head>
+<body
+	class="flex h-dvh flex-col items-center bg-gradient-to-b from-black via-black to-gray-900 text-gray-100 transition-opacity duration-750 opacity-0 alvins-class"
+>
+
+	<slot />
+
+	<div
+		class="h-sm:hidden fixed bottom-0 w-full max-w-screen-lg border-t border-gray-600 px-3 py-6"
+	>
+		<p class="text-center">
+			© Copyright {new Date().getFullYear()}. {GlobalTranslation.siteName}.
+		</p>
+	</div>
+
+	<script is:inline>
+		// Start transition
+		document.body.classList.replace('opacity-0', 'opacity-100');
+	</script>
+</body>
