@@ -2,26 +2,25 @@
 export interface Props {
 	title?: string;
 	imageUrl: string;
-	className?: string;
 }
 
-const { title, imageUrl, className } = Astro.props;
+const { title, imageUrl } = Astro.props;
 ---
 
-<section class:list={["relative h-dvh w-full overflow-hidden", className]}>
-	<div class="absolute inset-0">
+<section class="relative h-dvh w-full overflow-hidden">
+	<div class="absolute inset-0 flex items-start justify-center pt-[30vh]">
 		<div
 			class="absolute bottom-0 z-10 h-2/5 w-full bg-gradient-to-b from-black/0 to-black/100 align-bottom"
-    >
+		>
 		</div>
 		<img
 			src={imageUrl}
 			alt="Banner Image"
-			class="size-full object-cover brightness-75"
+			class="absolute inset-0 z-0 size-full object-cover brightness-75"
 		/>
 		{
 			title && (
-				<h1 class="absolute top-50 z-20 w-full px-5 text-center text-7xl font-bold">
+				<h1 class="w-full z-10 px-5 text-center font-bold break-words" style="font-size: clamp(2.5rem, 5vh + 3vw, 6rem)">
 					{title}
 				</h1>
 			)
@@ -41,8 +40,7 @@ const { title, imageUrl, className } = Astro.props;
 				stroke="currentColor"
 				stroke-width="2"
 			>
-				<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"
-				></path>
+				<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
 			</svg>
 		</div>
 	</div>
@@ -50,17 +48,23 @@ const { title, imageUrl, className } = Astro.props;
 		import { smoothScroll } from '@/frontend/windowTools';
 
 		if (typeof window !== 'undefined') {
+
 			const btn = document.getElementById('banner-scroll-btn');
 			btn?.addEventListener('click', () => {
+
 				if (window.innerWidth < 640) {
+
 					// fixed navbar would cover content, so account for that
 					smoothScroll(
 						window.innerHeight -
 							(document.querySelector('#hamburger-div')?.scrollHeight || 0),
 						1000
 					);
+
 				} else {
+
 					smoothScroll(window.innerHeight, 1000);
+
 				}
 			});
 		}
