@@ -171,14 +171,18 @@ export const AdminBuildsTable = () => {
 
 							};
 
-							const tdClassName = clsx(
-								'border p-2',
-								entry.buildNumber == window.__BUILD__.buildNumber && 'border-4'
-							);
+							const tdClassName = clsx('border p-2');
 							return (
 								<tr key={entry.buildNumber}>
 
-									<td className={tdClassName}>
+									<td
+										className={
+											clsx(
+												tdClassName,
+												entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-r-1'
+											)
+										}
+									>
 										<A
 											className={'text-center underline'}
 											href={`/admin/submission/build/${entry.buildNumber}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
@@ -187,15 +191,36 @@ export const AdminBuildsTable = () => {
 										</A>
 									</td>
 
-									<td className={tdClassName}>
+									<td
+										className={
+											clsx(
+												tdClassName,
+												entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-x-1'
+											)
+										}
+									>
 										{defaultFormatDateTimeString(new Date(entry.createdAt))}
 									</td>
 
-									<td className={tdClassName}>
+									<td
+										className={
+											clsx(
+												tdClassName,
+												entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-x-1'
+											)
+										}
+									>
 										{entry.gitBranch}
 									</td>
 
-									<td className={tdClassName}>
+									<td
+										className={
+											clsx(
+												tdClassName,
+												entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-x-1'
+											)
+										}
+									>
 										{
 											isGitCommitExpanded
 												? entry.gitCommit
@@ -217,7 +242,14 @@ export const AdminBuildsTable = () => {
 										</A>
 									</td>
 
-									<td className={tdClassName}>
+									<td
+										className={
+											clsx(
+												tdClassName,
+												entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-x-1'
+											)
+										}
+									>
 										{
 											entry.isGitDirty
 												? 'Yes'
@@ -225,7 +257,14 @@ export const AdminBuildsTable = () => {
 										}
 									</td>
 
-									<td className={tdClassName}>
+									<td
+										className={
+											clsx(
+												tdClassName,
+												entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-l-1'
+											)
+										}
+									>
 										<A
 											className={'text-red-600 text-center'}
 											onClick={() => void remove(entry.buildNumber)}

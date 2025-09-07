@@ -1,6 +1,7 @@
 import {
 	useState,
-	useLayoutEffect
+	useLayoutEffect,
+	useCallback
 } from 'react';
 import { Monolog } from '@/components/components/MonologProvider';
 import { type TBuild } from '@/components/types';
@@ -26,24 +27,27 @@ export const AdminBuildOverview = ({ buildNumber }: { buildNumber: number | stri
 
 	};
 
-	const get = async() => {
+	const get = useCallback(
+		async() => {
 
-		const result = await getBuild(buildNumber);
-		if (result) {
+			const result = await getBuild(buildNumber);
+			if (result) {
 
-			setBuild(result);
+				setBuild(result);
 
-		} else {
+			} else {
 
-			Monolog.show({
-				text: 'Failed to fetch the build!',
-				durationMs: 5000
-			});
+				Monolog.show({
+					text: 'Failed to fetch the build!',
+					durationMs: 5000
+				});
 
-		}
-		return null;
+			}
+			return null;
 
-	};
+		},
+		[ buildNumber ]
+	);
 
 	useLayoutEffect(
 		() => {
@@ -51,7 +55,7 @@ export const AdminBuildOverview = ({ buildNumber }: { buildNumber: number | stri
 			void get();
 
 		},
-		[]
+		[ get ]
 	);
 
 	return (
