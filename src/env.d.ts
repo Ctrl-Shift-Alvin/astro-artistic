@@ -14,4 +14,20 @@ declare global {
 	interface Window {
 		__TRANSLATION__: ITranslation;
 	}
+
+	interface String {
+		/**
+		 * Removes the first occurrence of a substring from the string.
+		 * @param {string} substring The substring to remove.
+		 * @returns {string} The string with the first occurrence of the substring removed.
+		 */
+		without(substring: string): string;
+
+		/**
+		 * Removes all occurrences of a substring from the string.
+		 * @param {string} substring The substring to remove.
+		 * @returns {string} The string with all occurrences of the substring removed.
+		 */
+		withoutAll(substring: string): string;
+	}
 }
