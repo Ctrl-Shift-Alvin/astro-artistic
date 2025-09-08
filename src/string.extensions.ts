@@ -43,3 +43,18 @@ if (!String.prototype.withoutAll) {
 	};
 
 }
+
+/**
+ * Capitalizes the first letter of the string.
+ * @returns {string} The string with the first letter capitalized.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+if (!String.prototype.capitalize) {
+
+	String.prototype.capitalize = function(this: string): string {
+
+		return this && this[0]!.toUpperCase() + this.slice(1);
+
+	};
+
+}

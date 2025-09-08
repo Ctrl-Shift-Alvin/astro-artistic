@@ -29,5 +29,11 @@ declare global {
 		 * @returns {string} The string with all occurrences of the substring removed.
 		 */
 		withoutAll(substring: string): string;
+
+		/**
+		 * Capitalizes the first letter of the string.
+		 * @returns {string} The string with the first letter capitalized.
+		 */
+		capitalize(): string;
 	}
 }
