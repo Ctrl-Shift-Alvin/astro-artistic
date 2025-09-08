@@ -12,7 +12,7 @@ export const AdminMarkdownEditor = ({
 	onSave,
 	onChange
 }: {
-	value: string;
+	value: string | undefined;
 	onSave: (newValue: string)=> void;
 	onChange: (newValue: string)=> void;
 }) => {

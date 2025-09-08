@@ -3,7 +3,8 @@ import { Monolog } from '@/components/components/MonologProvider';
 import {
 	deleteBuild,
 	deleteContactForm,
-	deleteError
+	deleteError,
+	deleteEventsEntry
 } from '@/frontend/adminTools';
 import {
 	goto,
@@ -152,6 +153,43 @@ const actions = {
 
 			Monolog.show({
 				text: `Failed to delete error with ID '${id}'!`,
+				durationMs: 2000
+			});
+
+		}
+
+	},
+	adminDeleteEvent: async(id: number | string) => {
+
+		const result = await Dialog.yesNo(
+			'Are you sure you want to delete this event entry?',
+			`This will irreversibly remove the error with ID ${id}.`
+		);
+
+		if (!result)
+			return;
+
+		const deleteResult = await deleteEventsEntry(id);
+
+		if (deleteResult) {
+
+			Monolog.show({
+				text: `Successfully deleted event entry with ID '${id}'!`,
+				durationMs: 2000
+			});
+			setTimeout(
+				() => {
+
+					goto('/admin/home/');
+
+				},
+				2000
+			);
+
+		} else {
+
+			Monolog.show({
+				text: `Failed to delete event entry with ID '${id}'!`,
 				durationMs: 2000
 			});
 

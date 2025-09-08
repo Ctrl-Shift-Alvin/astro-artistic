@@ -425,7 +425,10 @@ export const editEventsEntry = async(
 	return parsedResponse.success && !('error' in parsedResponse.data);
 
 };
-export const getEvent = async(id: string | number): Promise<string | null> => {
+export const getEvent = async(id: string | number): Promise<{
+	data: TEventsEntry;
+	file: string | undefined;
+} | null> => {
 
 	const requestBody = ZProtectedPostApiRequestMap['events/get'].safeParse({ id });
 	if (!requestBody.success)
@@ -443,7 +446,10 @@ export const getEvent = async(id: string | number): Promise<string | null> => {
 
 	const parsedResponse = await TProtectedPostApiResponseMap['events/get'].safeParseAsync(await response.json());
 	return parsedResponse.success && !('error' in parsedResponse.data)
-		? parsedResponse.data.data
+		? {
+			data: parsedResponse.data.data,
+			file: parsedResponse.data.file
+		}
 		: null;
 
 };

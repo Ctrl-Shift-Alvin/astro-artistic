@@ -309,9 +309,11 @@ export const events_createPage = async(id: number | bigint): Promise<boolean> =>
 		EventsConfig.pagesPath,
 		{ withFileTypes: true }
 	);
-	const existing = existingFiles.map((e) => e.name);
 
-	if (existing.find((e) => e === `${id}.md`)) {
+	if (existingFiles
+		.map((e) => e.name)
+		.find((e) => e === `${id}.md`)
+	) {
 
 		return false;
 
@@ -327,9 +329,11 @@ export const events_createPage = async(id: number | bigint): Promise<boolean> =>
 			try {
 
 				const child = spawn(
-					'node',
+					'npm',
 					[
-						'./scripts/createEvent',
+						'run',
+						'createEvent',
+						'--',
 						id.toString()
 					],
 					{ shell: true }

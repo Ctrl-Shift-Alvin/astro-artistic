@@ -1,0 +1,41 @@
+---
+import Section from '@/components/astro-components/Section.astro';
+import { AdminEventsEditor } from '@/components/partials/admin/AdminEventEditor';
+import { AdminOverviewButtons } from '@/components/partials/admin/AdminOverviewButtons';
+import BaseAdmin from '@/templates/BaseAdmin.astro';
+
+const { id = '-1' } = Astro.params;
+
+let idInt = -1;
+try {
+
+	idInt = parseInt(id);
+	if (!idInt)
+		throw new Error();
+
+} catch {
+
+	Astro.response.status = 400;
+	Astro.response.statusText = 'bad-request';
+
+}
+---
+<BaseAdmin
+	head={{
+		title: 'Event ' + id,
+		description: `Editing event with ID '${id}'`
+	}}
+>
+	<Section center title={`Event ID '${id}' Overview`}>
+		<AdminEventsEditor eventId={idInt} client:only="react" />
+	</Section>
+	<Section>
+		<AdminOverviewButtons
+			removeButtonPayload={{
+				action: 'adminDeleteEvent',
+				args: [id]
+			}}
+			client:only="react"
+		/>
+	</Section>
+</BaseAdmin>

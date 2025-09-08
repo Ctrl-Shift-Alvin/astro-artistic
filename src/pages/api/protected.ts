@@ -25,7 +25,9 @@ import {
 import {
 	events_createPage,
 	events_dbGet,
-	events_dbRun, events_getAllEntries
+	events_dbRun,
+	events_getAllEntries,
+	events_getEntry
 } from '@/backend/database/events';
 import { EventsConfig } from '@/backend/config/events';
 import { BlogConfig } from '@/backend/config/blog';
@@ -430,11 +432,9 @@ export async function POST(context: APIContext) {
 
 			try {
 
-				const filePath = path.join(
-					EventsConfig.pagesPath,
-					`${id}.md`
-				);
-				if (!existsSync(filePath)) {
+				const entry = events_getEntry(id);
+
+				if (!entry) {
 
 					const errorBody = TProtectedPostApiResponseMap[requestType].safeParse({ error: 'resource-not-found' });
 					return new Response(
@@ -444,14 +444,46 @@ export async function POST(context: APIContext) {
 
 				}
 
-				const fileContent = readFileSync(
-					filePath,
-					{ encoding: 'utf8' }
-				);
+				// Read page content if needed
+				if (entry.enablePage) {
+
+					const filePath = path.join(
+						EventsConfig.pagesPath,
+						`${id}.md`
+					);
+					if (!existsSync(filePath)) {
+
+						const errorBody = TProtectedPostApiResponseMap[requestType].safeParse({
+							message: 'content-not-found',
+							data: entry
+						});
+						return new Response(
+							JSON.stringify(errorBody),
+							{ status: 206 }
+						);
+
+					}
+
+					const fileContent = readFileSync(
+						filePath,
+						{ encoding: 'utf8' }
+					);
+
+					const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+						message: 'success',
+						data: entry,
+						file: fileContent
+					});
+					return new Response(
+						JSON.stringify(responseBody),
+						{ status: 200 }
+					);
+
+				}
 
 				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
-					data: fileContent
+					data: entry
 				});
 				return new Response(
 					JSON.stringify(responseBody),

@@ -310,7 +310,12 @@ export const TProtectedPostApiResponseMap = {
 	'events/add': ZApiResponse,
 	'events/delete': ZApiResponse,
 	'events/get': z.union([
-		ZApiResponseSuccess.extend({ data: z.string() }),
+		ZApiResponseSuccess.extend({
+			data: ZEventsEntry,
+			file: z
+				.string()
+				.optional()
+		}),
 		ZApiResponseError
 	]),
 	'events/save': ZApiResponse,
