@@ -20,7 +20,6 @@ const fileName
 		? process.argv[2]
 		: `${process.argv[2]}.md`;
 const filePath = join(
-	process.cwd(),
 	fileDir,
 	fileName
 );
