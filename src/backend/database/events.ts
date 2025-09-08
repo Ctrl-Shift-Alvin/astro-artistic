@@ -317,46 +317,53 @@ export const events_createPage = async(id: number | bigint): Promise<boolean> =>
 
 	}
 
-	const result: boolean = await new Promise((
-		resolve,
-		reject
-	) => {
+	try {
 
-		try {
+		await new Promise((
+			resolve,
+			reject
+		) => {
 
-			const child = spawn(
-				'node',
-				[
-					'./scripts/createEvent',
-					id.toString()
-				],
-				{ shell: true }
-			);
+			try {
 
-			child.on(
-				'error',
-				reject
-			); // spawn failed (e.g. command not found)
+				const child = spawn(
+					'node',
+					[
+						'./scripts/createEvent',
+						id.toString()
+					],
+					{ shell: true }
+				);
 
-			child.on(
-				'close',
-				(code) => {
+				child.on(
+					'error',
+					reject
+				);
 
-					resolve(code === 0);
+				child.on(
+					'close',
+					(code) => {
 
-				}
-			);
+						resolve(code === 0);
 
-		} catch(err: any) {
+					}
+				);
 
-			// eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
-			reject(err);
+			} catch(err: any) {
 
-		}
+				// eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+				reject(err);
 
-	});
+			}
 
-	return result;
+		});
+		return true;
+
+	} catch {
+
+		return false;
+
+	}
 
 };
 
