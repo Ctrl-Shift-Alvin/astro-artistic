@@ -12,9 +12,7 @@ export default defineConfig({
 	site: 'http://maxmaxwell.com/',
 	trailingSlash: 'always',
 	output: 'server',
-	adapter: node({
-		mode: 'standalone'
-	}),
+	adapter: node({ mode: 'standalone' }),
 	devToolbar: { enabled: false },
 	integrations: [
 		react(),
@@ -30,7 +28,8 @@ export default defineConfig({
 			port: 4321,
 			strictPort: true,
 			allowedHosts: [
-				'nasty', 'testsite.local'
+				'nasty',
+				'testsite.local'
 			],
 			cors: true,
 			hmr: true
@@ -45,7 +44,8 @@ export default defineConfig({
 		},
 		watch: {
 			paths: [
-				'src/*', 'public/*'
+				'src/*',
+				'public/*'
 			]
 		},
 		plugins: [
@@ -62,9 +62,22 @@ export default defineConfig({
 	},
 	env: {
 		schema: {
-			ADMIN_PASSWORD_HASH: envField.string({ context: 'server', access: 'secret', optional: true }),
-			JWT_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
-			JWT_LENGTH: envField.number({ context: 'server', access: 'secret', optional: false, default: 1000 })
+			ADMIN_PASSWORD_HASH: envField.string({
+				context: 'server',
+				access: 'secret',
+				optional: true
+			}),
+			JWT_KEY: envField.string({
+				context: 'server',
+				access: 'secret',
+				optional: true
+			}),
+			JWT_LENGTH: envField.number({
+				context: 'server',
+				access: 'secret',
+				optional: false,
+				default: 1000
+			})
 		}
 	},
 	markdown: {
