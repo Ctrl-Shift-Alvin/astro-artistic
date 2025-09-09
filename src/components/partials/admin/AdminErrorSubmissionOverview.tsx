@@ -4,7 +4,7 @@ import {
 } from 'react';
 import { Monolog } from '@/components/components/MonologProvider';
 import { type TError } from '@/components/types';
-import { getError } from '@/frontend/adminTools';
+import { getError } from '@/frontend/protectedApi';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 import { A } from '@/components/components/A';
 

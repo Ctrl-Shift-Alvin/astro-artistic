@@ -10,7 +10,7 @@ import {
 	getErrorIndexByBuild,
 	countErrors,
 	countErrorsByBuild
-} from '@/frontend/adminTools';
+} from '@/frontend/protectedApi';
 import { ErrorsConfig } from '@/shared/config/errors';
 import { A } from '@/components/components/A';
 import { Dialog } from '@/components/components/DialogProvider';

@@ -5,7 +5,7 @@ import {
 	logout,
 	setLogoutCallback,
 	setLogoutTimeout
-} from '@/frontend/adminTools';
+} from '@/frontend/protectedApi';
 import { goto } from '@/frontend/windowTools';
 
 export const AdminLogout = () => {

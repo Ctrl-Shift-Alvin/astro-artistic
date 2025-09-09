@@ -1,5 +1,6 @@
 import {
-	useLayoutEffect, useState
+	useLayoutEffect,
+	useState
 } from 'react';
 import { type z } from 'zod';
 import { AdminMarkdownEditor } from './AdminMarkdownEditor';
@@ -7,11 +8,12 @@ import { Dialog } from '@/components/components/DialogProvider';
 import { Monolog } from '@/components/components/MonologProvider';
 import { ZProtectedPostApiRequestMap } from '@/components/types';
 import {
-	fetchBlogFile, fetchBlogIndex,
+	fetchBlogFile,
+	fetchBlogIndex,
 	newBlogFile,
 	removeBlogFile,
 	saveBlogFile
-} from '@/frontend/adminTools';
+} from '@/frontend/protectedApi';
 import { A } from '@/components/components/A';
 import { Button } from '@/components/components/Button';
 

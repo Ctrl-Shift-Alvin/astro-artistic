@@ -13,8 +13,7 @@ import {
 	editEventsEntry,
 	getEvent,
 	saveEvent
-} from '@/frontend/adminTools';
-import { Button } from '@/components/components/Button';
+} from '@/frontend/protectedApi';
 
 // eslint-disable-next-line import-x/no-unassigned-import
 import 'react-datepicker/dist/react-datepicker.css';

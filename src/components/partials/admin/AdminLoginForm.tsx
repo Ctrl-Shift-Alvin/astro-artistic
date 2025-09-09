@@ -1,7 +1,8 @@
 import { Button } from '@/components/components/Button';
 import {
-	checkLogin, handleAuthSubmit
-} from '@/frontend/adminTools';
+	checkLogin,
+	handleAuthSubmit
+} from '@/frontend/protectedApi';
 import { goto } from '@/frontend/windowTools';
 
 export const AdminLoginForm = () => (

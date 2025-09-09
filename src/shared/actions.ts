@@ -3,9 +3,8 @@ import { Monolog } from '@/components/components/MonologProvider';
 import {
 	deleteBuild,
 	deleteContactForm,
-	deleteError,
-	deleteEventsEntry
-} from '@/frontend/adminTools';
+	deleteError
+} from '@/frontend/protectedApi';
 import {
 	goto,
 	windowRefresh

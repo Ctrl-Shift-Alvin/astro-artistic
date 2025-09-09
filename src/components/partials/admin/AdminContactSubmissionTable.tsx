@@ -9,7 +9,7 @@ import { type TContactFormEntry } from '@/components/types';
 import {
 	getContactForms,
 	deleteContactForm
-} from '@/frontend/adminTools';
+} from '@/frontend/protectedApi';
 
 export const AdminContactSubmissionTable = () => {
 

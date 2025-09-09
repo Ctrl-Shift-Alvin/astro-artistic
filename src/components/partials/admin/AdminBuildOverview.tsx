@@ -5,7 +5,7 @@ import {
 } from 'react';
 import { Monolog } from '@/components/components/MonologProvider';
 import { type TBuild } from '@/components/types';
-import { getBuild } from '@/frontend/adminTools';
+import { getBuild } from '@/frontend/protectedApi';
 import { A } from '@/components/components/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 

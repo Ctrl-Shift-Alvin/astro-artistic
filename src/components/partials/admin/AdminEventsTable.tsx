@@ -15,7 +15,7 @@ import {
 	getEventsIndex,
 	addEventsEntry,
 	deleteEventsEntry
-} from '@/frontend/adminTools';
+} from '@/frontend/protectedApi';
 import { cGetUserLanguage } from '@/shared/cookies';
 import { defaultLanguageCode } from '@/backend/i18n';
 

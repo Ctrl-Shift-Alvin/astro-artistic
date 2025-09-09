@@ -8,7 +8,7 @@ import { type TBuild } from '@/components/types';
 import {
 	getBuildIndex,
 	countBuilds
-} from '@/frontend/adminTools';
+} from '@/frontend/protectedApi';
 import { ErrorsConfig } from '@/shared/config/errors';
 import { A } from '@/components/components/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';

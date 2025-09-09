@@ -127,19 +127,14 @@ export const setLogoutTimeout = () => {
 	}
 
 };
-export const handleAuthSubmit = async(event?: Event) => {
+export const handleAuthSubmit = async(
+	password: string,
+	event?: Event
+) => {
 
 	event?.preventDefault();
 
-	const passwordField = document.getElementById('password') as HTMLInputElement | null;
-	if (passwordField === null) {
-
-		console.error('Failed to get password from the password field!');
-		return;
-
-	}
-
-	const loginResult = await login(passwordField.value);
+	const loginResult = await login(password);
 	if (loginResult) {
 
 		Monolog.show({

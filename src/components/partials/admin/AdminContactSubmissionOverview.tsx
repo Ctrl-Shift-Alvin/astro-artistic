@@ -4,7 +4,7 @@ import {
 } from 'react';
 import { Monolog } from '@/components/components/MonologProvider';
 import { type TContactFormEntry } from '@/components/types';
-import { getContactForm } from '@/frontend/adminTools';
+import { getContactForm } from '@/frontend/protectedApi';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 
 export const AdminContactSubmissionOverview = ({ submissionId }: { submissionId: number | string }) => {
