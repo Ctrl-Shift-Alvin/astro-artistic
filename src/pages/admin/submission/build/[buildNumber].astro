@@ -2,7 +2,6 @@
 import Section from '@/components/astro-components/Section.astro';
 import { AdminErrorsTable } from '@/components/partials/admin/AdminErrorsTable';
 import { AdminBuildOverview } from '@/components/partials/admin/AdminBuildOverview';
-import { AdminOverviewButtons } from '@/components/partials/admin/AdminOverviewButtons';
 import BaseAdmin from '@/templates/BaseAdmin.astro';
 
 const { buildNumber = '-1' } = Astro.params;
@@ -32,14 +31,5 @@ try {
 	</Section>
 	<Section center title={`Errors`}>
 		<AdminErrorsTable buildNumber={buildNumberInt} client:only="react" />
-	</Section>
-	<Section>
-		<AdminOverviewButtons
-			removeButtonPayload={{
-				action: 'adminDeleteBuild',
-				args: [buildNumber]
-			}}
-			client:only="react"
-		/>
 	</Section>
 </BaseAdmin>

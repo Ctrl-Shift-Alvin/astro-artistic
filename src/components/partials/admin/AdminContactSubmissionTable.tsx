@@ -32,8 +32,8 @@ export const AdminContactSubmissionTable = () => {
 
 		if (
 			!await Dialog.yesNo(
-				'Are you sure you want to delete this entry?',
-				`This will irreversibly remove the entry with ID ${id}.`
+				'Are you sure you want to delete this contact form submission?',
+				`This will irreversibly remove the contact form submission with ID ${id}.`
 			)
 		)
 			return;
@@ -42,7 +42,7 @@ export const AdminContactSubmissionTable = () => {
 		if (result) {
 
 			Monolog.show({
-				text: `Successfully deleted form submission with id ${id}!`,
+				text: `Successfully deleted contact form submission with id ${id}!`,
 				durationMs: 3000
 			});
 			void get();

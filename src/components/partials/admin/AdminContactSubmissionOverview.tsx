@@ -2,10 +2,15 @@ import {
 	useState,
 	useLayoutEffect
 } from 'react';
+import { addAdminButton } from './AdminButtonContainer';
 import { Monolog } from '@/components/components/MonologProvider';
 import { type TContactFormEntry } from '@/components/types';
-import { getContactForm } from '@/frontend/protectedApi';
+import {
+	deleteContactForm,
+	getContactForm
+} from '@/frontend/protectedApi';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
+import { Dialog } from '@/components/components/DialogProvider';
 
 export const AdminContactSubmissionOverview = ({ submissionId }: { submissionId: number | string }) => {
 
@@ -33,10 +38,45 @@ export const AdminContactSubmissionOverview = ({ submissionId }: { submissionId:
 
 	};
 
+	const remove = async() => {
+
+		if (
+			!await Dialog.yesNo(
+				'Are you sure you want to delete this contact form submission?',
+				`This will irreversibly remove the contact form submission with ID ${submissionId}.`
+			)
+		)
+			return;
+
+		const result = await deleteContactForm(submissionId);
+		if (result) {
+
+			Monolog.show({
+				text: `Successfully deleted form submission with id ${submissionId}!`,
+				durationMs: 3000
+			});
+			void get();
+
+		}
+
+	};
+
 	useLayoutEffect(
 		() => {
 
 			void get();
+
+		},
+		[]
+	);
+
+	useLayoutEffect(
+		() => {
+
+			addAdminButton({
+				children: 'Remove',
+				onClick: () => void remove()
+			});
 
 		},
 		[]

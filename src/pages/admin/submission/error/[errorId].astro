@@ -1,7 +1,6 @@
 ---
 import Section from '@/components/astro-components/Section.astro';
 import { AdminErrorSubmissionOverview } from '@/components/partials/admin/AdminErrorSubmissionOverview';
-import { AdminOverviewButtons } from '@/components/partials/admin/AdminOverviewButtons';
 import BaseAdmin from '@/templates/BaseAdmin.astro';
 
 const { errorId = '-1' } = Astro.params;
@@ -29,14 +28,5 @@ try {
 >
 	<Section center title={`Contact Submission ID '${errorId}'`}>
 		<AdminErrorSubmissionOverview submissionId={errorId} client:only="react" />
-	</Section>
-	<Section>
-		<AdminOverviewButtons
-			removeButtonPayload={{
-				action: 'adminDeleteError',
-				args: [errorId]
-			}}
-			client:only="react"
-		/>
 	</Section>
 </BaseAdmin>

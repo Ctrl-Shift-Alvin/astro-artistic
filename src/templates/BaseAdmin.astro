@@ -1,5 +1,6 @@
 ---
 import Section from '@/components/astro-components/Section.astro';
+import { AdminButtonContainer } from '@/components/partials/admin/AdminButtonContainer';
 import { AdminLogout } from '@/components/partials/admin/AdminLogout';
 import { GlobalTranslation } from '@/locales/global';
 import Base from '@/templates/Base.astro';
@@ -16,14 +17,25 @@ const { head, noLogoutComponent } = Astro.props;
 
 const title = `${GlobalTranslation.siteName} - Admin - ${head.title}`;
 const description = `${GlobalTranslation.siteName} - Admin - ${head.description}`;
+
+const pathname = Astro.url.pathname;
+const prevUrl = decodeURIComponent(Astro.url.searchParams.get('prevUrl') ?? '');
+
+const adminButtons = pathname !== '/admin/home/'
+	? [
+		{
+			children: 'Back',
+			href: prevUrl || '/admin/home/'
+		}
+	]
+	: undefined;
 ---
 
 <Base head={{ title, description }}>
+
 	<slot />
-	{
-		!noLogoutComponent &&
-		<Section center>
-			<AdminLogout client:only="react" />
-		</Section>
-	}
+	<Section center>
+		<AdminLogout client:only="react" />
+	</Section>
+	<AdminButtonContainer buttons={adminButtons} client:only="react" />
 </Base>

@@ -1,6 +1,7 @@
-TODO Add better way to handle admin page buttons
-TODO Add prevUrl query to admin login redirect on token expiration
+TODO Consitent naming of admin components
 TODO Check React patterns for better usage of useCallback
+TODO Better blog editor
+TODO Add prevUrl query to admin login redirect on token expiration
 TODO Change class and className patterns, and replace with clsx
 TODO Implement errors API
 TODO Implement middleware for error submission

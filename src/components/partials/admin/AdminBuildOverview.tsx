@@ -1,13 +1,15 @@
 import {
 	useState,
-	useLayoutEffect,
-	useCallback
+	useCallback,
+	useLayoutEffect
 } from 'react';
+import { addAdminButton } from './AdminButtonContainer';
 import { Monolog } from '@/components/components/MonologProvider';
 import { type TBuild } from '@/components/types';
 import { getBuild } from '@/frontend/protectedApi';
 import { A } from '@/components/components/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
+import { executeAsyncAction } from '@/shared/actions';
 
 export const AdminBuildOverview = ({ buildNumber }: { buildNumber: number | string }) => {
 
@@ -49,6 +51,18 @@ export const AdminBuildOverview = ({ buildNumber }: { buildNumber: number | stri
 		[ buildNumber ]
 	);
 
+	const remove = useCallback(
+		async() => {
+
+			await executeAsyncAction({
+				action: 'adminDeleteBuild',
+				args: [ buildNumber ]
+			});
+
+		},
+		[ buildNumber ]
+	);
+
 	useLayoutEffect(
 		() => {
 
@@ -56,6 +70,18 @@ export const AdminBuildOverview = ({ buildNumber }: { buildNumber: number | stri
 
 		},
 		[ get ]
+	);
+
+	useLayoutEffect(
+		() => {
+
+			addAdminButton({
+				children: 'Remove',
+				onClick: () => void remove()
+			});
+
+		},
+		[ remove ]
 	);
 
 	return (
@@ -135,11 +161,13 @@ export const AdminBuildOverview = ({ buildNumber }: { buildNumber: number | stri
 
 				{
 					build?.buildNumber == window.__BUILD__.buildNumber
-					&& (<div>
-						<h1 className={'font-bold'}>
-							{'Is Current Build!'}
-						</h1>
-					</div>)
+					&& (
+						<div>
+							<h1 className={'font-bold'}>
+								{'Is Current Build!'}
+							</h1>
+						</div>
+					)
 				}
 			</div>
 		</>

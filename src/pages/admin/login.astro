@@ -1,17 +1,16 @@
 ---
 import Section from '@/components/astro-components/Section.astro';
 import { AdminLoginForm } from '@/components/partials/admin/AdminLoginForm';
-import BaseAdmin from '@/templates/BaseAdmin.astro';
+import Base from '@/templates/Base.astro';
 ---
 
-<BaseAdmin
+<Base
 	head={{
-		title: 'Admin',
-		description: 'Admin page'
+		title: 'Admin Login',
+		description: 'Admin login page'
 	}}
-	noLogoutComponent={true}
 >
 	<Section id="auth-form">
 		<AdminLoginForm client:only="react" />
 	</Section>
-</BaseAdmin>
+</Base>

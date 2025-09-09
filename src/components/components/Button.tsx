@@ -10,7 +10,7 @@ import {
 	type TActionPayload
 } from '@/shared/actions';
 
-type IButtonProps = {
+export type TButtonProps = {
 	children: ReactNode;
 	className?: string;
 	small?: boolean;
@@ -22,7 +22,7 @@ type IButtonProps = {
 };
 
 const click = (
-	props: IButtonProps,
+	props: TButtonProps,
 	event: React.MouseEvent<HTMLButtonElement>
 ) => {
 
@@ -60,7 +60,7 @@ const click = (
 
 };
 
-export const Button = (props: IButtonProps) => {
+export const Button = (props: TButtonProps) => {
 
 	return (
 		<button

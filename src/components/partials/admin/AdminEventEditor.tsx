@@ -1,19 +1,24 @@
 import {
 	useCallback,
 	useEffect,
+	useLayoutEffect,
 	useRef,
 	useState
 } from 'react';
 import clsx from 'clsx/lite';
 import { DatePicker } from 'react-datepicker';
 import { AdminMarkdownEditor } from './AdminMarkdownEditor';
+import { addAdminButton } from './AdminButtonContainer';
 import { Monolog } from '@/components/components/MonologProvider';
 import { type TEventsEntry } from '@/components/types';
 import {
+	deleteEventsEntry,
 	editEventsEntry,
 	getEvent,
 	saveEvent
 } from '@/frontend/protectedApi';
+import { Dialog } from '@/components/components/DialogProvider';
+import { goto } from '@/frontend/windowTools';
 
 // eslint-disable-next-line import-x/no-unassigned-import
 import 'react-datepicker/dist/react-datepicker.css';
@@ -153,6 +158,47 @@ export const AdminEventsEditor = ({ eventId }: { eventId: number }) => {
 			fileContent
 		]
 	);
+
+	const del = useCallback(
+		async() => {
+
+			const result = await Dialog.yesNo(
+				'Are you sure you want to delete this event entry?',
+				`This will irreversibly remove the event entry with ID ${eventId}.`
+			);
+
+			if (!result)
+				return;
+
+			const deleteResult = await deleteEventsEntry(eventId);
+
+			if (deleteResult) {
+
+				Monolog.show({
+					text: `Successfully deleted event entry with ID '${eventId}'!`,
+					durationMs: 2000
+				});
+				setTimeout(
+					() => {
+
+						goto('/admin/home/');
+
+					},
+					2000
+				);
+
+			} else {
+
+				Monolog.show({
+					text: `Failed to delete event entry with ID '${eventId}'!`,
+					durationMs: 2000
+				});
+
+			}
+
+		},
+		[ eventId ]
+	);
 	const saveEdit = useCallback(
 		async() => {
 
@@ -203,6 +249,27 @@ export const AdminEventsEditor = ({ eventId }: { eventId: number }) => {
 			eventEntry,
 			edit,
 			save
+		]
+	);
+
+	useLayoutEffect(
+		() => {
+
+			addAdminButton(
+				{
+					children: 'Save',
+					onClick: () => void saveEdit()
+				},
+				{
+					children: 'Delete',
+					onClick: () => void del()
+				}
+			);
+
+		},
+		[
+			del,
+			saveEdit
 		]
 	);
 
@@ -368,12 +435,6 @@ export const AdminEventsEditor = ({ eventId }: { eventId: number }) => {
 						/>
 					</div>
 				</form>
-
-				<div className={'w-full flex justify-center mt-5'}>
-					<Button onClick={() => void saveEdit()}>
-						{'Save'}
-					</Button>
-				</div>
 
 				{
 					eventEntry.enablePage

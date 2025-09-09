@@ -2,11 +2,15 @@ import {
 	useState,
 	useLayoutEffect
 } from 'react';
+import { addAdminButton } from './AdminButtonContainer';
 import { Monolog } from '@/components/components/MonologProvider';
 import { type TError } from '@/components/types';
-import { getError } from '@/frontend/protectedApi';
+import {
+	deleteError, getError
+} from '@/frontend/protectedApi';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 import { A } from '@/components/components/A';
+import { Dialog } from '@/components/components/DialogProvider';
 
 export const AdminErrorSubmissionOverview = ({ submissionId }: { submissionId: number | string }) => {
 
@@ -45,10 +49,45 @@ export const AdminErrorSubmissionOverview = ({ submissionId }: { submissionId: n
 
 	};
 
+	const remove = async() => {
+
+		if (
+			!await Dialog.yesNo(
+				'Are you sure you want to delete this error?',
+				`This will irreversibly remove the error with the ID '${submissionId}'.`
+			)
+		)
+			return;
+
+		const result = await deleteError(submissionId);
+		if (result) {
+
+			Monolog.show({ text: `Successfully deleted error '${submissionId}'!` });
+
+		} else {
+
+			Monolog.show({ text: `Failed deleting error '${submissionId}'!` });
+
+		}
+
+	};
+
 	useLayoutEffect(
 		() => {
 
 			void get();
+
+		},
+		[]
+	);
+
+	useLayoutEffect(
+		() => {
+
+			addAdminButton({
+				children: 'Remove',
+				onClick: () => void remove()
+			});
 
 		},
 		[]

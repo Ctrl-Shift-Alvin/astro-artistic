@@ -1,14 +1,7 @@
-import { Dialog } from '@/components/components/DialogProvider';
-import { Monolog } from '@/components/components/MonologProvider';
-import {
-	deleteBuild,
-	deleteContactForm,
-	deleteError
-} from '@/frontend/protectedApi';
-import {
-	goto,
-	windowRefresh
-} from '@/frontend/windowTools';
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+
+import { windowRefresh } from '@/frontend/windowTools';
 import { cSetIgnoreSizeError } from '@/shared/cookies';
 
 const actions = {
@@ -40,157 +33,6 @@ const actions = {
 				'opacity-0',
 				'opacity-100'
 			);
-
-		}
-
-	},
-	adminDeleteContactSubmission: async(id: number | string) => {
-
-		const result = await Dialog.yesNo(
-			'Are you sure you want to delete this contact submission?',
-			`This will irreversibly remove the contact submission with ID ${id}.`
-		);
-
-		if (!result)
-			return;
-
-		const deleteResult = await deleteContactForm(id);
-
-		if (deleteResult) {
-
-			Monolog.show({
-				text: `Successfully deleted contact submission with ID '${id}'!`,
-				durationMs: 2000
-			});
-			setTimeout(
-				() => {
-
-					goto('/admin/home/');
-
-				},
-				2000
-			);
-
-		} else {
-
-			Monolog.show({
-				text: `Failed to delete contact submission with ID '${id}'!`,
-				durationMs: 2000
-			});
-
-		}
-
-	},
-	adminDeleteBuild: async(buildNumber: number | string) => {
-
-		const result = await Dialog.yesNo(
-			'Are you sure you want to delete this build?',
-			`This will irreversibly remove the build with ID ${buildNumber}.`
-			+ (window.__BUILD__.buildNumber === buildNumber
-				? ' This is the current running build!'
-				: '')
-		);
-
-		if (!result)
-			return;
-
-		const deleteResult = await deleteBuild(buildNumber);
-
-		if (deleteResult) {
-
-			Monolog.show({
-				text: `Successfully deleted build with ID '${buildNumber}'!`,
-				durationMs: 2000
-			});
-			setTimeout(
-				() => {
-
-					goto('/admin/home/');
-
-				},
-				2000
-			);
-
-		} else {
-
-			Monolog.show({
-				text: `Failed to delete build with ID '${buildNumber}'!`,
-				durationMs: 2000
-			});
-
-		}
-
-	},
-	adminDeleteError: async(id: number | string) => {
-
-		const result = await Dialog.yesNo(
-			'Are you sure you want to delete this error?',
-			`This will irreversibly remove the error with ID ${id}.`
-		);
-
-		if (!result)
-			return;
-
-		const deleteResult = await deleteError(id);
-
-		if (deleteResult) {
-
-			Monolog.show({
-				text: `Successfully deleted error with ID '${id}'!`,
-				durationMs: 2000
-			});
-			setTimeout(
-				() => {
-
-					goto('/admin/home/');
-
-				},
-				2000
-			);
-
-		} else {
-
-			Monolog.show({
-				text: `Failed to delete error with ID '${id}'!`,
-				durationMs: 2000
-			});
-
-		}
-
-	},
-	adminDeleteEvent: async(id: number | string) => {
-
-		const result = await Dialog.yesNo(
-			'Are you sure you want to delete this event entry?',
-			`This will irreversibly remove the error with ID ${id}.`
-		);
-
-		if (!result)
-			return;
-
-		const deleteResult = await deleteEventsEntry(id);
-
-		if (deleteResult) {
-
-			Monolog.show({
-				text: `Successfully deleted event entry with ID '${id}'!`,
-				durationMs: 2000
-			});
-			setTimeout(
-				() => {
-
-					goto('/admin/home/');
-
-				},
-				2000
-			);
-
-		} else {
-
-			Monolog.show({
-				text: `Failed to delete event entry with ID '${id}'!`,
-				durationMs: 2000
-			});
 
 		}
 
@@ -250,6 +92,7 @@ export type TAsyncActionPayload = {
 /**
  * A discriminated union for all actions (sync and async) and their arguments.
  */
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export type TActionPayload = TSyncActionPayload | TAsyncActionPayload;
 
 /**
@@ -267,12 +110,14 @@ export function isSyncPayload(payload: TActionPayload): payload is TSyncActionPa
  */
 export const executeAction = (payload: TSyncActionPayload) => {
 
+	// @ts-ignore When TAsyncActionPayload is 'never', 'payload.action' is an error.
 	const func = getAction(payload.action);
 
 	/*
 	 * The TSyncActionPayload type guarantees this call is safe.
 	 * We cast to a generic function type to satisfy TypeScript's inference limitations.
 	 */
+	// @ts-ignore When TAsyncActionPayload is 'never', 'payload.action' is an error.
 	(func as (...args: any[])=> void)(...payload.args || []);
 
 };
@@ -284,12 +129,14 @@ export const executeAction = (payload: TSyncActionPayload) => {
  */
 export const executeAsyncAction = (payload: TAsyncActionPayload) => {
 
+	// @ts-ignore When TAsyncActionPayload is 'never', 'payload.action' is an error.
 	const func = getAction(payload.action);
 
 	/*
 	 * The TAsyncActionPayload type guarantees this call is safe.
 	 * We cast to a generic function type to satisfy TypeScript's inference limitations.
 	 */
+	// @ts-ignore When TAsyncActionPayload is 'never', 'payload.args' is an error.
 	return (func as (...args: any[])=> Promise<unknown>)(...payload.args);
 
 };

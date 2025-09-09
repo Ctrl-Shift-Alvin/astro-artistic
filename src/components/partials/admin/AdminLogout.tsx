@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Button } from '@/components/components/Button';
+import { addAdminButton } from '@/components/partials/admin/AdminButtonContainer';
 import { Monolog } from '@/components/components/MonologProvider';
 import {
 	logout,
@@ -40,14 +40,9 @@ export const AdminLogout = () => {
 			});
 			setLogoutTimeout();
 
-		},
-		[]
-	);
-
-	return (
-		<Button
-			onClick={
-				() => {
+			addAdminButton({
+				children: 'Logout',
+				onClick: () => {
 
 					setLogoutCallback(() => {
 
@@ -57,10 +52,10 @@ export const AdminLogout = () => {
 					void logout();
 
 				}
-			}
-		>
-			{'Logout'}
-		</Button>
+			});
+
+		},
+		[]
 	);
 
 };
