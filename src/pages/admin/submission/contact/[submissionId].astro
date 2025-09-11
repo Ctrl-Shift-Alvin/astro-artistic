@@ -1,6 +1,6 @@
 ---
 import Section from '@/components/astro-components/Section.astro';
-import { AdminContactSubmissionOverview } from '@/components/partials/admin/AdminContactSubmissionOverview';
+import { AdminContactOverview } from '@/components/partials/admin/AdminContactOverview';
 import BaseAdmin from '@/templates/BaseAdmin.astro';
 
 const { submissionId = '-1' } = Astro.params;
@@ -26,6 +26,6 @@ try {
 	}}
 >
 	<Section center title={`Contact Submission ID '${submissionId}'`}>
-		<AdminContactSubmissionOverview submissionId={submissionId} client:only="react" />
+		<AdminContactOverview submissionId={submissionId} client:only="react" />
 	</Section>
 </BaseAdmin>

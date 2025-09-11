@@ -20,7 +20,7 @@ import {
 // eslint-disable-next-line import-x/no-unassigned-import
 import 'react-datepicker/dist/react-datepicker.css';
 
-export const AdminEventsEditor = ({ eventId }: { eventId: number }) => {
+export const AdminEventsEditorOverview = ({ eventId }: { eventId: number }) => {
 
 	const [
 		eventEntry,

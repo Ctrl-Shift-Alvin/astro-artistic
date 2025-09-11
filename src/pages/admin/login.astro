@@ -1,6 +1,6 @@
 ---
 import Section from '@/components/astro-components/Section.astro';
-import { AdminLoginForm } from '@/components/partials/admin/AdminLoginForm';
+import { AdminLogin } from '@/components/partials/admin/AdminLogin';
 import Base from '@/templates/Base.astro';
 ---
 
@@ -11,6 +11,6 @@ import Base from '@/templates/Base.astro';
 	}}
 >
 	<Section id="auth-form">
-		<AdminLoginForm client:only="react" />
+		<AdminLogin client:only="react" />
 	</Section>
 </Base>

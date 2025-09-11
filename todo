@@ -1,4 +1,3 @@
-TODO Consitent naming of admin components
 TODO Check React patterns for better usage of useCallback
 TODO Interrupt navigation when admin editor file has changed
 TODO Fetch contact submission ranges instead of *

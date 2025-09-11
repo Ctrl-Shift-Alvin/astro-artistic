@@ -9,7 +9,7 @@ import {
 	deleteContactForm
 } from '@/frontend/adminApi';
 
-export const AdminContactSubmissionTable = () => {
+export const AdminContactTable = () => {
 
 	const [
 		formSubmissions,

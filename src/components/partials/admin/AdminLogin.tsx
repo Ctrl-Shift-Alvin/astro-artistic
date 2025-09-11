@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { Button } from '@/components/components/Button';
 import { login } from '@/frontend/adminApi';
 
-export const AdminLoginForm = () => {
+export const AdminLogin = () => {
 
 	const [
 		password,

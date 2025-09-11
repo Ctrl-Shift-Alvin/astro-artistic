@@ -11,7 +11,7 @@ import {
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 import { A } from '@/components/components/A';
 
-export const AdminErrorSubmissionOverview = ({ submissionId }: { submissionId: number | string }) => {
+export const AdminErrorOverview = ({ submissionId }: { submissionId: number | string }) => {
 
 	const [
 		submission,

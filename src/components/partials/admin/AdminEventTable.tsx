@@ -283,7 +283,7 @@ const EventForm = ({
 	</form>
 );
 
-export const AdminEventsTable = () => {
+export const AdminEventTable = () => {
 
 	const [
 		eventEntries,

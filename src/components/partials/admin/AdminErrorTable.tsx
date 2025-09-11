@@ -16,7 +16,7 @@ import { ErrorsConfig } from '@/shared/config/errors';
 import { A } from '@/components/components/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 
-export const AdminErrorsTable = ({ buildNumber }: { buildNumber?: number }) => {
+export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 
 	const [
 		errorsIndex,

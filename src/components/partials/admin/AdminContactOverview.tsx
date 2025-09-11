@@ -10,7 +10,7 @@ import {
 } from '@/frontend/adminApi';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 
-export const AdminContactSubmissionOverview = ({ submissionId }: { submissionId: number | string }) => {
+export const AdminContactOverview = ({ submissionId }: { submissionId: number | string }) => {
 
 	const [
 		submission,

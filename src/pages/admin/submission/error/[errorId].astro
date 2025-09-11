@@ -1,6 +1,6 @@
 ---
 import Section from '@/components/astro-components/Section.astro';
-import { AdminErrorSubmissionOverview } from '@/components/partials/admin/AdminErrorSubmissionOverview';
+import { AdminErrorOverview } from '@/components/partials/admin/AdminErrorOverview';
 import BaseAdmin from '@/templates/BaseAdmin.astro';
 
 const { errorId = '-1' } = Astro.params;
@@ -27,6 +27,6 @@ try {
 	}}
 >
 	<Section center title={`Contact Submission ID '${errorId}'`}>
-		<AdminErrorSubmissionOverview submissionId={errorId} client:only="react" />
+		<AdminErrorOverview submissionId={errorId} client:only="react" />
 	</Section>
 </BaseAdmin>

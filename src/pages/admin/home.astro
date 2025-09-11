@@ -1,11 +1,11 @@
 ---
 import Section from '@/components/astro-components/Section.astro';
 import { AdminBlogEditor } from '@/components/partials/admin/AdminBlogEditor';
-import { AdminContactSubmissionTable } from '@/components/partials/admin/AdminContactSubmissionTable';
-import { AdminEventsTable } from '@/components/partials/admin/AdminEventsTable';
+import { AdminContactTable } from '@/components/partials/admin/AdminContactTable';
+import { AdminEventTable } from '@/components/partials/admin/AdminEventTable';
 import BaseAdmin from '@/templates/BaseAdmin.astro';
-import { AdminBuildsTable } from '@/components/partials/admin/AdminBuildsTable';
-import { AdminErrorsTable } from '@/components/partials/admin/AdminErrorsTable';
+import { AdminBuildTable } from '@/components/partials/admin/AdminBuildTable';
+import { AdminErrorTable } from '@/components/partials/admin/AdminErrorTable';
 ---
 
 <BaseAdmin
@@ -15,18 +15,18 @@ import { AdminErrorsTable } from '@/components/partials/admin/AdminErrorsTable';
 	}}
 >
 	<Section center title="Contact Form Submissions">
-		<AdminContactSubmissionTable client:only="react" />
+		<AdminContactTable client:only="react" />
 	</Section>
 	<Section center title="Manage Events">
-		<AdminEventsTable client:only="react" />
+		<AdminEventTable client:only="react" />
 	</Section>
 	<Section title="Manage Blog">
 		<AdminBlogEditor client:only="react" />
 	</Section>
 	<Section title="Manage Builds" center>
-		<AdminBuildsTable client:only="react" />
+		<AdminBuildTable client:only="react" />
 	</Section>
 	<Section title="Manage Errors" center>
-		<AdminErrorsTable client:only="react" />
+		<AdminErrorTable client:only="react" />
 	</Section>
 </BaseAdmin>

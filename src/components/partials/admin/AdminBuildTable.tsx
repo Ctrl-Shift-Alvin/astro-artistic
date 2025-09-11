@@ -15,7 +15,7 @@ import { ErrorsConfig } from '@/shared/config/errors';
 import { A } from '@/components/components/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 
-export const AdminBuildsTable = () => {
+export const AdminBuildTable = () => {
 
 	const [
 		buildsIndex,
