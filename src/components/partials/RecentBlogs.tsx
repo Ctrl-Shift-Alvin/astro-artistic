@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { BlogGallery } from '@/components/partials/BlogGallery';
 import { A } from '@/components/components/A';
 import {
@@ -7,7 +8,10 @@ import { BlogConfig } from '@/shared/config/blog';
 
 export const RecentBlogs = ({ recentBlogFiles }: { recentBlogFiles: IBlogMarkdownInstance<IBlogFrontmatter>[] }) => {
 
-	const config = BlogConfig(window.__TRANSLATION__);
+	const config = useMemo(
+		() => BlogConfig(window.__TRANSLATION__),
+		[]
+	);
 
 	return (
 		<>

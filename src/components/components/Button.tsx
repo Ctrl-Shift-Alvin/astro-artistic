@@ -1,4 +1,6 @@
-import { type ReactNode } from 'react';
+import {
+	useCallback, type ReactNode
+} from 'react';
 import {
 	windowFadeIn,
 	windowFadeOut
@@ -21,46 +23,46 @@ export type TButtonProps = {
 	actionPayload?: TActionPayload;
 };
 
-const click = (
-	props: TButtonProps,
-	event: React.MouseEvent<HTMLButtonElement>
-) => {
-
-	props.onClick?.(event);
-
-	if (props.actionPayload) {
-
-		if (isSyncPayload(props.actionPayload)) {
-
-			executeAction(props.actionPayload);
-
-		} else {
-
-			void executeAsyncAction(props.actionPayload);
-
-		}
-
-	}
-
-	if (props.href) {
-
-		void windowFadeOut()
-			.then(() => {
-
-				window.location.href = props.href || '';
-
-			})
-			.then(() => {
-
-				windowFadeIn();
-
-			});
-
-	}
-
-};
-
 export const Button = (props: TButtonProps) => {
+
+	const click = useCallback(
+		(event: React.MouseEvent<HTMLButtonElement>) => {
+
+			props.onClick?.(event);
+
+			if (props.actionPayload) {
+
+				if (isSyncPayload(props.actionPayload)) {
+
+					executeAction(props.actionPayload);
+
+				} else {
+
+					void executeAsyncAction(props.actionPayload);
+
+				}
+
+			}
+
+			if (props.href) {
+
+				void windowFadeOut()
+					.then(() => {
+
+						window.location.href = props.href || '';
+
+					})
+					.then(() => {
+
+						windowFadeIn();
+
+					});
+
+			}
+
+		},
+		[ props ]
+	);
 
 	return (
 		<button
@@ -74,10 +76,7 @@ export const Button = (props: TButtonProps) => {
 			onClick={
 				(e) => {
 
-					click(
-						props,
-						e
-					);
+					click(e);
 
 				}
 			}

@@ -1,5 +1,6 @@
 import {
-	useState, useEffect
+	useState, useEffect,
+	useMemo
 } from 'react';
 
 export enum MonologPosition {
@@ -29,41 +30,37 @@ export const MonologPopup = ({
 	className?: string;
 }) => {
 
-	let positionClassName = '';
+	const positionClassName = useMemo(
+		() => {
 
-	switch (dialogPosition) {
+			switch (dialogPosition) {
 
-		case MonologPosition.None:
-			break;
-		case MonologPosition.Center:
-			positionClassName = 'top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2';
-			break;
-		case MonologPosition.Top:
-			positionClassName = 'top-5 left-1/2 -translate-x-1/2';
-			break;
-		case MonologPosition.Bottom:
-			positionClassName = 'bottom-5 left-1/2 -translate-x-1/2';
-			break;
-		case MonologPosition.Left:
-			positionClassName = 'top-1/2 left-5 -translate-y-1/2';
-			break;
-		case MonologPosition.Right:
-			positionClassName = 'top-1/2 right-5 -translate-y-1/2';
-			break;
-		case MonologPosition.TopLeft:
-			positionClassName = 'top-5 left-5';
-			break;
-		case MonologPosition.TopRight:
-			positionClassName = 'top-5 right-5';
-			break;
-		case MonologPosition.BottomLeft:
-			positionClassName = 'bottom-5 left-5';
-			break;
-		case MonologPosition.BottomRight:
-			positionClassName = 'bottom-5 right-5';
-			break;
+				case MonologPosition.None:
+					return '';
+				case MonologPosition.Center:
+					return 'top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2';
+				case MonologPosition.Top:
+					return 'top-5 left-1/2 -translate-x-1/2';
+				case MonologPosition.Bottom:
+					return 'bottom-5 left-1/2 -translate-x-1/2';
+				case MonologPosition.Left:
+					return 'top-1/2 left-5 -translate-y-1/2';
+				case MonologPosition.Right:
+					return 'top-1/2 right-5 -translate-y-1/2';
+				case MonologPosition.TopLeft:
+					return 'top-5 left-5';
+				case MonologPosition.TopRight:
+					return 'top-5 right-5';
+				case MonologPosition.BottomLeft:
+					return 'bottom-5 left-5';
+				case MonologPosition.BottomRight:
+					return 'bottom-5 right-5';
 
-	}
+			}
+
+		},
+		[ dialogPosition ]
+	);
 
 	const [
 		visible,
@@ -88,7 +85,7 @@ export const MonologPopup = ({
 			);
 
 		},
-		[]
+		[ durationMs ]
 	);
 
 	return (

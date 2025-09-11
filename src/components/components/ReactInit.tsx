@@ -1,5 +1,6 @@
 import {
-	useEffect, useLayoutEffect
+	useEffect,
+	useLayoutEffect
 } from 'react';
 
 /**

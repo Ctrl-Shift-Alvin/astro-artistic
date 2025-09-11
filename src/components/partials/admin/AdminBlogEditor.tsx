@@ -70,215 +70,246 @@ export const AdminBlogEditor = () => {
 		[]
 	);
 
-	const selectFile = async(fileName: string) => {
+	const getIndex = useCallback(
+		async() => {
 
-		// Did not save!
-		if (selectedFile && fileContentChanged) {
-
-			if (
-				!await Dialog.yesNo(
-					'File contents not saved',
-					'Your currently open document was changed, but not saved.'
-					+ 'Are you sure you want to continue and discard the changes?'
-				)
-			)
+			const blogIndex = await fetchBlogIndex();
+			if (!blogIndex)
 				return;
+
+			setFilesTable(blogIndex.map((e) => ({
+				fileName: e,
+				isSelected: false
+			})));
+
+		},
+		[]
+	);
+	const get = useCallback(
+		async(fileName: string) => {
+
+			const file = await fetchBlogFile(
+				fileName,
+				true
+			);
+			if (!file)
+				return;
+
+			setFileContent(file);
 			setFileContentChanged(false);
+			setShowEditor(true);
 
-		}
+		},
+		[ setFileContent ]
+	);
 
-		// If selected item is selected again, then unselect
-		if (selectedFile && fileName === selectedFile.fileName) {
+	const selectFile = useCallback(
+		async(fileName: string) => {
 
+			// Did not save!
+			if (selectedFile && fileContentChanged) {
+
+				if (
+					!await Dialog.yesNo(
+						'File contents not saved',
+						'Your currently open document was changed, but not saved.'
+						+ 'Are you sure you want to continue and discard the changes?'
+					)
+				)
+					return;
+				setFileContentChanged(false);
+
+			}
+
+			// If selected item is selected again, then unselect
+			if (selectedFile && fileName === selectedFile.fileName) {
+
+				setFilesTable((prev) => prev.map((item) => {
+
+					return item.fileName === fileName
+						? {
+							...item,
+							isSelected: !item.isSelected
+						}
+						:	item;
+
+				}));
+				return;
+
+			}
+
+			// Hide editor, and show only when file is loaded
+			setShowEditor(false);
+
+			// Unselect former selected item, and select selected item
 			setFilesTable((prev) => prev.map((item) => {
 
 				return item.fileName === fileName
 					? {
 						...item,
-						isSelected: !item.isSelected
+						isSelected: true
 					}
-					:	item;
+					: item.isSelected
+						? {
+							...item,
+							isSelected: false
+						}
+						: item;
 
 			}));
-			return;
 
-		}
+			await get(fileName);
 
-		// Hide editor, and show only when file is loaded
-		setShowEditor(false);
+		},
+		[
+			get,
+			fileContentChanged,
+			selectedFile
+		]
+	);
 
-		// Unselect former selected item, and select selected item
-		setFilesTable((prev) => prev.map((item) => {
+	const save = useCallback(
+		async() => {
 
-			return item.fileName === fileName
-				? {
-					...item,
-					isSelected: true
-				}
-				: item.isSelected
-					? {
-						...item,
-						isSelected: false
-					}
-					: item;
+			if (!selectedFile?.fileName || !fileContent)
+				return;
 
-		}));
+			if (!fileContentChanged) {
 
-		await get(fileName);
+				Monolog.show({ text: 'The blog file is already saved in this state!' });
 
-	};
+			} else if (
+				await saveBlogFile(
+					selectedFile.fileName,
+					fileContent
+				)
+			) {
 
-	const getIndex = async() => {
+				setFileContentChanged(false);
 
-		const blogIndex = await fetchBlogIndex();
-		if (!blogIndex)
-			return;
+			}
 
-		setFilesTable(blogIndex.map((e) => ({
-			fileName: e,
-			isSelected: false
-		})));
+		},
+		[
+			fileContent,
+			fileContentChanged,
+			selectedFile
+		]
+	);
+	const newFile = useCallback(
+		async() => {
 
-	};
-	const get = async(fileName: string) => {
+			type IFormValues = z.infer<typeof ZProtectedPostApiRequestMap['blog/new']>;
 
-		const file = await fetchBlogFile(
-			fileName,
-			true
-		);
-		if (!file)
-			return;
+			const form = (
+				formValues: IFormValues,
+				setFormValues: (newValues: IFormValues)=> void
+			) => (
+				<form className={'flex flex-col'}>
+					<label
+						className={'text-white'}
+						htmlFor={'fileName'}
+					>
+						{'File Name'}
+					</label>
 
-		setFileContent(file);
-		setFileContentChanged(false);
-		setShowEditor(true);
+					<input
+						className={'border-1 border-white text-white'}
+						name={'fileName'}
+						id={'fileName'}
+						value={formValues.fileName}
+						onChange={
+							(e) => {
 
-	};
-	const save = async() => {
+								setFormValues({ fileName: e.target.value });
 
-		if (!selectedFile?.fileName || !fileContent)
-			return;
-
-		if (!fileContentChanged) {
-
-			Monolog.show({ text: 'The blog file is already saved in this state!' });
-
-		} else if (
-			await saveBlogFile(
-				selectedFile.fileName,
-				fileContent
-			)
-		) {
-
-			setFileContentChanged(false);
-
-		}
-
-	};
-	const newFile = async() => {
-
-		type IFormValues = z.infer<typeof ZProtectedPostApiRequestMap['blog/new']>;
-
-		const form = (
-			formValues: IFormValues,
-			setFormValues: (newValues: IFormValues)=> void
-		) => (
-			<form className={'flex flex-col'}>
-				<label
-					className={'text-white'}
-					htmlFor={'fileName'}
-				>
-					{'File Name'}
-				</label>
-
-				<input
-					className={'border-1 border-white text-white'}
-					name={'fileName'}
-					id={'fileName'}
-					value={formValues.fileName}
-					onChange={
-						(e) => {
-
-							setFormValues({ fileName: e.target.value });
-
+							}
 						}
+					/>
+				</form>
+			);
+			const submitCallback = (formValues: IFormValues): boolean => {
+
+				const parsed = ZProtectedPostApiRequestMap['blog/new'].safeParse(formValues);
+
+				if (parsed.success) {
+
+					return true;
+
+				} else {
+
+					switch (parsed.error.issues[0]?.code) {
+
+						case 'invalid_format':
+							Monolog.show({
+								text: 'Error: Please only use the characters a-z, A-Z and 0-9, '
+									+ 'aside from the optional .md at the end.'
+							});
+							break;
+						case 'too_small':
+							Monolog.show({ text: 'Error: Please enter a file name!' });
+							break;
+						case 'too_big':
+							Monolog.show({ text: 'Error: The file name is too long!' });
+							break;
+						default:
+							Monolog.show({ text: 'Error: Failed to parse file name!' });
+							break;
+
 					}
-				/>
-			</form>
-		);
-		const submitCallback = (formValues: IFormValues): boolean => {
-
-			const parsed = ZProtectedPostApiRequestMap['blog/new'].safeParse(formValues);
-
-			if (parsed.success) {
-
-				return true;
-
-			} else {
-
-				switch (parsed.error.issues[0]?.code) {
-
-					case 'invalid_format':
-						Monolog.show({
-							text: 'Error: Please only use the characters a-z, A-Z and 0-9, '
-								+ 'aside from the optional .md at the end.'
-						});
-						break;
-					case 'too_small':
-						Monolog.show({ text: 'Error: Please enter a file name!' });
-						break;
-					case 'too_big':
-						Monolog.show({ text: 'Error: The file name is too long!' });
-						break;
-					default:
-						Monolog.show({ text: 'Error: Failed to parse file name!' });
-						break;
+					return false;
 
 				}
-				return false;
+
+			};
+
+			const dialogResult = await Dialog.form<IFormValues>(
+				'New Blog Post',
+				{
+					body: form,
+					onSubmit: submitCallback,
+					initialValue: { fileName: '' }
+				}
+			);
+			if (dialogResult === null)
+				return;
+
+			if (await newBlogFile(dialogResult.fileName)) {
+
+				void getIndex();
 
 			}
 
-		};
+		},
+		[ getIndex ]
+	);
+	const remove = useCallback(
+		async() => {
 
-		const dialogResult = await Dialog.form<IFormValues>(
-			'New Blog Post',
-			{
-				body: form,
-				onSubmit: submitCallback,
-				initialValue: { fileName: '' }
+			const fileName = selectedFile?.fileName;
+			if (fileName === undefined)
+				return;
+
+			if (
+				await removeBlogFile(
+					fileName,
+					true
+				)
+			) {
+
+				// Deselect file and refresh index
+				await selectFile(fileName);
+				void getIndex();
+
 			}
-		);
-		if (dialogResult === null)
-			return;
 
-		if (await newBlogFile(dialogResult.fileName)) {
-
-			void getIndex();
-
-		}
-
-	};
-	const remove = async() => {
-
-		const fileName = selectedFile?.fileName;
-		if (fileName === undefined)
-			return;
-
-		if (
-			await removeBlogFile(
-				fileName,
-				true
-			)
-		) {
-
-			// Deselect file and refresh index
-			await selectFile(fileName);
-			void getIndex();
-
-		}
-
-	};
+		},
+		[
+			getIndex,
+			selectFile,
+			selectedFile?.fileName
+		]
+	);
 
 	useLayoutEffect(
 		() => {
@@ -286,7 +317,7 @@ export const AdminBlogEditor = () => {
 			void getIndex();
 
 		},
-		[]
+		[ getIndex ]
 	);
 
 	return (

@@ -1,5 +1,6 @@
 import {
-	useEffect, useState
+	useEffect,
+	useState
 } from 'react';
 import { smoothScroll } from '@/frontend/windowTools';
 
@@ -40,7 +41,7 @@ export const ScrollUp = ({ scrollYThreshold }: { scrollYThreshold: number }) => 
 			};
 
 		},
-		[]
+		[ scrollYThreshold ]
 	);
 
 	return (

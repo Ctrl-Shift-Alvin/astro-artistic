@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import clsx from 'clsx';
 import { Monolog } from '../components/MonologProvider';
 import { ZContactFormSubmission } from '../types';
 import { A } from '../components/A';
@@ -108,6 +109,11 @@ export const ContactCard = ({
 
 	};
 
+	const inputClassName = clsx(
+		'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white',
+		'outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm/6'
+	);
+
 	return (
 		<>
 			<div
@@ -192,7 +198,7 @@ export const ContactCard = ({
 												name={'first-name'}
 												type={'text'}
 												autoComplete={'given-name'}
-												className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
+												className={inputClassName}
 												value={formData.firstName}
 												onChange={
 													(e) => {
@@ -222,7 +228,7 @@ export const ContactCard = ({
 												name={'last-name'}
 												type={'text'}
 												autoComplete={'family-name'}
-												className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
+												className={inputClassName}
 												value={formData.lastName}
 												onChange={
 													(e) => {
@@ -252,7 +258,7 @@ export const ContactCard = ({
 												name={'email'}
 												type={'text'}
 												autoComplete={'email'}
-												className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
+												className={inputClassName}
 												value={formData.email}
 												onChange={
 													(e) => {
@@ -282,7 +288,7 @@ export const ContactCard = ({
 												name={'phone-number'}
 												type={'text'}
 												autoComplete={'tel'}
-												className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
+												className={inputClassName}
 												value={formData.phoneNumber}
 												onChange={
 													(e) => {
@@ -328,7 +334,7 @@ export const ContactCard = ({
 												id={'message'}
 												name={'message'}
 												rows={3}
-												className={'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
+												className={inputClassName}
 												value={formData.message}
 												onChange={
 													(e) => {

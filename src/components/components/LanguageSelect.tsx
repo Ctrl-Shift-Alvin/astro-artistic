@@ -1,3 +1,4 @@
+import clsx from 'clsx/lite';
 import { type ILocale } from '@/locales/locales.config';
 
 export const LanguageSelect = ({
@@ -16,7 +17,12 @@ export const LanguageSelect = ({
 	<div className={`flex flex-row items-center justify-center ${className}`}>
 		<select
 			value={selectedLanguageCode || defaultLanguageCode}
-			className={'rounded border border-gray-300 bg-transparent px-4 py-2 text-white focus:ring-2 focus:ring-blue-600 focus:outline-none'}
+			className={
+				clsx(
+					'rounded border border-gray-300 bg-transparent px-4 py-2 text-white',
+					'focus:ring-2 focus:ring-blue-600 focus:outline-none'
+				)
+			}
 			name={'languageSelect'}
 			onChange={onLanguageChange}
 		>

@@ -1,6 +1,7 @@
 import {
 	useState,
-	useLayoutEffect
+	useLayoutEffect,
+	useCallback
 } from 'react';
 import { addAdminButton } from './AdminButtonContainer';
 import { type TContactFormEntry } from '@/components/types';
@@ -17,28 +18,34 @@ export const AdminContactOverview = ({ submissionId }: { submissionId: number | 
 		setSubmission
 	] = useState<TContactFormEntry>();
 
-	const get = async() => {
+	const get = useCallback(
+		async() => {
 
-		const result = await fetchContactForm(
-			submissionId,
-			true
-		);
-		if (result) {
+			const result = await fetchContactForm(
+				submissionId,
+				true
+			);
+			if (result) {
 
-			setSubmission(result);
+				setSubmission(result);
 
-		}
+			}
 
-	};
+		},
+		[ submissionId ]
+	);
 
-	const remove = async() => {
+	const remove = useCallback(
+		async() => {
 
-		await deleteContactForm(
-			submissionId,
-			true
-		);
+			await deleteContactForm(
+				submissionId,
+				true
+			);
 
-	};
+		},
+		[ submissionId ]
+	);
 
 	useLayoutEffect(
 		() => {
@@ -46,7 +53,7 @@ export const AdminContactOverview = ({ submissionId }: { submissionId: number | 
 			void get();
 
 		},
-		[]
+		[ get ]
 	);
 
 	useLayoutEffect(
@@ -58,7 +65,7 @@ export const AdminContactOverview = ({ submissionId }: { submissionId: number | 
 			});
 
 		},
-		[]
+		[ remove ]
 	);
 
 	return (

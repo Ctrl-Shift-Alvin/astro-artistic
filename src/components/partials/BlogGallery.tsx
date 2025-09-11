@@ -1,9 +1,12 @@
 import {
-	useEffect, useMemo, useState
+	useLayoutEffect,
+	useMemo,
+	useState
 } from 'react';
 import { BlogCard } from '../components/BlogCard';
 import {
-	type IBlogFrontmatter, type IBlogMarkdownInstance
+	type IBlogFrontmatter,
+	type IBlogMarkdownInstance
 } from '@/components/types';
 
 export const BlogGallery = ({
@@ -21,7 +24,7 @@ export const BlogGallery = ({
 		setWindowWidth
 	] = useState(0);
 
-	useEffect(
+	useLayoutEffect(
 		() => {
 
 			const update = () => {

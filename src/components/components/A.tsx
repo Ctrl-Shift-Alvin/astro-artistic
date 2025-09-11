@@ -1,4 +1,6 @@
-import { type ReactNode } from 'react';
+import {
+	useCallback, type ReactNode
+} from 'react';
 import {
 	windowFadeIn,
 	windowFadeOut
@@ -20,74 +22,75 @@ type IAProps = {
 	key?: string;
 };
 
-const hrefClicked = (
-	clickEvent: React.MouseEvent<HTMLAnchorElement>,
-	props: IAProps
-) => {
+export const A = (props: IAProps) => {
 
-	props.onClick?.(clickEvent);
+	const clicked = useCallback(
+		(clickEvent: React.MouseEvent<HTMLAnchorElement>) => {
 
-	if (props.actionPayload) {
+			props.onClick?.(clickEvent);
 
-		if (isSyncPayload(props.actionPayload)) {
+			if (props.actionPayload) {
 
-			executeAction(props.actionPayload);
+				if (isSyncPayload(props.actionPayload)) {
 
-		} else {
+					executeAction(props.actionPayload);
 
-			void executeAsyncAction(props.actionPayload);
+				} else {
 
-		}
+					void executeAsyncAction(props.actionPayload);
 
-	}
-
-	if (props.href) {
-
-		// Prevent default anchor behavior if we're handling navigation with fades
-		clickEvent.preventDefault();
-
-		void windowFadeOut().then(() => {
-
-			if (props.target === '_blank') {
-
-				window.open(
-					props.href,
-					'_blank'
-				);
-
-				// Fade the current window back in after opening a new tab
-				windowFadeIn();
-
-			} else {
-
-				// Let the browser navigate, the fade out provides a nice transition
-				window.location.href = props.href || '';
+				}
 
 			}
 
-		});
+			if (props.href) {
 
-	}
+				// Prevent default anchor behavior if we're handling navigation with fades
+				clickEvent.preventDefault();
+
+				void windowFadeOut().then(() => {
+
+					if (props.target === '_blank') {
+
+						window.open(
+							props.href,
+							'_blank'
+						);
+
+						// Fade the current window back in after opening a new tab
+						windowFadeIn();
+
+					} else {
+
+						// Let the browser navigate, the fade out provides a nice transition
+						window.location.href = props.href || '';
+
+					}
+
+				});
+
+			}
+
+		},
+		[ props ]
+	);
+
+	return (
+		<a
+			key={props.key}
+			href={props.href}
+			className={`cursor-pointer ${props.className}`}
+			target={props.target}
+			onClick={
+				(e) => {
+
+					clicked(e);
+
+				}
+			}
+		>
+			{props.children}
+		</a>
+	);
 
 };
-
-export const A = (props: IAProps) => (
-	<a
-		key={props.key}
-		href={props.href}
-		className={`cursor-pointer ${props.className}`}
-		target={props.target}
-		onClick={
-			(e) => {
-
-				hrefClicked(
-					e,
-					props
-				);
-
-			}
-		}
-	>
-		{props.children}
-	</a>
-);

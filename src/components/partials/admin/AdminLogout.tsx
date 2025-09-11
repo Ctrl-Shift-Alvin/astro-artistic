@@ -1,4 +1,7 @@
-import { useEffect } from 'react';
+import {
+	useEffect,
+	useLayoutEffect
+} from 'react';
 import { addAdminButton } from '@/components/partials/admin/AdminButtonContainer';
 import {
 	logout,
@@ -7,15 +10,19 @@ import {
 
 export const AdminLogout = () => {
 
+	useLayoutEffect(() => {
+
+		addAdminButton({
+			children: 'Logout',
+			onClick: () => void logout()
+		});
+
+	});
+
 	useEffect(
 		() => {
 
 			setLogoutTimeout();
-
-			addAdminButton({
-				children: 'Logout',
-				onClick: () => void logout()
-			});
 
 		},
 		[]

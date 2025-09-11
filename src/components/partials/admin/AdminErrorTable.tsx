@@ -41,6 +41,13 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 	const index = useCallback(
 		async(count: number) => {
 
+			/*
+			 * Because of semi-circular deps, when 'Show more...' is clicked, this is called twice.
+			 * A simple check if something has changed prevents an API request.
+			 */
+			if (count == errorsIndex.length)
+				return;
+
 			// If count decreased, just slice the errors index
 			if (errorsIndex.length >= count) {
 
@@ -98,43 +105,50 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 		[ buildNumber ]
 	);
 
-	const del = async(id: number | string) => {
+	const del = useCallback(
+		async(id: number | string) => {
 
-		await deleteError(id);
-		setErrorsIndex([]); // Refetch all errors, but keep the shown count
-		void index(errorsCount);
-
-	};
-
-	const increaseCount = () => {
-
-		setErrorsCount((prev) => prev + ErrorsConfig.tableInitialErrorCount);
-
-	};
-
-	const decreaseCount = () => {
-
-		setErrorsCount((prev) => prev - ErrorsConfig.tableInitialErrorCount);
-
-	};
-
-	useLayoutEffect(
-		() => {
-
-			void count();
+			await deleteError(id);
+			setErrorsIndex([]); // Refetch all errors, but keep the shown count
+			void index(errorsCount);
 
 		},
-		[ count ]
+		[
+			errorsCount,
+			index
+		]
+	);
+
+	const increaseCount = useCallback(
+		() => {
+
+			setErrorsCount((prev) => prev + ErrorsConfig.tableInitialErrorCount);
+
+		},
+		[]
+	);
+
+	const decreaseCount = useCallback(
+		() => {
+
+			setErrorsCount((prev) => prev - ErrorsConfig.tableInitialErrorCount);
+
+		},
+		[]
 	);
 
 	useLayoutEffect(
 		() => {
 
+			void count();
 			void index(errorsCount);
 
 		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[ errorsCount ]
+		[
+			errorsCount,
+			index,
+			count
+		]
 	);
 
 	return (

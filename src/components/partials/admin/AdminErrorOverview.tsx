@@ -1,6 +1,7 @@
 import {
 	useState,
-	useLayoutEffect
+	useLayoutEffect,
+	useCallback
 } from 'react';
 import { addAdminButton } from './AdminButtonContainer';
 import { Monolog } from '@/components/components/MonologProvider';
@@ -23,33 +24,39 @@ export const AdminErrorOverview = ({ submissionId }: { submissionId: number | st
 		setIsStackExpanded
 	] = useState<boolean>(false);
 
-	const toggleIsStackExpanded = () => {
+	const toggleIsStackExpanded = useCallback(
+		() => {
 
-		setIsStackExpanded(!isStackExpanded);
+			setIsStackExpanded(!isStackExpanded);
 
-	};
+		},
+		[ isStackExpanded ]
+	);
 
-	const get = async() => {
+	const get = useCallback(
+		async() => {
 
-		const result = await getError(
-			submissionId,
-			true
-		);
-		if (result) {
+			const result = await getError(
+				submissionId,
+				true
+			);
+			if (result) {
 
-			setSubmission(result);
+				setSubmission(result);
 
-		} else {
+			} else {
 
-			Monolog.show({
-				text: 'Failed to fetch the submission!',
-				durationMs: 5000
-			});
+				Monolog.show({
+					text: 'Failed to fetch the submission!',
+					durationMs: 5000
+				});
 
-		}
-		return null;
+			}
+			return null;
 
-	};
+		},
+		[ submissionId ]
+	);
 
 	useLayoutEffect(
 		() => {
@@ -57,7 +64,7 @@ export const AdminErrorOverview = ({ submissionId }: { submissionId: number | st
 			void get();
 
 		},
-		[]
+		[ get ]
 	);
 
 	useLayoutEffect(
@@ -72,7 +79,7 @@ export const AdminErrorOverview = ({ submissionId }: { submissionId: number | st
 			});
 
 		},
-		[]
+		[ submissionId ]
 	);
 
 	return (

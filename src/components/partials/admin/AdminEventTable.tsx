@@ -1,6 +1,7 @@
 import {
 	useState,
-	useLayoutEffect
+	useLayoutEffect,
+	useCallback
 } from 'react';
 import { z } from 'zod';
 import { A } from '@/components/components/A';
@@ -290,99 +291,111 @@ export const AdminEventTable = () => {
 		setEventEntries
 	] = useState<TEventsEntry[]>([]);
 
-	const index = async() => {
+	const index = useCallback(
+		async() => {
 
-		const result = await fetchEventIndex();
-		if (result) {
+			const result = await fetchEventIndex();
+			if (result) {
 
-			setEventEntries(result);
-
-		}
-
-	};
-	const add = async() => {
-
-		const formResult = await showAddDialog();
-		if (!formResult)
-			return;
-
-		const newEventEntry: TNewEventsEntry = {
-			title: formResult.title,
-			location: formResult.location,
-			dateTime: new Date(
-				formResult.year,
-				formResult.month - 1,
-				formResult.day,
-				formResult.hours,
-				formResult.minutes
-			).toISOString(),
-			enablePage: formResult.enablePage
-		};
-
-		await addEvent(newEventEntry);
-		void index();
-
-	};
-	const remove = async(id: string | number) => {
-
-		await deleteEvent(id);
-		void index();
-
-	};
-
-	const showAddDialog = async(): Promise<IFormValues | null> => {
-
-		const submitCallback = (formValues: IFormValues): boolean => {
-
-			const result = ZFormValues.safeParse(formValues);
-			if (!result.success) {
-
-				Monolog.show({
-					text: `Empty/Invalid value for '${
-						result.error.issues[0]?.path
-							.toString()
-							.capitalize()
-					}'!`,
-					durationMs: 5000
-				});
-				return false;
+				setEventEntries(result);
 
 			}
-			return true;
 
-		};
+		},
+		[]
+	);
+	const add = useCallback(
+		async() => {
 
-		return await Dialog.form<IFormValues>(
-			'Add New Event',
-			{
-				body: (
-					formValues,
-					setFormValues
-				) => (
-					<EventForm
-						formValues={formValues}
-						setFormValues={setFormValues}
-					/>
-				),
-				onSubmit: submitCallback,
-				initialValue: {
-					title: '',
-					location: '',
-					day: 1,
-					month: 1,
-					year: new Date().getUTCFullYear(),
-					hours: 18,
-					minutes: 0,
-					enablePage: true
+			const formResult = await showAddDialog();
+			if (!formResult)
+				return;
+
+			const newEventEntry: TNewEventsEntry = {
+				title: formResult.title,
+				location: formResult.location,
+				dateTime: new Date(
+					formResult.year,
+					formResult.month - 1,
+					formResult.day,
+					formResult.hours,
+					formResult.minutes
+				).toISOString(),
+				enablePage: formResult.enablePage
+			};
+
+			await addEvent(newEventEntry);
+			void index();
+
+		},
+		[ index ]
+	);
+	const remove = useCallback(
+		async(id: string | number) => {
+
+			await deleteEvent(id);
+			void index();
+
+		},
+		[ index ]
+	);
+
+	const showAddDialog = useCallback(
+		async(): Promise<IFormValues | null> => {
+
+			const submitCallback = (formValues: IFormValues): boolean => {
+
+				const result = ZFormValues.safeParse(formValues);
+				if (!result.success) {
+
+					Monolog.show({
+						text: `Empty/Invalid value for '${
+							result.error.issues[0]?.path
+								.toString()
+								.capitalize()
+						}'!`,
+						durationMs: 5000
+					});
+					return false;
+
 				}
-			}
-		);
+				return true;
 
-	};
+			};
+
+			return await Dialog.form<IFormValues>(
+				'Add New Event',
+				{
+					body: (
+						formValues,
+						setFormValues
+					) => (
+						<EventForm
+							formValues={formValues}
+							setFormValues={setFormValues}
+						/>
+					),
+					onSubmit: submitCallback,
+					initialValue: {
+						title: '',
+						location: '',
+						day: 1,
+						month: 1,
+						year: new Date().getUTCFullYear(),
+						hours: 18,
+						minutes: 0,
+						enablePage: true
+					}
+				}
+			);
+
+		},
+		[]
+	);
 
 	useLayoutEffect(
 		() => void index(),
-		[]
+		[ index ]
 	);
 
 	return (

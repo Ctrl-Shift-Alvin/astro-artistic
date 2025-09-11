@@ -6,6 +6,7 @@ import { languages } from '@codemirror/language-data';
 import { material } from '@uiw/codemirror-theme-material';
 import ReactCodeMirror, { keymap } from '@uiw/react-codemirror';
 import { marked } from 'marked';
+import { useMemo } from 'react';
 
 export const AdminMarkdownEditor = ({
 	value = '',
@@ -17,17 +18,23 @@ export const AdminMarkdownEditor = ({
 	onChange: (newValue: string)=> void;
 }) => {
 
-	const editorKeymap = keymap.of([
-		{
-			key: 'Ctrl-s',
-			run: () => {
+	const editorKeymap = useMemo(
+		() => keymap.of([
+			{
+				key: 'Ctrl-s',
+				run: () => {
 
-				onSave(value);
-				return true;
+					onSave(value);
+					return true;
 
+				}
 			}
-		}
-	]);
+		]),
+		[
+			onSave,
+			value
+		]
+	);
 
 	return (
 		<div className={'w-full flex flex-col items-center'}>

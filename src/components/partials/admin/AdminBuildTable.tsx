@@ -40,6 +40,13 @@ export const AdminBuildTable = () => {
 	const index = useCallback(
 		async(count: number) => {
 
+			/*
+			 * Because of semi-circular deps, when 'Show more...' is clicked, this is called twice.
+			 * A simple check if something has changed prevents an API request.
+			 */
+			if (count == buildsIndex.length)
+				return;
+
 			// If count decreased, just slice the builds index
 			if (buildsIndex.length >= count) {
 
@@ -74,40 +81,46 @@ export const AdminBuildTable = () => {
 		]
 	);
 
-	const remove = async(buildNumber: number | string) => {
+	const remove = useCallback(
+		async(buildNumber: number | string) => {
 
-		await deleteBuild(buildNumber);
-		void index(buildsCount);
+			await deleteBuild(buildNumber);
+			void index(buildsCount);
 
-	};
+		},
+		[
+			buildsCount,
+			index
+		]
+	);
 
-	const count = async() => {
+	const count = useCallback(
+		async() => {
 
-		const result = await countBuilds();
-		if (result) {
+			const result = await countBuilds();
+			if (result) {
 
-			setFullIndexCount(result);
+				setFullIndexCount(result);
 
-		}
+			}
 
-	};
+		},
+		[]
+	);
 
-	const increaseCount = () => {
-
-		setBuildsCount((prev) => prev + ErrorsConfig.tableInitialBuildCount);
-
-	};
-
-	const decreaseCount = () => {
-
-		setBuildsCount((prev) => prev - ErrorsConfig.tableInitialBuildCount);
-
-	};
-
-	useLayoutEffect(
+	const increaseCount = useCallback(
 		() => {
 
-			void count();
+			setBuildsCount((prev) => prev + ErrorsConfig.tableInitialBuildCount);
+
+		},
+		[]
+	);
+
+	const decreaseCount = useCallback(
+		() => {
+
+			setBuildsCount((prev) => prev - ErrorsConfig.tableInitialBuildCount);
 
 		},
 		[]
@@ -116,11 +129,15 @@ export const AdminBuildTable = () => {
 	useLayoutEffect(
 		() => {
 
+			void count();
 			void index(buildsCount);
 
 		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[ buildsCount ]
+		[
+			buildsCount,
+			count,
+			index
+		]
 	);
 
 	return (

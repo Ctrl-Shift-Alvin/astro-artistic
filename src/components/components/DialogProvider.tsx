@@ -99,8 +99,7 @@ export class Dialog {
 	/**
 	 * Closes the currently open dialog.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	static close = () => {};
+	static close = () => { /* Will be assigned */ };
 
 	/**
 	 * Shows a dialog with a title, body and an OK button.
@@ -188,7 +187,7 @@ export class Dialog {
 	 * @param form.body A function that returns the form. Use 'formValues' to bind the form element values.
 	 * @param form.initialValue Initial value of type T used to instantiate a prop that will be passed to body at first.
 	 * @param onSubmit Callback for the 'Submit' button. Use 'formValues' to validate and return true to close the form.
-	 * @returns A promise that resolves with the 'form.onSubmit' return value
+	 * @returns A promise that resolves with the 'form.onSubmit' return value (when 'Submit' is clicked).
 	 */
 	static form<T>(
 		title: ReactNode,
@@ -277,7 +276,6 @@ export const DialogProvider: React.FC = () => {
 		},
 		[]
 	);
-	Dialog.close = hideDialogCallback;
 
 	useEffect(
 		() => {
@@ -298,6 +296,7 @@ export const DialogProvider: React.FC = () => {
 
 			};
 			dialogEmitter.subscribe(listener);
+			Dialog.close = hideDialogCallback;
 
 			return () => {
 

@@ -1,4 +1,5 @@
 import {
+	useCallback,
 	useEffect, useState
 } from 'react';
 import { LanguageSelect } from '../components/LanguageSelect';
@@ -22,37 +23,41 @@ export const Navbar = ({
 
 	const selectedLanguageCode = cGetUserLanguage();
 
-	const handleLanguageChange = (event: any) => {
+	const handleLanguageChange = useCallback(
+		(event: React.ChangeEvent<HTMLSelectElement>) => {
 
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-		const langCode: string = event.target.value;
-		cSetUserLanguage(langCode);
+			const langCode: string = event.target.value;
+			cSetUserLanguage(langCode);
 
-		windowRefresh();
+			windowRefresh();
 
-	};
+		},
+		[]
+	);
 
 	const [
 		hamburgerOpen,
 		setHamburgerOpen
 	] = useState(false);
-	const handleHamburgerClick = () => {
+	const handleHamburgerClick = useCallback(
+		() => {
 
-		setHamburgerOpen(!hamburgerOpen);
+			setHamburgerOpen(!hamburgerOpen);
 
-	};
+		},
+		[ hamburgerOpen ]
+	);
 
 	const [
 		hamburgerBackgroundAlpha,
 		setHamburgerBackgroundAlpha
-	]
-		= useState(true);
+	] = useState(true);
+
 	useEffect(
 		() => {
 
 			const handleScroll = () => {
 
-				setHamburgerOpen(false);
 				if (window.scrollY > 0) {
 
 					setHamburgerBackgroundAlpha(false);

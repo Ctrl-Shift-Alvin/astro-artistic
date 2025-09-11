@@ -1,4 +1,5 @@
 import {
+	useCallback,
 	useLayoutEffect,
 	useState
 } from 'react';
@@ -16,29 +17,35 @@ export const AdminContactTable = () => {
 		setFormSubmissions
 	] = useState<TContactFormEntry[]>([]);
 
-	const get = async() => {
+	const get = useCallback(
+		async() => {
 
-		const result = await fetchContactFormIndex();
-		if (result) {
+			const result = await fetchContactFormIndex();
+			if (result) {
 
-			setFormSubmissions(result);
+				setFormSubmissions(result);
 
-		}
+			}
 
-	};
-	const remove = async(id: number) => {
+		},
+		[]
+	);
+	const remove = useCallback(
+		async(id: number) => {
 
-		await deleteContactForm(id);
-		void get();
+			await deleteContactForm(id);
+			void get();
 
-	};
+		},
+		[ get ]
+	);
 	useLayoutEffect(
 		() => {
 
 			void get();
 
 		},
-		[]
+		[ get ]
 	);
 	return (
 		<>
