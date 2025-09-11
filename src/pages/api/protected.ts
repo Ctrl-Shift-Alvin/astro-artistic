@@ -1,4 +1,3 @@
-import { spawn } from 'node:child_process';
 import {
 	existsSync,
 	readdirSync,
@@ -1256,6 +1255,7 @@ export async function POST(context: APIContext) {
 				}
 
 				errors_deleteError(parsedBody.data.id);
+				console.log('Deleted');
 
 				const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
 				return new Response(

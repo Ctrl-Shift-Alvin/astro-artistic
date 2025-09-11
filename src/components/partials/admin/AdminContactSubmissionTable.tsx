@@ -3,13 +3,11 @@ import {
 	useState
 } from 'react';
 import { A } from '@/components/components/A';
-import { Dialog } from '@/components/components/DialogProvider';
-import { Monolog } from '@/components/components/MonologProvider';
 import { type TContactFormEntry } from '@/components/types';
 import {
-	getContactForms,
+	fetchContactFormIndex,
 	deleteContactForm
-} from '@/frontend/protectedApi';
+} from '@/frontend/adminApi';
 
 export const AdminContactSubmissionTable = () => {
 
@@ -20,7 +18,7 @@ export const AdminContactSubmissionTable = () => {
 
 	const get = async() => {
 
-		const result = await getContactForms();
+		const result = await fetchContactFormIndex();
 		if (result) {
 
 			setFormSubmissions(result);
@@ -30,24 +28,8 @@ export const AdminContactSubmissionTable = () => {
 	};
 	const remove = async(id: number) => {
 
-		if (
-			!await Dialog.yesNo(
-				'Are you sure you want to delete this contact form submission?',
-				`This will irreversibly remove the contact form submission with ID ${id}.`
-			)
-		)
-			return;
-
-		const result = await deleteContactForm(id);
-		if (result) {
-
-			Monolog.show({
-				text: `Successfully deleted contact form submission with id ${id}!`,
-				durationMs: 3000
-			});
-			void get();
-
-		}
+		await deleteContactForm(id);
+		void get();
 
 	};
 	useLayoutEffect(

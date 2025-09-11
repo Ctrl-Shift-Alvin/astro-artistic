@@ -1,5 +1,8 @@
 TODO Consitent naming of admin components
 TODO Check React patterns for better usage of useCallback
+TODO Interrupt navigation when admin editor file has changed
+TODO Fetch contact submission ranges instead of *
+TODO Add standardized form components
 TODO Better blog editor
 TODO Add prevUrl query to admin login redirect on token expiration
 TODO Change class and className patterns, and replace with clsx

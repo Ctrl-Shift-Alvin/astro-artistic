@@ -2,7 +2,6 @@ import {
 	useCallback,
 	useEffect,
 	useLayoutEffect,
-	useRef,
 	useState
 } from 'react';
 import clsx from 'clsx/lite';
@@ -12,81 +11,79 @@ import { addAdminButton } from './AdminButtonContainer';
 import { Monolog } from '@/components/components/MonologProvider';
 import { type TEventsEntry } from '@/components/types';
 import {
-	deleteEventsEntry,
-	editEventsEntry,
+	deleteEvent,
+	editEvent,
 	getEvent,
 	saveEvent
-} from '@/frontend/protectedApi';
-import { Dialog } from '@/components/components/DialogProvider';
-import { goto } from '@/frontend/windowTools';
+} from '@/frontend/adminApi';
 
 // eslint-disable-next-line import-x/no-unassigned-import
 import 'react-datepicker/dist/react-datepicker.css';
 
 export const AdminEventsEditor = ({ eventId }: { eventId: number }) => {
 
-	const isInitialMount = useRef(true);
-
 	const [
 		eventEntry,
-		setEventEntry
+		_setEventEntry
 	] = useState<TEventsEntry>();
 	const [
 		eventEntryChanged,
 		setEventEntryChanged
 	] = useState<boolean>(false);
-	useEffect(
-		() => {
+	const setEventEntry = useCallback(
+		(value: typeof eventEntry) => {
 
-			if (isInitialMount.current) {
+			_setEventEntry((prev) => {
 
-				isInitialMount.current = false;
+				if (prev) {
 
-			} else {
+					setEventEntryChanged(true);
 
-				setEventEntryChanged(true);
+				}
 
-			}
+				return value;
+
+			});
 
 		},
-		[ eventEntry ]
+		[]
 	);
 
 	const [
 		fileContent,
-		setFileContent
+		_setFileContent
 	] = useState<string>();
 	const [
 		fileContentChanged,
 		setFileContentChanged
 	] = useState<boolean>(false);
-	useEffect(
-		() => {
+	const setFileContent = useCallback(
+		(value: typeof fileContent) => {
 
-			if (isInitialMount.current) {
+			_setFileContent((prev) => {
 
-				isInitialMount.current = false;
+				if (prev) {
 
-			} else {
+					setFileContentChanged(true);
 
-				setFileContentChanged(true);
+				}
+				return value;
 
-			}
+			});
 
 		},
-		[ fileContent ]
+		[]
 	);
 
 	const get = useCallback(
 		async() => {
 
-			const result = await getEvent(eventId);
-			if (result === null) {
-
-				Monolog.show({ text: `Failed to fetch event entry with ID '${eventId}'!` });
+			const result = await getEvent(
+				eventId,
+				true
+			);
+			if (!result)
 				return;
-
-			}
 
 			setEventEntry(result.data);
 
@@ -94,32 +91,28 @@ export const AdminEventsEditor = ({ eventId }: { eventId: number }) => {
 				setFileContent(result.file);
 
 		},
-		[ eventId ]
+		[
+			eventId,
+			setEventEntry,
+			setFileContent
+		]
 	);
 	const edit = useCallback(
-		async(): Promise<boolean> => {
+		async() => {
 
-			if (!eventEntry) {
+			if (!eventEntry)
+				return;
 
-				Monolog.show({
-					text: 'Failed to edit event entry, values undefined!',
-					durationMs: 3000
-				});
-				return false;
-
-			}
-			const result = await editEventsEntry(
-				eventId,
-				eventEntry
-			);
-
-			if (result) {
+			if (
+				await editEvent(
+					eventId,
+					eventEntry
+				)
+			) {
 
 				setEventEntryChanged(false);
 
 			}
-
-			return result;
 
 		},
 		[
@@ -128,29 +121,21 @@ export const AdminEventsEditor = ({ eventId }: { eventId: number }) => {
 		]
 	);
 	const save = useCallback(
-		async(): Promise<boolean> => {
+		async() => {
 
-			if (!fileContent) {
+			if (!fileContent)
+				return;
 
-				Monolog.show({
-					text: 'Failed to save event entry content, file contents undefined!',
-					durationMs: 3000
-				});
-				return false;
-
-			}
-			const result = await saveEvent(
-				eventId,
-				fileContent
-			);
-
-			if (result) {
+			if (
+				await saveEvent(
+					eventId,
+					fileContent
+				)
+			) {
 
 				setFileContentChanged(false);
 
 			}
-
-			return result;
 
 		},
 		[
@@ -158,87 +143,24 @@ export const AdminEventsEditor = ({ eventId }: { eventId: number }) => {
 			fileContent
 		]
 	);
-
-	const del = useCallback(
-		async() => {
-
-			const result = await Dialog.yesNo(
-				'Are you sure you want to delete this event entry?',
-				`This will irreversibly remove the event entry with ID ${eventId}.`
-			);
-
-			if (!result)
-				return;
-
-			const deleteResult = await deleteEventsEntry(eventId);
-
-			if (deleteResult) {
-
-				Monolog.show({
-					text: `Successfully deleted event entry with ID '${eventId}'!`,
-					durationMs: 2000
-				});
-				setTimeout(
-					() => {
-
-						goto('/admin/home/');
-
-					},
-					2000
-				);
-
-			} else {
-
-				Monolog.show({
-					text: `Failed to delete event entry with ID '${eventId}'!`,
-					durationMs: 2000
-				});
-
-			}
-
-		},
-		[ eventId ]
-	);
 	const saveEdit = useCallback(
-		async() => {
+		() => {
 
-			const promises = new Array<Promise<boolean>>();
 			if (eventEntryChanged) {
 
-				promises.push(edit());
+				void edit();
+
+			}
+			if (fileContentChanged) {
+
+				void save();
 
 			}
 
-			if (fileContentChanged && eventEntry?.enablePage) {
-
-				promises.push(save());
-
-			}
-
-			if (promises.length === 0) {
+			if (!eventEntryChanged && !fileContentChanged) {
 
 				Monolog.show({ text: 'No changes made!' });
 				return;
-
-			}
-
-			const results = await Promise.all(promises);
-
-			if (results.every((i) => i)) {
-
-				Monolog.show({
-					text: `Successfully saved the event entry${results.length > 1
-						? ' and entry contents'
-						: ''}!`
-				});
-
-			} else if (results[0] === true) {
-
-				Monolog.show({ text: 'Successfully saved the event entry!' });
-
-			} else if (results[1] === true) {
-
-				Monolog.show({ text: 'Successfully saved the event entry contents!' });
 
 			}
 
@@ -246,7 +168,6 @@ export const AdminEventsEditor = ({ eventId }: { eventId: number }) => {
 		[
 			eventEntryChanged,
 			fileContentChanged,
-			eventEntry,
 			edit,
 			save
 		]
@@ -258,17 +179,20 @@ export const AdminEventsEditor = ({ eventId }: { eventId: number }) => {
 			addAdminButton(
 				{
 					children: 'Save',
-					onClick: () => void saveEdit()
+					onClick: saveEdit
 				},
 				{
 					children: 'Delete',
-					onClick: () => void del()
+					onClick: () => void deleteEvent(
+						eventId,
+						true
+					)
 				}
 			);
 
 		},
 		[
-			del,
+			eventId,
 			saveEdit
 		]
 	);
@@ -447,11 +371,16 @@ export const AdminEventsEditor = ({ eventId }: { eventId: number }) => {
 									(str) => {
 
 										setFileContent(str);
-										setFileContentChanged(true);
 
 									}
 								}
-								onSave={() => void saveEdit()}
+								onSave={
+									() => {
+
+										saveEdit();
+
+									}
+								}
 							/>
 						</div>
 					)

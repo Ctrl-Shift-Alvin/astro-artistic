@@ -4,12 +4,12 @@ import {
 	useLayoutEffect
 } from 'react';
 import { addAdminButton } from './AdminButtonContainer';
-import { Monolog } from '@/components/components/MonologProvider';
 import { type TBuild } from '@/components/types';
-import { getBuild } from '@/frontend/protectedApi';
+import {
+	deleteBuild, getBuild
+} from '@/frontend/adminApi';
 import { A } from '@/components/components/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
-import { executeAsyncAction } from '@/shared/actions';
 
 export const AdminBuildOverview = ({ buildNumber }: { buildNumber: number | string }) => {
 
@@ -32,32 +32,15 @@ export const AdminBuildOverview = ({ buildNumber }: { buildNumber: number | stri
 	const get = useCallback(
 		async() => {
 
-			const result = await getBuild(buildNumber);
+			const result = await getBuild(
+				buildNumber,
+				true
+			);
 			if (result) {
 
 				setBuild(result);
 
-			} else {
-
-				Monolog.show({
-					text: 'Failed to fetch the build!',
-					durationMs: 5000
-				});
-
 			}
-			return null;
-
-		},
-		[ buildNumber ]
-	);
-
-	const remove = useCallback(
-		async() => {
-
-			await executeAsyncAction({
-				action: 'adminDeleteBuild',
-				args: [ buildNumber ]
-			});
 
 		},
 		[ buildNumber ]
@@ -77,11 +60,14 @@ export const AdminBuildOverview = ({ buildNumber }: { buildNumber: number | stri
 
 			addAdminButton({
 				children: 'Remove',
-				onClick: () => void remove()
+				onClick: () => void deleteBuild(
+					buildNumber,
+					true
+				)
 			});
 
 		},
-		[ remove ]
+		[ buildNumber ]
 	);
 
 	return (

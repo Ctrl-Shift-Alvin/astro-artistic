@@ -9,12 +9,11 @@ import {
 	deleteError,
 	getErrorIndexByBuild,
 	countErrors,
-	countErrorsByBuild
-} from '@/frontend/protectedApi';
+	countErrorsByBuild,
+	getPrevUrlQuery
+} from '@/frontend/adminApi';
 import { ErrorsConfig } from '@/shared/config/errors';
 import { A } from '@/components/components/A';
-import { Dialog } from '@/components/components/DialogProvider';
-import { Monolog } from '@/components/components/MonologProvider';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 
 export const AdminErrorsTable = ({ buildNumber }: { buildNumber?: number }) => {
@@ -99,27 +98,10 @@ export const AdminErrorsTable = ({ buildNumber }: { buildNumber?: number }) => {
 		[ buildNumber ]
 	);
 
-	const remove = async(id: number | string) => {
+	const del = async(id: number | string) => {
 
-		if (
-			!await Dialog.yesNo(
-				'Are you sure you want to delete this error?',
-				`This will irreversibly remove the error with the ID '${id}'.`
-			)
-		)
-			return;
-
-		const result = await deleteError(id);
-		if (result) {
-
-			Monolog.show({ text: `Successfully deleted error '${id}'!` });
-
-		} else {
-
-			Monolog.show({ text: `Failed deleting error '${id}'!` });
-
-		}
-
+		await deleteError(id);
+		setErrorsIndex([]); // Refetch all errors, but keep the shown count
 		void index(errorsCount);
 
 	};
@@ -222,7 +204,7 @@ export const AdminErrorsTable = ({ buildNumber }: { buildNumber?: number }) => {
 										<td className={tdClassName}>
 											<A
 												className={'text-center underline'}
-												href={`/admin/submission/error/${entry.id}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
+												href={`/admin/submission/error/${entry.id}/${getPrevUrlQuery()}`}
 											>
 												{entry.id}
 											</A>
@@ -236,7 +218,7 @@ export const AdminErrorsTable = ({ buildNumber }: { buildNumber?: number }) => {
 										<td className={tdClassName}>
 											<A
 												className={'underline'}
-												href={`/admin/submission/build/${entry.buildNumber}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
+												href={`/admin/submission/build/${entry.buildNumber}/${getPrevUrlQuery()}}`}
 											>
 												{entry.buildNumber}
 											</A>
@@ -272,7 +254,7 @@ export const AdminErrorsTable = ({ buildNumber }: { buildNumber?: number }) => {
 										>
 											<A
 												className={'text-red-600 text-center'}
-												onClick={() => void remove(entry.buildNumber)}
+												onClick={() => void del(entry.id)}
 											>
 												{'D'}
 											</A>

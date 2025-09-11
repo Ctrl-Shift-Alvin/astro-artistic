@@ -1,3 +1,5 @@
+import { goto } from './windowTools';
+import { Dialog } from '@/components/components/DialogProvider';
 import { Monolog } from '@/components/components/MonologProvider';
 import {
 	ZAuthPostApiRequest,
@@ -15,15 +17,21 @@ import {
 	lsSetAuthTokenExpiry
 } from '@/frontend/localStorage';
 
+export const getPrevUrlQuery = () => {
+
+	return `?prevUrl=${encodeURIComponent(location.pathname)}`;
+
+};
+export const gotoPrevOrHome = () => {
+
+	const prevUrl = new URLSearchParams(location.search).get('prevUrl');
+	goto(prevUrl ?? '/admin/home/');
+
+};
+
 // #region Auth API
 
 let currentTimeout: NodeJS.Timeout;
-let logoutCallback: ()=> void;
-export const setLogoutCallback = (callback: ()=> void) => {
-
-	logoutCallback = callback;
-
-};
 export const checkLogin = (): boolean => {
 
 	const tokenExpiry = lsGetAuthTokenExpiry();
@@ -46,8 +54,15 @@ export const login = async(password: string): Promise<boolean> => {
 		}
 	);
 
-	if (!response.ok)
+	if (!response.ok) {
+
+		Monolog.show({
+			text: `Error: Could not authenticate (${response.status})!`,
+			durationMs: 2000
+		});
 		return false;
+
+	}
 
 	const response1 = await fetch(
 		'/api/protected/',
@@ -59,17 +74,38 @@ export const login = async(password: string): Promise<boolean> => {
 	);
 
 	const {
-		success: success1, data: data1
+		success: success1,
+		data: data1
 	} = await ZProtectedGetApiResponse.safeParseAsync(await response1.json());
 
-	if (!success1 || 'error' in data1)
+	if (!success1 || 'error' in data1) {
+
+		Monolog.show({
+			text: 'Error: Incorrect password!',
+			durationMs: 2000
+		});
 		return false;
 
-	lsSetAuthTokenExpiry(data1.expiry);
-	return true;
+	} else {
+
+		void Monolog
+			.showAsync({
+				text: 'Success: Logged in!',
+				durationMs: 1500
+			})
+			.then(() => {
+
+				goto('/admin/home/');
+
+			});
+		setLogoutTimeout();
+		lsSetAuthTokenExpiry(data1.expiry);
+		return true;
+
+	}
 
 };
-export const logout = async() => {
+export const logout = async(timeout: boolean = false) => {
 
 	const response = await fetch(
 		'/api/auth/',
@@ -80,18 +116,73 @@ export const logout = async() => {
 		}
 	);
 
+	lsSetAuthTokenExpiry(null);
+	clearTimeout(currentTimeout);
+
+	// Aggressively delete document immediately
+	document
+		.getElementById('content-div')
+		?.childNodes.forEach((v) => {
+
+			v.remove();
+
+		});
+
+	const h1 = document.createElement('h1');
+	h1.textContent = 'Logged out!';
+	h1.classList.add(
+		'absolute',
+		'top-20',
+		'left-0',
+		'right-0',
+		'text-4xl',
+		'text-center'
+	);
+	document
+		.getElementById('content-div')
+		?.appendChild(h1);
+
 	if (response.ok) {
 
-		lsSetAuthTokenExpiry(null);
-		clearTimeout(currentTimeout);
-		logoutCallback();
-		logoutCallback = () => { /* noop */ };
+		void Monolog
+			.showAsync({
+				text: `${
+					timeout
+						? 'Token expiry: '
+						: ''
+				}Successfully logged out!`,
+				durationMs: 2000,
+				fadeDurationMs: 500
+			})
+			.then(() => {
+
+				goto('/admin/login/');
+
+			});
+
+	} else {
+
+		void Monolog
+			.showAsync({
+				text: `${
+					timeout
+						? 'Token expiry: '
+						: ''
+				}Partially successfully logged out! (Auth API Endpoint error)`,
+				durationMs: 2000,
+				fadeDurationMs: 500
+			})
+			.then(() => {
+
+				goto('/admin/login/');
+
+			});
 
 	}
 
 };
 
-export const setLogoutTimeout = () => {
+export const setLogoutTimeout = (callback?: ()=> void) => {
 
 	const tokenExpiry = lsGetAuthTokenExpiry();
 	if (tokenExpiry) {
@@ -103,7 +194,7 @@ export const setLogoutTimeout = () => {
 			currentTimeout = setTimeout(
 				() => {
 
-					void logout().then(logoutCallback);
+					void logout(true).then(callback);
 
 				},
 				timeDifference
@@ -120,35 +211,9 @@ export const setLogoutTimeout = () => {
 
 		} else {
 
-			void logout();
+			void logout(true).then(callback);
 
 		}
-
-	}
-
-};
-export const handleAuthSubmit = async(
-	password: string,
-	event?: Event
-) => {
-
-	event?.preventDefault();
-
-	const loginResult = await login(password);
-	if (loginResult) {
-
-		Monolog.show({
-			text: 'Success: Logged in!',
-			durationMs: 1500
-		});
-		setLogoutTimeout();
-
-	} else {
-
-		Monolog.show({
-			text: 'Error: Incorrect password!',
-			durationMs: 2000
-		});
 
 	}
 
@@ -170,13 +235,23 @@ export const fetchBlogIndex = async(): Promise<string[] | null> => {
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['blog/index'].safeParseAsync(await response.json());
-	if (!parsedResponse.success || 'error' in parsedResponse.data)
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		Monolog.show({
+			text: 'Failed to fetch the blog index!',
+			durationMs: 3000
+		});
 		return null;
+
+	}
 
 	return parsedResponse.data.data;
 
 };
-export const fetchBlogFile = async(fileName: string): Promise<string | null> => {
+export const fetchBlogFile = async(
+	fileName: string,
+	gotoPrevUrl: boolean = false
+): Promise<string | null> => {
 
 	const requestBody = ZProtectedPostApiRequestMap['blog/get'].safeParse({ fileName });
 	if (!requestBody.success)
@@ -193,12 +268,27 @@ export const fetchBlogFile = async(fileName: string): Promise<string | null> => 
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['blog/get'].safeParseAsync(await response.json());
-	if (!parsedResponse.success || 'error' in parsedResponse.data)
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		void Monolog
+			.showAsync({
+				text: `Failed to fetch a blog file named '${fileName}'!`,
+				durationMs: 3000
+			})
+			.then(() => {
+
+				if (gotoPrevUrl)
+					gotoPrevOrHome();
+
+			});
 		return null;
+
+	}
 
 	return parsedResponse.data.data;
 
 };
+
 export const saveBlogFile = async(
 	fileName: string,
 	fileContent: string
@@ -222,7 +312,20 @@ export const saveBlogFile = async(
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['blog/save'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data);
+	if (!parsedResponse.success) {
+
+		Monolog.show({
+			text: `Failed to save a blog file named '${fileName}'!`,
+			durationMs: 3000
+		});
+		return false;
+
+	}
+	Monolog.show({
+		text: `Successfully saved the blog file named '${fileName}'!`,
+		durationMs: 3000
+	});
+	return true;
 
 };
 export const newBlogFile = async(fileName: string): Promise<boolean> => {
@@ -242,10 +345,34 @@ export const newBlogFile = async(fileName: string): Promise<boolean> => {
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['blog/new'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data);
+	if (!parsedResponse.success) {
+
+		Monolog.show({
+			text: `Failed to create a new blog file named '${fileName}'!`,
+			durationMs: 3000
+		});
+		return false;
+
+	}
+	Monolog.show({
+		text: `Successfully created a blog file named '${fileName}'!`,
+		durationMs: 3000
+	});
+	return true;
 
 };
-export const removeBlogFile = async(fileName: string): Promise<boolean> => {
+export const removeBlogFile = async(
+	fileName: string,
+	gotoPrevUrl: boolean = false
+): Promise<boolean> => {
+
+	if (
+		!await Dialog.yesNo(
+			'Remove Blog Post File',
+			`Removing the file '${fileName}' cannot be reverted. Are you sure you want to continue?`
+		)
+	)
+		return false;
 
 	const requestBody = ZProtectedPostApiRequestMap['blog/remove'].safeParse({ fileName });
 	if (!requestBody.success)
@@ -262,7 +389,25 @@ export const removeBlogFile = async(fileName: string): Promise<boolean> => {
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['blog/remove'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data);
+	if (!parsedResponse.success) {
+
+		Monolog.show({
+			text: `Failed to remove a blog file named '${fileName}'!`,
+			durationMs: 3000
+		});
+		return false;
+
+	}
+
+	void Monolog
+		.showAsync({ text: `Successfully removed the blog file named '${fileName}'!` })
+		.then(() => {
+
+			if (gotoPrevUrl)
+				gotoPrevOrHome();
+
+		});
+	return true;
 
 };
 
@@ -270,7 +415,7 @@ export const removeBlogFile = async(fileName: string): Promise<boolean> => {
 
 // #region Contact
 
-export const getContactForms = async(): Promise<TContactFormEntry[] | null> => {
+export const fetchContactFormIndex = async(): Promise<TContactFormEntry[] | null> => {
 
 	const response = await fetch(
 		'/api/protected/?type=contact/index',
@@ -282,13 +427,23 @@ export const getContactForms = async(): Promise<TContactFormEntry[] | null> => {
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['contact/index'].safeParseAsync(await response.json());
-	if (!parsedResponse.success || 'error' in parsedResponse.data)
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		Monolog.show({
+			text: 'Failed to get all contact form submissions!',
+			durationMs: 3000
+		});
 		return null;
+
+	}
 
 	return parsedResponse.data.data;
 
 };
-export const getContactForm = async(id: string | number): Promise<TContactFormEntry | null> => {
+export const fetchContactForm = async(
+	id: string | number,
+	gotoPrevUrl: boolean = false
+): Promise<TContactFormEntry | null> => {
 
 	const requestBody = ZProtectedPostApiRequestMap['contact/get'].safeParse({ id });
 	if (!requestBody.success)
@@ -305,13 +460,41 @@ export const getContactForm = async(id: string | number): Promise<TContactFormEn
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['contact/get'].safeParseAsync(await response.json());
-	if (!parsedResponse.success || 'error' in parsedResponse.data)
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		void Monolog
+			.showAsync({
+				text: `Failed to get a contact form submission with the ID '${id}'!`,
+				durationMs: 3000
+			})
+			.then(() => {
+
+				if (gotoPrevUrl)
+					gotoPrevOrHome();
+
+			});
 		return null;
+
+	}
 
 	return parsedResponse.data.data;
 
 };
-export const deleteContactForm = async(id: string | number): Promise<boolean> => {
+export const deleteContactForm = async(
+	id: string | number,
+	gotoPrevUrl: boolean = false
+): Promise<boolean> => {
+
+	if (
+		!await Dialog.yesNo(
+			'Are you sure you want to delete this contact form submission?',
+			`This will irreversibly remove the contact form submission with ID '${id}'.`
+		)
+	) {
+
+		return false;
+
+	}
 
 	const requestBody = ZProtectedPostApiRequestMap['contact/delete'].safeParse({ id });
 	if (!requestBody.success)
@@ -328,7 +511,25 @@ export const deleteContactForm = async(id: string | number): Promise<boolean> =>
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['contact/delete'].safeParseAsync(await response.json());
-	return parsedResponse.success;
+	if (!parsedResponse.success) {
+
+		Monolog.show({
+			text: `Failed to delete a contact form submission with the ID '${id}'!`,
+			durationMs: 3000
+		});
+		return false;
+
+	}
+
+	void Monolog
+		.showAsync({ text: `Successfully deleted the contact form submission with the ID '${id}'!` })
+		.then(() => {
+
+			if (gotoPrevUrl)
+				gotoPrevOrHome();
+
+		});
+	return true;
 
 };
 
@@ -336,7 +537,7 @@ export const deleteContactForm = async(id: string | number): Promise<boolean> =>
 
 // #region Events
 
-export const getEventsIndex = async(): Promise<TEventsEntry[] | null> => {
+export const fetchEventIndex = async(): Promise<TEventsEntry[] | null> => {
 
 	const response = await fetch(
 		'/api/protected/?type=events/index',
@@ -348,13 +549,65 @@ export const getEventsIndex = async(): Promise<TEventsEntry[] | null> => {
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['events/index'].safeParseAsync(await response.json());
-	if (!parsedResponse.success || 'error' in parsedResponse.data)
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		Monolog.show({
+			text: 'Failed to get the event entry index!',
+			durationMs: 3000
+		});
 		return null;
+
+	}
 
 	return parsedResponse.data.data;
 
 };
-export const addEventsEntry = async(newEntry: TNewEventsEntry): Promise<boolean> => {
+export const getEvent = async(
+	id: string | number,
+	gotoPrevUrl: boolean = false
+): Promise<{
+	data: TEventsEntry;
+	file: string | undefined;
+} | null> => {
+
+	const requestBody = ZProtectedPostApiRequestMap['events/get'].safeParse({ id });
+	if (!requestBody.success)
+		return null;
+
+	const response = await fetch(
+		'/api/protected/?type=events/get',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestBody.data),
+			credentials: 'include'
+		}
+	);
+
+	const parsedResponse = await TProtectedPostApiResponseMap['events/get'].safeParseAsync(await response.json());
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		void Monolog
+			.showAsync({
+				text: `Failed to fetch an event entry with the ID '${id}'!`,
+				durationMs: 3000
+			})
+			.then(() => {
+
+				if (gotoPrevUrl)
+					gotoPrevOrHome();
+
+			});
+		return null;
+
+	}
+	return {
+		data: parsedResponse.data.data,
+		file: parsedResponse.data.file
+	};
+
+};
+export const addEvent = async(newEntry: TNewEventsEntry): Promise<boolean> => {
 
 	const requestBody = ZProtectedPostApiRequestMap['events/add'].safeParse({ data: newEntry });
 	if (!requestBody.success)
@@ -371,10 +624,37 @@ export const addEventsEntry = async(newEntry: TNewEventsEntry): Promise<boolean>
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['events/add'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data);
+	if (!parsedResponse.success) {
+
+		Monolog.show({
+			text: `Failed to add new event entry titled '${
+				newEntry.title.length > 10
+					? newEntry.title.slice(
+						0,
+						10
+					) + '...'
+					: newEntry.title
+			}'!`,
+			durationMs: 3000
+		});
+		return false;
+
+	}
+	return true;
 
 };
-export const deleteEventsEntry = async(id: string | number): Promise<boolean> => {
+export const deleteEvent = async(
+	id: string | number,
+	gotoPrevUrl: boolean = false
+): Promise<boolean> => {
+
+	if (
+		!await Dialog.yesNo(
+			'Are you sure you want to delete this event entry?',
+			`This will irreversibly remove the event entry with ID '${id}'.`
+		)
+	)
+		return false;
 
 	const requestBody = ZProtectedPostApiRequestMap['events/delete'].safeParse({ id });
 	if (!requestBody.success)
@@ -391,10 +671,27 @@ export const deleteEventsEntry = async(id: string | number): Promise<boolean> =>
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['events/delete'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data);
+	if (!parsedResponse.success) {
+
+		Monolog.show({
+			text: `Failed to delete an event entry with the ID '${id}'!`,
+			durationMs: 3000
+		});
+		return false;
+
+	}
+	void Monolog
+		.showAsync({ text: `Successfully deleted the event entry with the ID '${id}'!` })
+		.then(() => {
+
+			if (gotoPrevUrl)
+				gotoPrevOrHome();
+
+		});
+	return true;
 
 };
-export const editEventsEntry = async(
+export const editEvent = async(
 	id: string | number,
 	newEntry: TNewEventsEntry
 ): Promise<boolean> => {
@@ -417,35 +714,20 @@ export const editEventsEntry = async(
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['events/edit'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data);
+	if (!parsedResponse.success) {
 
-};
-export const getEvent = async(id: string | number): Promise<{
-	data: TEventsEntry;
-	file: string | undefined;
-} | null> => {
+		Monolog.show({
+			text: `Failed to edit an event entry with the ID '${id}'!`,
+			durationMs: 3000
+		});
+		return false;
 
-	const requestBody = ZProtectedPostApiRequestMap['events/get'].safeParse({ id });
-	if (!requestBody.success)
-		return null;
-
-	const response = await fetch(
-		'/api/protected/?type=events/get',
-		{
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestBody.data),
-			credentials: 'include'
-		}
-	);
-
-	const parsedResponse = await TProtectedPostApiResponseMap['events/get'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data)
-		? {
-			data: parsedResponse.data.data,
-			file: parsedResponse.data.file
-		}
-		: null;
+	}
+	Monolog.show({
+		text: `Successfully edited the event entry with the ID '${id}'!`,
+		durationMs: 3000
+	});
+	return true;
 
 };
 export const saveEvent = async(
@@ -471,7 +753,20 @@ export const saveEvent = async(
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['events/save'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data);
+	if (!parsedResponse.success) {
+
+		Monolog.show({
+			text: `Failed to save an event entry with the ID '${id}'!`,
+			durationMs: 3000
+		});
+		return false;
+
+	}
+	Monolog.show({
+		text: `Successfully saved the event entry contents with the ID '${id}'!`,
+		durationMs: 3000
+	});
+	return true;
 
 };
 
@@ -502,12 +797,26 @@ export const getBuildIndex = async(
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['builds/index'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data)
-		? parsedResponse.data.data
-		: null;
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		Monolog.show({
+			text: `Failed to fetch build index with count '${count}'${
+				offset
+					? ` and offset '${offset}'`
+					: ''
+			}!`,
+			durationMs: 3000
+		});
+		return null;
+
+	}
+	return parsedResponse.data.data;
 
 };
-export const getBuild = async(buildNumber: number | string): Promise<TBuild | null> => {
+export const getBuild = async(
+	buildNumber: number | string,
+	gotoPrevUrl: boolean = false
+): Promise<TBuild | null> => {
 
 	const requestBody = ZProtectedPostApiRequestMap['builds/get'].safeParse({ buildNumber });
 	if (!requestBody.success)
@@ -524,9 +833,23 @@ export const getBuild = async(buildNumber: number | string): Promise<TBuild | nu
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['builds/get'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data)
-		? parsedResponse.data.data
-		: null;
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		void Monolog
+			.showAsync({
+				text: `Failed to fetch a build with the build number '${buildNumber}'!`,
+				durationMs: 3000
+			})
+			.then(() => {
+
+				if (gotoPrevUrl)
+					gotoPrevOrHome();
+
+			});
+		return null;
+
+	}
+	return parsedResponse.data.data;
 
 };
 export const countBuilds = async(): Promise<number | null> => {
@@ -541,12 +864,30 @@ export const countBuilds = async(): Promise<number | null> => {
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['builds/count'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data)
-		? parsedResponse.data.count
-		: null;
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		Monolog.show({
+			text: 'Failed to fetch the build count!',
+			durationMs: 3000
+		});
+		return null;
+
+	}
+	return parsedResponse.data.count;
 
 };
-export const deleteBuild = async(buildNumber: number | string): Promise<boolean> => {
+export const deleteBuild = async(
+	buildNumber: number | string,
+	gotoPrevUrl: boolean = false
+): Promise<boolean> => {
+
+	if (
+		!await Dialog.yesNo(
+			'Are you sure you want to delete this build?',
+			`This will irreversibly remove the build with the build number '${buildNumber}', AND its corresponding errors.`
+		)
+	)
+		return false;
 
 	const requestBody = ZProtectedPostApiRequestMap['builds/delete'].safeParse({ buildNumber });
 	if (!requestBody.success)
@@ -563,9 +904,27 @@ export const deleteBuild = async(buildNumber: number | string): Promise<boolean>
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['builds/delete'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data);
+	if (!parsedResponse.success) {
+
+		Monolog.show({
+			text: `Failed to delete a build with the build number '${buildNumber}'!`,
+			durationMs: 3000
+		});
+		return false;
+
+	}
+	void Monolog
+		.showAsync({ text: `Successfully deleted the build with the build number '${buildNumber}' and its errors!` })
+		.then(() => {
+
+			if (gotoPrevUrl)
+				gotoPrevOrHome();
+
+		});
+	return true;
 
 };
+
 export const getErrorIndex = async(
 	count: number | string,
 	offset?: number | string
@@ -589,9 +948,20 @@ export const getErrorIndex = async(
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['errors/index'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data)
-		? parsedResponse.data.data
-		: null;
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		Monolog.show({
+			text: `Failed to fetch the error index with count '${count}'${
+				offset
+					? ` and offset '${offset}'`
+					: ''
+			}!`,
+			durationMs: 3000
+		});
+		return null;
+
+	}
+	return parsedResponse.data.data;
 
 };
 export const countErrors = async(): Promise<number | null> => {
@@ -606,9 +976,16 @@ export const countErrors = async(): Promise<number | null> => {
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['errors/count'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data)
-		? parsedResponse.data.count
-		: null;
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		Monolog.show({
+			text: 'Failed to fetch the error count!',
+			durationMs: 3000
+		});
+		return null;
+
+	}
+	return parsedResponse.data.count;
 
 };
 export const getErrorIndexByBuild = async(
@@ -636,9 +1013,20 @@ export const getErrorIndexByBuild = async(
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['errors/indexBuild'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data)
-		? parsedResponse.data.data
-		: null;
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		Monolog.show({
+			text: `Failed to fetch the build index for the build number '${buildNumber}', with count '${count}'${
+				offset
+					? ` and offset '${offset}'`
+					: ''
+			}!`,
+			durationMs: 3000
+		});
+		return null;
+
+	}
+	return parsedResponse.data.data;
 
 };
 export const countErrorsByBuild = async(buildNumber: number | string): Promise<number | null> => {
@@ -658,12 +1046,22 @@ export const countErrorsByBuild = async(buildNumber: number | string): Promise<n
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['errors/countBuild'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data)
-		? parsedResponse.data.count
-		: null;
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		Monolog.show({
+			text: `Failed to fetch the errors for the build number '${buildNumber}'!`,
+			durationMs: 3000
+		});
+		return null;
+
+	}
+	return parsedResponse.data.count;
 
 };
-export const getError = async(id: number | string): Promise<TError | null> => {
+export const getError = async(
+	id: number | string,
+	gotoPrevUrl: boolean = false
+): Promise<TError | null> => {
 
 	const requestBody = ZProtectedPostApiRequestMap['errors/get'].safeParse({ id });
 	if (!requestBody.success)
@@ -680,12 +1078,37 @@ export const getError = async(id: number | string): Promise<TError | null> => {
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['errors/get'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data)
-		? parsedResponse.data.data
-		: null;
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		void Monolog
+			.showAsync({
+				text: `Failed to fetch an error with ID '${id}'!`,
+				durationMs: 3000
+			})
+			.then(() => {
+
+				if (gotoPrevUrl)
+					gotoPrevOrHome();
+
+			});
+		return null;
+
+	}
+	return parsedResponse.data.data;
 
 };
-export const deleteError = async(id: number | string): Promise<boolean> => {
+export const deleteError = async(
+	id: number | string,
+	gotoPrevUrl: boolean = false
+): Promise<boolean> => {
+
+	if (
+		!await Dialog.yesNo(
+			'Are you sure you want to delete this error?',
+			`This will irreversibly remove the error with the ID '${id}'.`
+		)
+	)
+		return false;
 
 	const requestBody = ZProtectedPostApiRequestMap['errors/delete'].safeParse({ id });
 	if (!requestBody.success)
@@ -702,7 +1125,24 @@ export const deleteError = async(id: number | string): Promise<boolean> => {
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['errors/delete'].safeParseAsync(await response.json());
-	return parsedResponse.success && !('error' in parsedResponse.data);
+	if (!parsedResponse.success) {
+
+		Monolog.show({
+			text: `Failed to delete an error with ID '${id}'!`,
+			durationMs: 3000
+		});
+		return false;
+
+	}
+	void Monolog
+		.showAsync({ text: `Successfully deleted the error with ID '${id}'!` })
+		.then(() => {
+
+			if (gotoPrevUrl)
+				gotoPrevOrHome();
+
+		});
+	return true;
 
 };
 

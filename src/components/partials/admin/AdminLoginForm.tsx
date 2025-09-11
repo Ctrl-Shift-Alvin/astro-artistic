@@ -1,16 +1,13 @@
 import { useState } from 'react';
+import clsx from 'clsx';
 import { Button } from '@/components/components/Button';
-import {
-	checkLogin,
-	handleAuthSubmit
-} from '@/frontend/protectedApi';
-import { goto } from '@/frontend/windowTools';
+import { login } from '@/frontend/adminApi';
 
 export const AdminLoginForm = () => {
 
 	const [
-		pass,
-		setPass
+		password,
+		setPassword
 	] = useState<string>('');
 
 	return (
@@ -25,18 +22,9 @@ export const AdminLoginForm = () => {
 				onSubmit={
 					(e: React.FormEvent) => {
 
-						void handleAuthSubmit(
-							pass,
-							e.nativeEvent
-						).then(() => {
+						e.preventDefault();
 
-							if (checkLogin()) {
-
-								goto('/admin/home/');
-
-							}
-
-						});
+						void login(password);
 
 					}
 				}
@@ -57,12 +45,17 @@ export const AdminLoginForm = () => {
 										id={'password'}
 										name={'password'}
 										type={'password'}
-										className={'w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'}
-										value={pass}
+										className={
+											clsx(
+												'w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white sm:text-sm/6',
+												'outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600'
+											)
+										}
+										value={password}
 										onChange={
 											(e) => {
 
-												setPass(e.target.value);
+												setPassword(e.target.value);
 
 											}
 										}

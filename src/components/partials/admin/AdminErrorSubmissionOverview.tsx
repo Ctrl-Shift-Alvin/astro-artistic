@@ -7,10 +7,9 @@ import { Monolog } from '@/components/components/MonologProvider';
 import { type TError } from '@/components/types';
 import {
 	deleteError, getError
-} from '@/frontend/protectedApi';
+} from '@/frontend/adminApi';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 import { A } from '@/components/components/A';
-import { Dialog } from '@/components/components/DialogProvider';
 
 export const AdminErrorSubmissionOverview = ({ submissionId }: { submissionId: number | string }) => {
 
@@ -32,7 +31,10 @@ export const AdminErrorSubmissionOverview = ({ submissionId }: { submissionId: n
 
 	const get = async() => {
 
-		const result = await getError(submissionId);
+		const result = await getError(
+			submissionId,
+			true
+		);
 		if (result) {
 
 			setSubmission(result);
@@ -46,29 +48,6 @@ export const AdminErrorSubmissionOverview = ({ submissionId }: { submissionId: n
 
 		}
 		return null;
-
-	};
-
-	const remove = async() => {
-
-		if (
-			!await Dialog.yesNo(
-				'Are you sure you want to delete this error?',
-				`This will irreversibly remove the error with the ID '${submissionId}'.`
-			)
-		)
-			return;
-
-		const result = await deleteError(submissionId);
-		if (result) {
-
-			Monolog.show({ text: `Successfully deleted error '${submissionId}'!` });
-
-		} else {
-
-			Monolog.show({ text: `Failed deleting error '${submissionId}'!` });
-
-		}
 
 	};
 
@@ -86,7 +65,10 @@ export const AdminErrorSubmissionOverview = ({ submissionId }: { submissionId: n
 
 			addAdminButton({
 				children: 'Remove',
-				onClick: () => void remove()
+				onClick: () => void deleteError(
+					submissionId,
+					true
+				)
 			});
 
 		},

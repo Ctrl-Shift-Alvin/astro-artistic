@@ -12,10 +12,10 @@ import {
 	type TNewEventsEntry
 } from '@/components/types';
 import {
-	getEventsIndex,
-	addEventsEntry,
-	deleteEventsEntry
-} from '@/frontend/protectedApi';
+	fetchEventIndex,
+	addEvent,
+	deleteEvent
+} from '@/frontend/adminApi';
 import { cGetUserLanguage } from '@/shared/cookies';
 import { defaultLanguageCode } from '@/backend/i18n';
 
@@ -290,20 +290,12 @@ export const AdminEventsTable = () => {
 		setEventEntries
 	] = useState<TEventsEntry[]>([]);
 
-	const fetch = async() => {
+	const index = async() => {
 
-		const result = await getEventsIndex();
-
+		const result = await fetchEventIndex();
 		if (result) {
 
 			setEventEntries(result);
-
-		} else {
-
-			Monolog.show({
-				text: 'Failed to fetch event entries!',
-				durationMs: 5000
-			});
 
 		}
 
@@ -327,54 +319,14 @@ export const AdminEventsTable = () => {
 			enablePage: formResult.enablePage
 		};
 
-		const result = await addEventsEntry(newEventEntry);
-
-		if (result) {
-
-			Monolog.show({
-				text: 'Successfully added a new event entry!',
-				durationMs: 3000
-			});
-			void fetch();
-
-		} else {
-
-			Monolog.show({
-				text: 'Failed to add new event entry!',
-				durationMs: 5000
-			});
-
-		}
+		await addEvent(newEventEntry);
+		void index();
 
 	};
 	const remove = async(id: string | number) => {
 
-		if (
-			!await Dialog.yesNo(
-				'Are you sure you want to delete this entry?',
-				`This will irreversibly remove the entry with ID ${id}.`
-			)
-		)
-			return;
-
-		const result = await deleteEventsEntry(id);
-
-		if (result) {
-
-			void fetch();
-			Monolog.show({
-				text: 'Successfully removed event entry!',
-				durationMs: 3000
-			});
-
-		} else {
-
-			Monolog.show({
-				text: 'Failed to remove event entry!',
-				durationMs: 5000
-			});
-
-		}
+		await deleteEvent(id);
+		void index();
 
 	};
 
@@ -429,7 +381,7 @@ export const AdminEventsTable = () => {
 	};
 
 	useLayoutEffect(
-		() => void fetch(),
+		() => void index(),
 		[]
 	);
 

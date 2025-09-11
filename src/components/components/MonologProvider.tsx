@@ -45,10 +45,19 @@ export class Monolog {
 		));
 
 		setTimeout(
-			() => setTimeout(
-				cleanup,
-				fadeDurationMs
-			),
+			() => {
+
+				try {
+
+					cleanup();
+
+				} catch {
+
+					console.error('Failed to run Monolog cleanup!');
+
+				}
+
+			},
 			durationMs + fadeDurationMs
 		);
 
@@ -88,7 +97,15 @@ export class Monolog {
 			setTimeout(
 				() => {
 
-					cleanup();
+					try {
+
+						cleanup();
+
+					} catch {
+
+						console.error('Failed to run Monolog cleanup!');
+
+					}
 					res();
 
 				},

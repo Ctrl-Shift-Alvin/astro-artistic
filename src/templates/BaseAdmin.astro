@@ -13,7 +13,7 @@ interface Props {
 	noLogoutComponent?: boolean;
 }
 
-const { head, noLogoutComponent } = Astro.props;
+const { head } = Astro.props;
 
 const title = `${GlobalTranslation.siteName} - Admin - ${head.title}`;
 const description = `${GlobalTranslation.siteName} - Admin - ${head.description}`;

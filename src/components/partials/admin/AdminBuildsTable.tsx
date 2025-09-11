@@ -7,12 +7,13 @@ import clsx from 'clsx/lite';
 import { type TBuild } from '@/components/types';
 import {
 	getBuildIndex,
-	countBuilds
-} from '@/frontend/protectedApi';
+	countBuilds,
+	deleteBuild,
+	getPrevUrlQuery
+} from '@/frontend/adminApi';
 import { ErrorsConfig } from '@/shared/config/errors';
 import { A } from '@/components/components/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
-import { executeAsyncAction } from '@/shared/actions';
 
 export const AdminBuildsTable = () => {
 
@@ -75,11 +76,7 @@ export const AdminBuildsTable = () => {
 
 	const remove = async(buildNumber: number | string) => {
 
-		await executeAsyncAction({
-			action: 'adminDeleteBuild',
-			args: [ buildNumber ]
-		});
-
+		await deleteBuild(buildNumber);
 		void index(buildsCount);
 
 	};
@@ -87,10 +84,11 @@ export const AdminBuildsTable = () => {
 	const count = async() => {
 
 		const result = await countBuilds();
-		if (result === null)
-			return;
+		if (result) {
 
-		setFullIndexCount(result);
+			setFullIndexCount(result);
+
+		}
 
 	};
 
@@ -185,7 +183,7 @@ export const AdminBuildsTable = () => {
 									>
 										<A
 											className={'text-center underline'}
-											href={`/admin/submission/build/${entry.buildNumber}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
+											href={`/admin/submission/build/${entry.buildNumber}/${getPrevUrlQuery()}`}
 										>
 											{entry.buildNumber}
 										</A>

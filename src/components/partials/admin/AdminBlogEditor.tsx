@@ -1,5 +1,7 @@
 import {
+	useCallback,
 	useLayoutEffect,
+	useMemo,
 	useState
 } from 'react';
 import { type z } from 'zod';
@@ -13,15 +15,15 @@ import {
 	newBlogFile,
 	removeBlogFile,
 	saveBlogFile
-} from '@/frontend/protectedApi';
+} from '@/frontend/adminApi';
 import { A } from '@/components/components/A';
 import { Button } from '@/components/components/Button';
 
 export const AdminBlogEditor = () => {
 
 	const [
-		hideEditor,
-		setHideEditor
+		showEditor,
+		setShowEditor
 	] = useState<boolean>(false);
 
 	const [
@@ -33,21 +35,45 @@ export const AdminBlogEditor = () => {
 			isSelected: boolean;
 		}[]
 	>([]);
+	const selectedFile = useMemo(
+		() => {
+
+			return filesTable.find((k) => k.isSelected);
+
+		},
+		[ filesTable ]
+	);
 
 	const [
 		fileContent,
-		setFileContent
-	] = useState<string>('');
-
+		_setFileContent
+	] = useState<string>();
 	const [
 		fileContentChanged,
 		setFileContentChanged
 	] = useState<boolean>(false);
+	const setFileContent = useCallback(
+		(value: typeof fileContent) => {
+
+			_setFileContent((prev) => {
+
+				if (prev) {
+
+					setFileContentChanged(true);
+
+				}
+				return value;
+
+			});
+
+		},
+		[]
+	);
 
 	const selectFile = async(fileName: string) => {
 
 		// Did not save!
-		if (fileContentChanged) {
+		if (selectedFile && fileContentChanged) {
 
 			if (
 				!await Dialog.yesNo(
@@ -62,7 +88,7 @@ export const AdminBlogEditor = () => {
 		}
 
 		// If selected item is selected again, then unselect
-		if (fileName === getSelected()?.fileName) {
+		if (selectedFile && fileName === selectedFile.fileName) {
 
 			setFilesTable((prev) => prev.map((item) => {
 
@@ -78,7 +104,8 @@ export const AdminBlogEditor = () => {
 
 		}
 
-		setHideEditor(true);
+		// Hide editor, and show only when file is loaded
+		setShowEditor(false);
 
 		// Unselect former selected item, and select selected item
 		setFilesTable((prev) => prev.map((item) => {
@@ -100,13 +127,12 @@ export const AdminBlogEditor = () => {
 		await get(fileName);
 
 	};
-	const getSelected = () => filesTable.find((k) => k.isSelected);
 
 	const getIndex = async() => {
 
 		const blogIndex = await fetchBlogIndex();
 		if (!blogIndex)
-			throw new Error('Failed to fetch blog index.');
+			return;
 
 		setFilesTable(blogIndex.map((e) => ({
 			fileName: e,
@@ -116,44 +142,35 @@ export const AdminBlogEditor = () => {
 	};
 	const get = async(fileName: string) => {
 
-		const file = await fetchBlogFile(fileName);
-		if (file === null) {
-
-			Monolog.show({ text: 'Failed to fetch blog file!' });
+		const file = await fetchBlogFile(
+			fileName,
+			true
+		);
+		if (!file)
 			return;
-
-		}
 
 		setFileContent(file);
 		setFileContentChanged(false);
-		setHideEditor(false);
+		setShowEditor(true);
 
 	};
 	const save = async() => {
 
-		const fileName = getSelected()?.fileName;
-		if (!fileName)
+		if (!selectedFile?.fileName || !fileContent)
 			return;
 
-		const status = await saveBlogFile(
-			fileName,
-			fileContent
-		);
+		if (!fileContentChanged) {
 
-		if (status) {
+			Monolog.show({ text: 'The blog file is already saved in this state!' });
+
+		} else if (
+			await saveBlogFile(
+				selectedFile.fileName,
+				fileContent
+			)
+		) {
 
 			setFileContentChanged(false);
-			Monolog.show({
-				text: 'File saved successfully!',
-				durationMs: 2000
-			});
-
-		} else {
-
-			Monolog.show({
-				text: 'Couldn\'t save the file!',
-				durationMs: 5000
-			});
 
 		}
 
@@ -239,37 +256,25 @@ export const AdminBlogEditor = () => {
 
 			void getIndex();
 
-		} else {
-
-			Monolog.show({ text: 'Failed to create new file!' });
-
 		}
 
 	};
 	const remove = async() => {
 
-		const fileName = getSelected()?.fileName;
+		const fileName = selectedFile?.fileName;
 		if (fileName === undefined)
 			return;
+
 		if (
-			!await Dialog.yesNo(
-				'Remove Blog Post File',
-				`Removing the file '${fileName}' cannot be reverted. Are you sure you want to continue?`
+			await removeBlogFile(
+				fileName,
+				true
 			)
-		)
-			return;
+		) {
 
-		if (await removeBlogFile(fileName)) {
-
+			// Deselect file and refresh index
 			await selectFile(fileName);
 			void getIndex();
-
-		} else {
-
-			Monolog.show({
-				text: 'Couldn\'t remove the file.',
-				durationMs: 5000
-			});
 
 		}
 
@@ -329,7 +334,7 @@ export const AdminBlogEditor = () => {
 					</table>
 
 					{
-						getSelected() !== undefined && (
+						selectedFile !== undefined && (
 							<div className={'flex flex-row'}>
 								<Button
 									small={true}
@@ -350,7 +355,7 @@ export const AdminBlogEditor = () => {
 				</div>
 
 				{
-					getSelected() && !hideEditor && (
+					selectedFile !== undefined && showEditor && (
 						<AdminMarkdownEditor
 							value={fileContent}
 							onChange={
