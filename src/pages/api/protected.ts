@@ -43,6 +43,7 @@ import {
 	errors_getFewErrors,
 	errors_getFewErrorsByBuild
 } from '@/backend/database/errors';
+import { blog_createPage } from '@/backend/blogs';
 
 const SECRET_KEY = import.meta.env.JWT_KEY as string;
 
@@ -797,44 +798,7 @@ export async function POST(context: APIContext) {
 
 			}
 
-			const result: boolean = await new Promise((
-				resolve,
-				reject
-			) => {
-
-				try {
-
-					const child = spawn(
-						'node',
-						[
-							'./scripts/createPost',
-							fileName
-						],
-						{ shell: true }
-					);
-
-					child.on(
-						'error',
-						reject
-					); // spawn failed (e.g. command not found)
-
-					child.on(
-						'close',
-						(code) => {
-
-							resolve(code === 0);
-
-						}
-					);
-
-				} catch(e: any) {
-
-					// eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
-					reject(e);
-
-				}
-
-			});
+			const result = await blog_createPage(fileName);
 
 			if (result) {
 

@@ -1,5 +1,6 @@
 import path from 'node:path';
 import fs from 'node:fs';
+import { spawn } from 'node:child_process';
 import matter from 'gray-matter';
 import {
 	type IBlogMarkdownInstance, type IBlogFrontmatter
@@ -109,3 +110,74 @@ export function getSortedBlogsSliced(
 	);
 
 }
+
+export const blog_createPage = async(fileName: string): Promise<boolean> => {
+
+	if (!fs.existsSync(BlogConfig.pagesPath))
+		fs.mkdirSync(BlogConfig.pagesPath);
+
+	const existingFiles = fs.readdirSync(
+		BlogConfig.pagesPath,
+		{ withFileTypes: true }
+	);
+
+	if (existingFiles
+		.map((e) => e.name)
+		.find((e) => e === `${fileName}.md`)
+	) {
+
+		return false;
+
+	}
+
+	try {
+
+		await new Promise((
+			resolve,
+			reject
+		) => {
+
+			try {
+
+				const child = spawn(
+					'npm',
+					[
+						'run',
+						'createPost',
+						'--',
+						fileName
+					],
+					{ shell: true }
+				);
+
+				child.on(
+					'error',
+					reject
+				);
+
+				child.on(
+					'close',
+					(code) => {
+
+						resolve(code === 0);
+
+					}
+				);
+
+			} catch(err: any) {
+
+				// eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+				reject(err);
+
+			}
+
+		});
+		return true;
+
+	} catch {
+
+		return false;
+
+	}
+
+};
