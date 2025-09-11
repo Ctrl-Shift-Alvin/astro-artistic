@@ -68,17 +68,14 @@ export const addAdminButton = (...newButtons: TButtonProps[]) => {
 
 	const updater = (existingButtons: TButtonProps[]) => {
 
-		const existingIds = new Set(existingButtons.map(getButtonId));
-		const filteredButtons = newButtons.filter((btn) => !existingIds.has(getButtonId(btn)));
+		const newButtonIds = new Set(newButtons.map(getButtonId));
 
-		if (filteredButtons.length === 0) {
+		// Filter out old buttons that are being replaced
+		const filteredExisting = existingButtons.filter((btn) => !newButtonIds.has(getButtonId(btn)));
 
-			return existingButtons;
-
-		}
 		return [
-			...existingButtons,
-			...filteredButtons
+			...filteredExisting,
+			...newButtons
 		];
 
 	};
