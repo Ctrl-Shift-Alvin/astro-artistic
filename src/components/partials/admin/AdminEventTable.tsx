@@ -50,240 +50,6 @@ const ZFormValues = z.object({
 });
 type IFormValues = z.infer<typeof ZFormValues>;
 
-const EventForm = ({
-	formValues,
-	setFormValues
-}: {
-	formValues: IFormValues;
-	setFormValues: (newValues: IFormValues)=> void;
-}) => (
-	<form>
-		<div>
-			<label
-				htmlFor={'title'}
-				className={'pr-4 text-white'}
-			>
-				{'Title'}
-			</label>
-
-			<input
-				id={'title'}
-				className={'w-full border-1 border-white text-white'}
-				value={formValues.title}
-				onChange={
-					(e) => {
-
-						setFormValues({
-							...formValues,
-							title: e.target.value
-						});
-
-					}
-				}
-			/>
-		</div>
-
-		<div>
-			<label
-				htmlFor={'location'}
-				className={'pr-4 text-white'}
-			>
-				{'Location'}
-			</label>
-
-			<input
-				id={'location'}
-				className={'w-full border-1 border-white text-white'}
-				value={formValues.location}
-				onChange={
-					(e) => {
-
-						setFormValues({
-							...formValues,
-							location: e.target.value
-						});
-
-					}
-				}
-			/>
-		</div>
-
-		<div className={'grid grid-cols-1 sm:grid-cols-5'}>
-			<div>
-				<label
-					htmlFor={'day'}
-					className={'text-white'}
-				>
-					{'Day'}
-				</label>
-
-				<input
-					id={'day'}
-					type={'number'}
-					min={'1'}
-					max={'31'}
-					maxLength={2}
-					value={formValues.day}
-					className={'w-full border-1 border-white text-white'}
-					onChange={
-						(e) => {
-
-							setFormValues({
-								...formValues,
-								day: Number(e.target.value)
-							});
-
-						}
-					}
-				/>
-			</div>
-
-			<div>
-				<label
-					htmlFor={'month'}
-					className={'text-white'}
-				>
-					{'Month'}
-				</label>
-
-				<input
-					id={'month'}
-					type={'number'}
-					min={'1'}
-					max={'12'}
-					maxLength={2}
-					value={formValues.month}
-					className={'w-full border-1 border-white text-white'}
-					onChange={
-						(e) => {
-
-							setFormValues({
-								...formValues,
-								month: Number(e.target.value)
-							});
-
-						}
-					}
-
-				/>
-			</div>
-
-			<div>
-				<label
-					htmlFor={'year'}
-					className={'text-white'}
-				>
-					{'Year'}
-				</label>
-
-				<input
-					id={'year'}
-					type={'number'}
-					min={'1900'}
-					max={'3000'}
-					maxLength={4}
-					value={formValues.year}
-					className={'w-full border-1 border-white text-white'}
-					onChange={
-						(e) => {
-
-							setFormValues({
-								...formValues,
-								year: Number(e.target.value)
-							});
-
-						}
-					}
-				/>
-			</div>
-
-			<div>
-				<label
-					htmlFor={'hours'}
-					className={'text-white'}
-				>
-					{'Hours'}
-				</label>
-
-				<input
-					id={'hours'}
-					type={'number'}
-					min={'0'}
-					max={'23'}
-					maxLength={2}
-					value={formValues.hours}
-					className={'w-full border-1 border-white text-white'}
-					onChange={
-						(e) => {
-
-							setFormValues({
-								...formValues,
-								hours: Number(e.target.value)
-							});
-
-						}
-					}
-				/>
-			</div>
-
-			<div>
-				<label
-					htmlFor={'minutes'}
-					className={'text-white'}
-				>
-					{'Minutes'}
-				</label>
-
-				<input
-					id={'minutes'}
-					type={'number'}
-					min={'0'}
-					max={'59'}
-					maxLength={2}
-					value={formValues.minutes}
-					className={'w-full border-1 border-white text-white'}
-					onChange={
-						(e) => {
-
-							setFormValues({
-								...formValues,
-								minutes: Number(e.target.value)
-							});
-
-						}
-					}
-				/>
-			</div>
-		</div>
-
-		<div className={'flex justify-center items-center mt-2'}>
-			<label
-				htmlFor={'enablePage'}
-				className={'pr-4 text-white'}
-			>
-				{'Enable Page'}
-			</label>
-
-			<input
-				id={'enablePage'}
-				type={'checkbox'}
-				checked={formValues.enablePage}
-				className={'size-5'}
-				onChange={
-					(e) => {
-
-						setFormValues({
-							...formValues,
-							enablePage: e.target.checked
-						});
-
-					}
-				}
-			/>
-		</div>
-	</form>
-);
-
 export const AdminEventTable = () => {
 
 	const [
@@ -343,6 +109,244 @@ export const AdminEventTable = () => {
 	const showAddDialog = useCallback(
 		async(): Promise<IFormValues | null> => {
 
+			const form = (
+				formValues: IFormValues,
+				setFormValues: (newValues: IFormValues)=> void,
+				onSubmit: (event: React.SyntheticEvent)=> void
+			) => (
+				<form onSubmit={onSubmit}>
+					<div>
+						<label
+							htmlFor={'title'}
+							className={'pr-4 text-white'}
+						>
+							{'Title'}
+						</label>
+
+						<input
+							id={'title'}
+							className={'w-full border-1 border-white text-white'}
+							value={formValues.title}
+							onChange={
+								(e) => {
+
+									setFormValues({
+										...formValues,
+										title: e.target.value
+									});
+
+								}
+							}
+						/>
+					</div>
+
+					<div>
+						<label
+							htmlFor={'location'}
+							className={'pr-4 text-white'}
+						>
+							{'Location'}
+						</label>
+
+						<input
+							id={'location'}
+							className={'w-full border-1 border-white text-white'}
+							value={formValues.location}
+							onChange={
+								(e) => {
+
+									setFormValues({
+										...formValues,
+										location: e.target.value
+									});
+
+								}
+							}
+						/>
+					</div>
+
+					<div className={'grid grid-cols-1 sm:grid-cols-5'}>
+						<div>
+							<label
+								htmlFor={'day'}
+								className={'text-white'}
+							>
+								{'Day'}
+							</label>
+
+							<input
+								id={'day'}
+								type={'number'}
+								min={'1'}
+								max={'31'}
+								maxLength={2}
+								value={formValues.day}
+								className={'w-full border-1 border-white text-white'}
+								onChange={
+									(e) => {
+
+										setFormValues({
+											...formValues,
+											day: Number(e.target.value)
+										});
+
+									}
+								}
+							/>
+						</div>
+
+						<div>
+							<label
+								htmlFor={'month'}
+								className={'text-white'}
+							>
+								{'Month'}
+							</label>
+
+							<input
+								id={'month'}
+								type={'number'}
+								min={'1'}
+								max={'12'}
+								maxLength={2}
+								value={formValues.month}
+								className={'w-full border-1 border-white text-white'}
+								onChange={
+									(e) => {
+
+										setFormValues({
+											...formValues,
+											month: Number(e.target.value)
+										});
+
+									}
+								}
+
+							/>
+						</div>
+
+						<div>
+							<label
+								htmlFor={'year'}
+								className={'text-white'}
+							>
+								{'Year'}
+							</label>
+
+							<input
+								id={'year'}
+								type={'number'}
+								min={'1900'}
+								max={'3000'}
+								maxLength={4}
+								value={formValues.year}
+								className={'w-full border-1 border-white text-white'}
+								onChange={
+									(e) => {
+
+										setFormValues({
+											...formValues,
+											year: Number(e.target.value)
+										});
+
+									}
+								}
+							/>
+						</div>
+
+						<div>
+							<label
+								htmlFor={'hours'}
+								className={'text-white'}
+							>
+								{'Hours'}
+							</label>
+
+							<input
+								id={'hours'}
+								type={'number'}
+								min={'0'}
+								max={'23'}
+								maxLength={2}
+								value={formValues.hours}
+								className={'w-full border-1 border-white text-white'}
+								onChange={
+									(e) => {
+
+										setFormValues({
+											...formValues,
+											hours: Number(e.target.value)
+										});
+
+									}
+								}
+							/>
+						</div>
+
+						<div>
+							<label
+								htmlFor={'minutes'}
+								className={'text-white'}
+							>
+								{'Minutes'}
+							</label>
+
+							<input
+								id={'minutes'}
+								type={'number'}
+								min={'0'}
+								max={'59'}
+								maxLength={2}
+								value={formValues.minutes}
+								className={'w-full border-1 border-white text-white'}
+								onChange={
+									(e) => {
+
+										setFormValues({
+											...formValues,
+											minutes: Number(e.target.value)
+										});
+
+									}
+								}
+							/>
+						</div>
+					</div>
+
+					<div className={'flex justify-center items-center mt-2'}>
+						<label
+							htmlFor={'enablePage'}
+							className={'pr-4 text-white'}
+						>
+							{'Enable Page'}
+						</label>
+
+						<input
+							id={'enablePage'}
+							type={'checkbox'}
+							checked={formValues.enablePage}
+							className={'size-5'}
+							onChange={
+								(e) => {
+
+									setFormValues({
+										...formValues,
+										enablePage: e.target.checked
+									});
+
+								}
+							}
+						/>
+					</div>
+
+					{/* Hidden submit button for 'Enter' submit */}
+					<button
+						type={'submit'}
+						className={'hidden'}
+					/>
+				</form>
+			);
+
 			const submitCallback = (formValues: IFormValues): boolean => {
 
 				const result = ZFormValues.safeParse(formValues);
@@ -366,15 +370,7 @@ export const AdminEventTable = () => {
 			return await Dialog.form<IFormValues>(
 				'Add New Event',
 				{
-					body: (
-						formValues,
-						setFormValues
-					) => (
-						<EventForm
-							formValues={formValues}
-							setFormValues={setFormValues}
-						/>
-					),
+					body: form,
 					onSubmit: submitCallback,
 					initialValue: {
 						title: '',

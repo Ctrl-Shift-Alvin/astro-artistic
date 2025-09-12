@@ -217,33 +217,6 @@ export const AdminBlogEditor = () => {
 
 			type IFormValues = z.infer<typeof ZProtectedPostApiRequestMap['blog/new']>;
 
-			const form = (
-				formValues: IFormValues,
-				setFormValues: (newValues: IFormValues)=> void
-			) => (
-				<form className={'flex flex-col'}>
-					<label
-						className={'text-white'}
-						htmlFor={'fileName'}
-					>
-						{'File Name'}
-					</label>
-
-					<input
-						className={'border-1 border-white text-white'}
-						name={'fileName'}
-						id={'fileName'}
-						value={formValues.fileName}
-						onChange={
-							(e) => {
-
-								setFormValues({ fileName: e.target.value });
-
-							}
-						}
-					/>
-				</form>
-			);
 			const submitCallback = (formValues: IFormValues): boolean => {
 
 				const parsed = ZProtectedPostApiRequestMap['blog/new'].safeParse(formValues);
@@ -278,6 +251,43 @@ export const AdminBlogEditor = () => {
 				}
 
 			};
+
+			const form = (
+				formValues: IFormValues,
+				setFormValues: (newValues: IFormValues)=> void,
+				onSubmit: (event: React.SyntheticEvent)=> void
+			) => (
+
+				/*
+				 * Implicit submission, no submit button needed inside the form element:
+				 * https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#implicit-submission
+				 */
+				<form
+					className={'flex flex-col'}
+					onSubmit={onSubmit}
+				>
+					<label
+						className={'text-white'}
+						htmlFor={'fileName'}
+					>
+						{'File Name'}
+					</label>
+
+					<input
+						className={'border-1 border-white text-white'}
+						name={'fileName'}
+						id={'fileName'}
+						value={formValues.fileName}
+						onChange={
+							(e) => {
+
+								setFormValues({ fileName: e.target.value });
+
+							}
+						}
+					/>
+				</form>
+			);
 
 			const dialogResult = await Dialog.form<IFormValues>(
 				'New Blog Post',

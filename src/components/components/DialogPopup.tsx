@@ -3,7 +3,7 @@ import { Button } from './Button';
 
 export interface DialogButton {
 	text: ReactNode;
-	onClick?: ()=> void;
+	onClick?: (event: React.MouseEvent<HTMLButtonElement>)=> void;
 	className?: string;
 	type?: 'button' | 'reset' | 'submit';
 }
@@ -14,7 +14,7 @@ export interface DialogPopupProps {
 	children: ReactNode;
 	buttons: DialogButton[];
 
-	onBackdropClick?: ()=> void;
+	onBackdropClick?: React.MouseEventHandler<HTMLDivElement>;
 }
 
 export const DialogPopup: React.FC<DialogPopupProps> = ({

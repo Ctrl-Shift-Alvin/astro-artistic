@@ -1,8 +1,12 @@
 import React, {
-	type ReactNode, useCallback, useEffect, useState
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useState
 } from 'react';
 import {
-	DialogPopup, type DialogButton
+	DialogPopup,
+	type DialogButton
 } from './DialogPopup';
 import { DialogConfig } from '@/shared/config/dialog';
 
@@ -36,49 +40,7 @@ class DialogEmitter {
 	}
 
 }
-
 const dialogEmitter = new DialogEmitter();
-
-function FormWrapper<T>({
-	form,
-	onStateChange
-}: {
-	form: {
-		body: (formValues: T, setFormValues: (newValues: T)=> void)=> ReactNode;
-		initialValue: T;
-	};
-	onStateChange: (newState: T)=> void;
-}) {
-
-	const [
-		formValues,
-		setFormValues
-	] = useState(form.initialValue);
-
-	useEffect(
-		() => {
-
-			onStateChange(formValues);
-
-		},
-		[
-			formValues,
-			onStateChange
-		]
-	);
-
-	return (
-		<>
-			{
-				form.body(
-					formValues,
-					setFormValues
-				)
-			}
-		</>
-	);
-
-}
 
 /**
  * Class with static helper functions for creating dialogs. The DOM must have the DialogProvider component.
@@ -185,6 +147,8 @@ export class Dialog {
 	 * Shows a dialog with a custom form component, a 'Submit' and 'Cancel' button.
 	 * Provide a type that can represent your form element values, and an initial value.
 	 * @param form.body A function that returns the form. Use 'formValues' to bind the form element values.
+	 * @param form.body.onSubmit The callback that tries to resolve the dialog, equal to the 'Submit' button callback.
+	 * @param form.body.onSubmit The callback that cancels the dialog, equal to the 'Cancel' button callback.
 	 * @param form.initialValue Initial value of type T used to instantiate a prop that will be passed to body at first.
 	 * @param onSubmit Callback for the 'Submit' button. Use 'formValues' to validate and return true to close the form.
 	 * @returns A promise that resolves with the 'form.onSubmit' return value (when 'Submit' is clicked).
@@ -192,7 +156,13 @@ export class Dialog {
 	static form<T>(
 		title: ReactNode,
 		form: {
-			body: (formValues: T, setFormValues: (newValues: T)=> void)=> ReactNode;
+			// eslint-disable-next-line @typescript-eslint/max-params
+			body: (
+				formValues: T,
+				setFormValues: (newValues: T)=> void,
+				onSubmit: (event: React.SyntheticEvent)=> void,
+				onCancel: (event: React.SyntheticEvent)=> void
+			)=> ReactNode;
 			onSubmit: (formValues: T)=> boolean;
 			initialValue: T;
 		},
@@ -211,45 +181,79 @@ export class Dialog {
 
 			};
 
+			// The callback for submitting the form
+			const submitCallback = (event: React.SyntheticEvent) => {
+
+				event.preventDefault();
+
+				// If the onSubmit callback returns true, resolve the promise
+				const result = form.onSubmit(latestFormValues);
+				if (result) {
+
+					if (DialogConfig.closeOnButtonClick)
+						this.close();
+
+					resolve(latestFormValues);
+
+				}
+
+				// Otherwise, the dialog remains open, so no resolve() here
+
+			};
+
+			// The callback for cancelling the form
+			const cancelCallback = (event: React.SyntheticEvent) => {
+
+				event.preventDefault();
+
+				if (DialogConfig.closeOnButtonClick)
+					this.close();
+
+				resolve(null);
+
+			};
+
+			const FormBody = () => {
+
+				const [
+					formValues,
+					setFormValues
+				] = useState(form.initialValue);
+
+				useEffect(
+					() => {
+
+						handleStateChange(formValues);
+
+					},
+					[ formValues ]
+				);
+
+				return form.body(
+					formValues,
+					setFormValues,
+					submitCallback,
+					cancelCallback
+				);
+
+			};
+
+			const dialogButtons = [
+				{
+					text: opts.cancelText || 'Cancel',
+					onClick: cancelCallback
+				},
+				{
+					text: opts.submitText || 'Submit',
+					onClick: submitCallback,
+					type: 'submit'
+				}
+			] as DialogButton[];
+
 			this.show({
 				title,
-				body: (
-					<FormWrapper
-						form={form}
-						onStateChange={handleStateChange}
-					/>
-				),
-				buttons: [
-					{
-						text: opts.cancelText || 'Cancel',
-						onClick: () => {
-
-							if (DialogConfig.closeOnButtonClick)
-								this.close();
-
-							resolve(null);
-
-						}
-					},
-					{
-						text: opts.submitText || 'Submit',
-						onClick: () => {
-
-							const result = form.onSubmit(latestFormValues);
-							if (result) {
-
-								if (DialogConfig.closeOnButtonClick)
-									this.close();
-
-								resolve(latestFormValues);
-
-							}
-
-							// If onSubmit returns false, the dialog remains open, so no resolve() here
-
-						}
-					}
-				]
+				body: <FormBody />,
+				buttons: dialogButtons
 			});
 
 		});
@@ -259,7 +263,7 @@ export class Dialog {
 }
 
 /**
- * The dialog provider that has to be present for the helper functions to work. Best place it in Base.astro.
+ * The dialog provider that has to be present for the helper functions to work.
  */
 export const DialogProvider: React.FC = () => {
 

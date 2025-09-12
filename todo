@@ -1,4 +1,4 @@
-FIXME Fix dialog form submission callback in admin pages
+FIXME Move event creation to editor page
 TODO Fetch contact submission ranges instead of *
 TODO Add standardized form components
 TODO Better blog editor
