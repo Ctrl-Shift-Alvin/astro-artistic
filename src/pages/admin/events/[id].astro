@@ -1,31 +1,57 @@
 ---
 import Section from '@/components/astro-components/Section.astro';
-import { AdminEventsEditorOverview } from '@/components/partials/admin/AdminEventEditorOverview';
+import { AdminEventsEditorOverview } from '@/components/partials/admin/AdminEventEditor';
 import BaseAdmin from '@/templates/BaseAdmin.astro';
 
-const { id = '-1' } = Astro.params;
+const { id = 'none' } = Astro.params;
 
-let idInt = -1;
-try {
+let idOrNew: number | true =
+	id === 'new'
+		? true
+		: -1;
 
-	idInt = parseInt(id);
-	if (!idInt)
-		throw new Error();
+if (idOrNew !== true) {
+	try {
 
-} catch {
+		idOrNew = parseInt(id);
+		if (!idOrNew)
+			throw new Error();
 
-	Astro.response.status = 400;
-	Astro.response.statusText = 'bad-request';
+	} catch {
 
+		Astro.response.status = 400;
+		Astro.response.statusText = 'bad-request';
+
+	}
 }
 ---
 <BaseAdmin
 	head={{
-		title: 'Event ' + id,
-		description: `Editing event with ID '${id}'`
+		title: 
+			idOrNew === true
+				? 'Creating New Event'
+				: `Event with ID '${id}'`,
+		description:
+			idOrNew === true
+				? 'Creating a new event entry'
+				: `Viewing the event entry with ID '${id}'`,
 	}}
 >
-	<Section center title={`Event ID '${id}' Overview`}>
-		<AdminEventsEditorOverview eventId={idInt} client:only="react" />
+	<Section
+		center
+		title={
+			idOrNew === true
+				? 'Creating New Event'
+				: `Event ID '${id}' Overview`
+		}
+	>
+		<AdminEventsEditorOverview
+			eventId={
+				idOrNew === true
+					? undefined
+					: idOrNew
+			}
+			client:only="react"
+		/>
 	</Section>
 </BaseAdmin>

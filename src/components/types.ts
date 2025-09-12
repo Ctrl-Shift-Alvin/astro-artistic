@@ -52,18 +52,26 @@ export interface IBlogMarkdownInstance<T extends Record<string, any>> {
 
 export const ZEventEntry = z.object({
 	id: z.coerce.number(),
-	title: z.string(),
+	title: z
+		.string()
+		.nonempty(),
 	dateTime: z.iso.datetime(),
-	location: z.string(),
+	location: z
+		.string()
+		.nonempty(),
 	enablePage: z.coerce.boolean(),
 	createdAt: z.string()
 });
 export type TEventEntry = z.infer<typeof ZEventEntry>;
 
 export const ZNewEventEntry = z.object({
-	title: z.string(),
+	title: z
+		.string()
+		.nonempty(),
 	dateTime: z.iso.datetime(),
-	location: z.string(),
+	location: z
+		.string()
+		.nonempty(),
 	enablePage: z.boolean()
 });
 export type TNewEventEntry = z.infer<typeof ZNewEventEntry>;

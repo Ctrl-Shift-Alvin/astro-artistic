@@ -2,6 +2,7 @@ import {
 	useCallback,
 	useEffect,
 	useLayoutEffect,
+	useMemo,
 	useState
 } from 'react';
 import clsx from 'clsx/lite';
@@ -9,27 +10,34 @@ import { DatePicker } from 'react-datepicker';
 import { AdminMarkdownEditor } from './AdminMarkdownEditor';
 import { addAdminButton } from './AdminButtonContainer';
 import { Monolog } from '@/components/components/MonologProvider';
-import { type TEventsEntry } from '@/components/types';
 import {
+	ZNewEventEntry,
+	type TEventEntry
+} from '@/components/types';
+import {
+	addEvent,
 	deleteEvent,
 	editEvent,
-	getEvent,
+	fetchEvent,
+	fetchEventIndex,
+	gotoPrevOrHome,
 	saveEvent
 } from '@/frontend/adminApi';
+import {
+	enableUnloadConfirmation,
+	disableUnloadConfirmation,
+	goto
+} from '@/frontend/windowTools';
 
 // eslint-disable-next-line import-x/no-unassigned-import
 import 'react-datepicker/dist/react-datepicker.css';
-import {
-	enableUnloadConfirmation,
-	disableUnloadConfirmation
-} from '@/frontend/windowTools';
 
-export const AdminEventsEditorOverview = ({ eventId }: { eventId: number }) => {
+export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => {
 
 	const [
 		eventEntry,
 		_setEventEntry
-	] = useState<TEventsEntry>();
+	] = useState<TEventEntry>();
 	const [
 		eventEntryChanged,
 		setEventEntryChanged
@@ -94,24 +102,45 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId: number }) => {
 		]
 	);
 
+	const isNewEntry = useMemo(
+		() => eventId === undefined,
+		[ eventId ]
+	);
+
 	const get = useCallback(
 		async() => {
 
-			const result = await getEvent(
-				eventId,
-				true
-			);
-			if (!result)
+			if (isNewEntry) {
+
+				setEventEntry({
+					id: -1,
+					createdAt: 'To Be Determined',
+					title: '',
+					dateTime: new Date().toISOString(),
+					location: '',
+					enablePage: true
+				});
 				return;
 
-			setEventEntry(result.data);
+			}
 
-			if (result.file)
-				setFileContent(result.file);
+			const result = await fetchEvent(
+				eventId as number, // isNewEntry being false means eventId is a number!
+				true
+			);
+			if (result) {
+
+				setEventEntry(result.data);
+
+				if (result.file)
+					setFileContent(result.file);
+
+			}
 
 		},
 		[
 			eventId,
+			isNewEntry,
 			setEventEntry,
 			setFileContent
 		]
@@ -122,27 +151,54 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId: number }) => {
 			if (!eventEntry)
 				return;
 
+			// Validate fields
+			const result = ZNewEventEntry.safeParse(eventEntry);
+			if (!result.success) {
+
+				Monolog.show({
+					text: `Empty/Invalid value for '${
+						result.error.issues[0]?.path
+							.toString()
+							.capitalize()
+					}'!`,
+					durationMs: 5000
+				});
+				return false;
+
+			}
+
+			if (isNewEntry) {
+
+				await addEvent(eventEntry);
+				return true;
+
+			}
+
 			if (
 				await editEvent(
-					eventId,
+					eventId as number, // isNewEntry being false means eventId is a number!
 					eventEntry
 				)
 			) {
 
 				setEventEntryChanged(false);
+				void get();
 
 			}
+			return true;
 
 		},
 		[
 			eventEntry,
-			eventId
+			eventId,
+			get,
+			isNewEntry
 		]
 	);
 	const save = useCallback(
 		async() => {
 
-			if (!fileContent)
+			if (!eventId || !fileContent)
 				return;
 
 			if (
@@ -163,22 +219,45 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId: number }) => {
 		]
 	);
 	const saveEdit = useCallback(
-		() => {
+		async() => {
 
-			if (eventEntryChanged) {
+			if (eventEntryChanged || isNewEntry) {
 
-				void edit();
+				if (!await edit())
+					return;
 
 			}
 			if (fileContentChanged) {
 
-				void save();
+				await save();
+
+			}
+
+			if (isNewEntry) {
+
+				disableUnloadConfirmation();
+
+				const newIndex = await fetchEventIndex();
+				if (!newIndex || newIndex.length < 1) {
+
+					gotoPrevOrHome();
+					return;
+
+				}
+
+				const newId = newIndex
+					.toSorted((
+						a,
+						b
+					) => b.createdAt.localeCompare(a.createdAt))[0]!.id;
+				goto(`/admin/events/${newId.toString()}/${location.search}`);
+				return;
 
 			}
 
 			if (!eventEntryChanged && !fileContentChanged) {
 
-				Monolog.show({ text: 'No changes made!' });
+				Monolog.show({ text: 'Successfully saved: No changes made!' });
 				return;
 
 			}
@@ -187,6 +266,7 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId: number }) => {
 		[
 			eventEntryChanged,
 			fileContentChanged,
+			isNewEntry,
 			edit,
 			save
 		]
@@ -195,23 +275,27 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId: number }) => {
 	useLayoutEffect(
 		() => {
 
-			addAdminButton(
-				{
-					children: 'Save',
-					onClick: saveEdit
-				},
-				{
+			addAdminButton({
+				children: 'Save',
+				onClick: () => void saveEdit()
+			});
+
+			if (isNewEntry && eventId) {
+
+				addAdminButton({
 					children: 'Delete',
 					onClick: () => void deleteEvent(
 						eventId,
 						true
 					)
-				}
-			);
+				});
+
+			}
 
 		},
 		[
 			eventId,
+			isNewEntry,
 			saveEdit
 		]
 	);
@@ -247,7 +331,11 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId: number }) => {
 						<input
 							id={'id'}
 							className={inputClassName}
-							value={eventEntry.id}
+							value={
+								eventEntry.id >= 0
+									? eventEntry.id
+									: 'To Be Determined'
+							}
 							disabled={true}
 						/>
 					</div>
@@ -332,7 +420,12 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId: number }) => {
 							showIcon
 							toggleCalendarOnIconClick
 							showTimeInput
-							className={'w-full'}
+							className={
+								clsx(
+									inputClassName,
+									'w-full'
+								)
+							}
 							id={'datetime'}
 							dateFormat={'dd/MM/yyyy HH:mm'}
 							timeIntervals={15}
@@ -381,6 +474,7 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId: number }) => {
 
 				{
 					eventEntry.enablePage
+					&& fileContent // Only allow editing of existing file (generated by server)
 					&& (
 						<div className={'w-full mt-5'}>
 
@@ -396,7 +490,7 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId: number }) => {
 								onSave={
 									() => {
 
-										saveEdit();
+										void saveEdit();
 
 									}
 								}
