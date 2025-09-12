@@ -9,8 +9,8 @@ import { Button } from '@/components/components/Button';
 import { Dialog } from '@/components/components/DialogProvider';
 import { Monolog } from '@/components/components/MonologProvider';
 import {
-	type TEventsEntry,
-	type TNewEventsEntry
+	type TEventEntry,
+	type TNewEventEntry
 } from '@/components/types';
 import {
 	fetchEventIndex,
@@ -55,7 +55,7 @@ export const AdminEventTable = () => {
 	const [
 		eventEntries,
 		setEventEntries
-	] = useState<TEventsEntry[]>([]);
+	] = useState<TEventEntry[]>([]);
 
 	const index = useCallback(
 		async() => {
@@ -77,7 +77,7 @@ export const AdminEventTable = () => {
 			if (!formResult)
 				return;
 
-			const newEventEntry: TNewEventsEntry = {
+			const newEventEntry: TNewEventEntry = {
 				title: formResult.title,
 				location: formResult.location,
 				dateTime: new Date(

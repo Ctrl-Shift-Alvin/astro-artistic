@@ -2,11 +2,12 @@ import path from 'node:path';
 import fs from 'node:fs';
 import matter from 'gray-matter';
 import {
-	type IEventsFrontmatter, type IEventsMarkdownInstance
+	type IEventFrontmatter,
+	type IEventMarkdownInstance
 } from '@/components/types';
 import { EventsConfig } from '@/backend/config/events';
 
-export function events_getEventContent(id: string): IEventsMarkdownInstance<IEventsFrontmatter> | null {
+export function events_getEventContent(id: string): IEventMarkdownInstance<IEventFrontmatter> | null {
 
 	const { pagesPath: EVENTS_PATH } = EventsConfig;
 
@@ -27,7 +28,7 @@ export function events_getEventContent(id: string): IEventsMarkdownInstance<IEve
 
 	return {
 		url: `/events/${id}/`,
-		frontmatter: data as IEventsFrontmatter,
+		frontmatter: data as IEventFrontmatter,
 		content
 	};
 

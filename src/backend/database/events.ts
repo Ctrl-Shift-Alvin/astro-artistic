@@ -2,8 +2,8 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import Database from 'better-sqlite3';
 import {
-	ZEventsEntry,
-	type TEventsEntry
+	ZEventEntry,
+	type TEventEntry
 } from '@/components/types';
 import { EventsConfig } from '@/backend/config/events';
 import { EventsConfig as SharedEventsConfig } from '@/shared/config/events';
@@ -144,14 +144,14 @@ export const events_dbRun = (
 export const events_dbGet = (
 	query: string,
 	...params: unknown[]
-): TEventsEntry | undefined => {
+): TEventEntry | undefined => {
 
 	try {
 
 		const result = db
 			.prepare(query)
 			.get(params);
-		const parsed = ZEventsEntry
+		const parsed = ZEventEntry
 			.optional()
 			.parse(result);
 		return parsed;
@@ -180,14 +180,14 @@ export const events_dbGet = (
 export const events_dbAll = (
 	query: string,
 	...params: unknown[]
-): TEventsEntry[] => {
+): TEventEntry[] => {
 
 	try {
 
 		const result = db
 			.prepare(query)
 			.all(params);
-		const parsed = ZEventsEntry
+		const parsed = ZEventEntry
 			.array()
 			.parse(result);
 		return parsed;
@@ -214,7 +214,7 @@ export const events_dbAll = (
 
 };
 
-export const events_getAllEntries = (): TEventsEntry[] => {
+export const events_getAllEntries = (): TEventEntry[] => {
 
 	try {
 
@@ -231,7 +231,7 @@ export const events_getAllEntries = (): TEventsEntry[] => {
 
 };
 
-export const events_getAllRelevantEntries = (): TEventsEntry[] => {
+export const events_getAllRelevantEntries = (): TEventEntry[] => {
 
 	try {
 
@@ -280,7 +280,7 @@ export const events_getAllRelevantEntries = (): TEventsEntry[] => {
 
 };
 
-export const events_getEntry = (id: string | number): TEventsEntry | undefined => {
+export const events_getEntry = (id: string | number): TEventEntry | undefined => {
 
 	try {
 

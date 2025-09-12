@@ -50,7 +50,7 @@ export interface IBlogMarkdownInstance<T extends Record<string, any>> {
 
 // #region Events
 
-export const ZEventsEntry = z.object({
+export const ZEventEntry = z.object({
 	id: z.coerce.number(),
 	title: z.string(),
 	dateTime: z.iso.datetime(),
@@ -58,20 +58,20 @@ export const ZEventsEntry = z.object({
 	enablePage: z.coerce.boolean(),
 	createdAt: z.string()
 });
-export type TEventsEntry = z.infer<typeof ZEventsEntry>;
+export type TEventEntry = z.infer<typeof ZEventEntry>;
 
-export const ZNewEventsEntry = z.object({
+export const ZNewEventEntry = z.object({
 	title: z.string(),
 	dateTime: z.iso.datetime(),
 	location: z.string(),
 	enablePage: z.boolean()
 });
-export type TNewEventsEntry = z.infer<typeof ZNewEventsEntry>;
+export type TNewEventEntry = z.infer<typeof ZNewEventEntry>;
 
-export interface IEventsFrontmatter { id: number }
-export interface IEventsMarkdownInstance<T extends Record<string, any>> {
+export interface IEventFrontmatter { id: number }
+export interface IEventMarkdownInstance<T extends Record<string, any>> {
 	url: string;
-	frontmatter: IEventsFrontmatter & T;
+	frontmatter: IEventFrontmatter & T;
 	content: string;
 }
 
@@ -206,7 +206,7 @@ export const ZProtectedPostApiRequestMap = {
 			.positive()
 	}),
 	'events/index': z.undefined(),
-	'events/add': z.object({ data: ZNewEventsEntry }),
+	'events/add': z.object({ data: ZNewEventEntry }),
 	'events/delete': z.object({
 		id: z
 			.coerce
@@ -228,7 +228,7 @@ export const ZProtectedPostApiRequestMap = {
 		id: z.coerce
 			.number()
 			.positive(),
-		data: ZNewEventsEntry
+		data: ZNewEventEntry
 	}),
 	'blog/index': z.undefined(),
 	'blog/get': z.object({
@@ -304,14 +304,14 @@ export const TProtectedPostApiResponseMap = {
 	]),
 	'contact/delete': ZApiResponse,
 	'events/index': z.union([
-		ZApiResponseSuccess.extend({ data: ZEventsEntry.array() }),
+		ZApiResponseSuccess.extend({ data: ZEventEntry.array() }),
 		ZApiResponseError
 	]),
 	'events/add': ZApiResponse,
 	'events/delete': ZApiResponse,
 	'events/get': z.union([
 		ZApiResponseSuccess.extend({
-			data: ZEventsEntry,
+			data: ZEventEntry,
 			file: z
 				.string()
 				.optional()

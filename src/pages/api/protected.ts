@@ -10,7 +10,7 @@ import { type APIContext } from 'astro';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import {
 	ZApiResponse,
-	ZEventsEntry,
+	ZEventEntry,
 	ZProtectedGetApiResponse,
 	ZProtectedPostApiRequestMap,
 	TProtectedPostApiResponseMap
@@ -578,7 +578,7 @@ export async function POST(context: APIContext) {
 					'SELECT * FROM events WHERE id=?',
 					id
 				);
-				const parsedResult = ZEventsEntry.safeParse(result);
+				const parsedResult = ZEventEntry.safeParse(result);
 				if (!parsedResult.success) {
 
 					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });

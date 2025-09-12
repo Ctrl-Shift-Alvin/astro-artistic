@@ -9,8 +9,8 @@ import {
 	type TBuild,
 	type TContactFormEntry,
 	type TError,
-	type TEventsEntry,
-	type TNewEventsEntry
+	type TEventEntry,
+	type TNewEventEntry
 } from '@/components/types';
 import {
 	lsGetAuthTokenExpiry,
@@ -549,7 +549,7 @@ export const deleteContactForm = async(
 
 // #region Events
 
-export const fetchEventIndex = async(): Promise<TEventsEntry[] | null> => {
+export const fetchEventIndex = async(): Promise<TEventEntry[] | null> => {
 
 	const response = await fetch(
 		'/api/protected/?type=events/index',
@@ -578,7 +578,7 @@ export const getEvent = async(
 	id: string | number,
 	gotoPrevUrl: boolean = false
 ): Promise<{
-	data: TEventsEntry;
+	data: TEventEntry;
 	file: string | undefined;
 } | null> => {
 
@@ -619,7 +619,7 @@ export const getEvent = async(
 	};
 
 };
-export const addEvent = async(newEntry: TNewEventsEntry): Promise<boolean> => {
+export const addEvent = async(newEntry: TNewEventEntry): Promise<boolean> => {
 
 	const requestBody = ZProtectedPostApiRequestMap['events/add'].safeParse({ data: newEntry });
 	if (!requestBody.success)
@@ -705,7 +705,7 @@ export const deleteEvent = async(
 };
 export const editEvent = async(
 	id: string | number,
-	newEntry: TNewEventsEntry
+	newEntry: TNewEventEntry
 ): Promise<boolean> => {
 
 	const requestBody = ZProtectedPostApiRequestMap['events/edit'].safeParse({
