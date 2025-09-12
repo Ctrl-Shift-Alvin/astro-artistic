@@ -42,6 +42,10 @@ export const smoothScroll = (
 
 };
 
+let _isUnloadConfirmation = false;
+export const enableUnloadConfirmation = () => _isUnloadConfirmation = true;
+export const disableUnloadConfirmation = () => _isUnloadConfirmation = false;
+
 let animatedObjects: NodeListOf<Element> | undefined;
 let animationDurationMs: number;
 let fadeInOffsetMs: number;
@@ -154,7 +158,10 @@ export function initWindowAnimations(
 	);
 
 	// Play fade-out animation before reload
-	window.onbeforeunload = () => {
+	window.onbeforeunload = (e) => {
+
+		if (_isUnloadConfirmation)
+			e.preventDefault();
 
 		void windowFadeOut().then(() => {
 

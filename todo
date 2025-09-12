@@ -1,4 +1,4 @@
-TODO Interrupt navigation when admin editor file has changed
+FIXME Fix dialog form submission callback in admin pages
 TODO Fetch contact submission ranges instead of *
 TODO Add standardized form components
 TODO Better blog editor

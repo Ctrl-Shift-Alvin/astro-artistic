@@ -1,5 +1,6 @@
 import {
 	useCallback,
+	useEffect,
 	useLayoutEffect,
 	useMemo,
 	useState
@@ -18,6 +19,10 @@ import {
 } from '@/frontend/adminApi';
 import { A } from '@/components/components/A';
 import { Button } from '@/components/components/Button';
+import {
+	disableUnloadConfirmation,
+	enableUnloadConfirmation
+} from '@/frontend/windowTools';
 
 export const AdminBlogEditor = () => {
 
@@ -68,6 +73,17 @@ export const AdminBlogEditor = () => {
 
 		},
 		[]
+	);
+	useEffect(
+		() => {
+
+			if (fileContentChanged)
+				enableUnloadConfirmation();
+			else
+				disableUnloadConfirmation();
+
+		},
+		[ fileContentChanged ]
 	);
 
 	const getIndex = useCallback(

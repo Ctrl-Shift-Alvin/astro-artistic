@@ -19,6 +19,10 @@ import {
 
 // eslint-disable-next-line import-x/no-unassigned-import
 import 'react-datepicker/dist/react-datepicker.css';
+import {
+	enableUnloadConfirmation,
+	disableUnloadConfirmation
+} from '@/frontend/windowTools';
 
 export const AdminEventsEditorOverview = ({ eventId }: { eventId: number }) => {
 
@@ -73,6 +77,21 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId: number }) => {
 
 		},
 		[]
+	);
+
+	useEffect(
+		() => {
+
+			if (eventEntryChanged || fileContentChanged)
+				enableUnloadConfirmation();
+			else
+				disableUnloadConfirmation();
+
+		},
+		[
+			eventEntryChanged,
+			fileContentChanged
+		]
 	);
 
 	const get = useCallback(
