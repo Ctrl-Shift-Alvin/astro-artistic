@@ -7,7 +7,8 @@ import { addAdminButton } from './AdminButtonContainer';
 import { Monolog } from '@/components/components/MonologProvider';
 import { type TError } from '@/components/types';
 import {
-	deleteError, getError
+	deleteError,
+	fetchError
 } from '@/frontend/adminApi';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 import { A } from '@/components/components/A';
@@ -36,7 +37,7 @@ export const AdminErrorOverview = ({ submissionId }: { submissionId: number | st
 	const get = useCallback(
 		async() => {
 
-			const result = await getError(
+			const result = await fetchError(
 				submissionId,
 				true
 			);

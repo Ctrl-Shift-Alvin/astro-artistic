@@ -6,7 +6,8 @@ import {
 import { addAdminButton } from './AdminButtonContainer';
 import { type TBuild } from '@/components/types';
 import {
-	deleteBuild, getBuild
+	deleteBuild,
+	fetchBuild
 } from '@/frontend/adminApi';
 import { A } from '@/components/components/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
@@ -32,7 +33,7 @@ export const AdminBuildOverview = ({ buildNumber }: { buildNumber: number | stri
 	const get = useCallback(
 		async() => {
 
-			const result = await getBuild(
+			const result = await fetchBuild(
 				buildNumber,
 				true
 			);

@@ -574,7 +574,7 @@ export const fetchEventIndex = async(): Promise<TEventEntry[] | null> => {
 	return parsedResponse.data.data;
 
 };
-export const getEvent = async(
+export const fetchEvent = async(
 	id: string | number,
 	gotoPrevUrl: boolean = false
 ): Promise<{
@@ -786,7 +786,7 @@ export const saveEvent = async(
 
 // #region Errors & Builds
 
-export const getBuildIndex = async(
+export const fetchBuildIndex = async(
 	count: number | string,
 	offset?: number | string
 ): Promise<TBuild[] | null> => {
@@ -825,7 +825,7 @@ export const getBuildIndex = async(
 	return parsedResponse.data.data;
 
 };
-export const getBuild = async(
+export const fetchBuild = async(
 	buildNumber: number | string,
 	gotoPrevUrl: boolean = false
 ): Promise<TBuild | null> => {
@@ -937,7 +937,7 @@ export const deleteBuild = async(
 
 };
 
-export const getErrorIndex = async(
+export const fetchErrorIndex = async(
 	count: number | string,
 	offset?: number | string
 ): Promise<TError[] | null> => {
@@ -1000,7 +1000,7 @@ export const countErrors = async(): Promise<number | null> => {
 	return parsedResponse.data.count;
 
 };
-export const getErrorIndexByBuild = async(
+export const fetchErrorIndexByBuild = async(
 	buildNumber: number | string,
 	count: number | string,
 	offset?: number | string
@@ -1070,7 +1070,7 @@ export const countErrorsByBuild = async(buildNumber: number | string): Promise<n
 	return parsedResponse.data.count;
 
 };
-export const getError = async(
+export const fetchError = async(
 	id: number | string,
 	gotoPrevUrl: boolean = false
 ): Promise<TError | null> => {

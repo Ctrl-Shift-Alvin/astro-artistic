@@ -6,7 +6,7 @@ import {
 import clsx from 'clsx/lite';
 import { type TBuild } from '@/components/types';
 import {
-	getBuildIndex,
+	fetchBuildIndex,
 	countBuilds,
 	deleteBuild,
 	getPrevUrlQuery
@@ -59,7 +59,7 @@ export const AdminBuildTable = () => {
 			}
 
 			// Otherwise, fetch only missing rows
-			const result = await getBuildIndex(
+			const result = await fetchBuildIndex(
 				count - buildsIndex.length,
 				buildsIndex.length
 			);

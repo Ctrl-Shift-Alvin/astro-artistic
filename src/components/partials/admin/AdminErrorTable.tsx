@@ -5,9 +5,9 @@ import React, {
 } from 'react';
 import { type TError } from '@/components/types';
 import {
-	getErrorIndex,
+	fetchErrorIndex,
 	deleteError,
-	getErrorIndexByBuild,
+	fetchErrorIndexByBuild,
 	countErrors,
 	countErrorsByBuild,
 	getPrevUrlQuery
@@ -61,12 +61,12 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 
 			// Otherwise, fetch only missing rows
 			const result = buildNumber
-				? await getErrorIndexByBuild(
+				? await fetchErrorIndexByBuild(
 					buildNumber,
 					count - errorsIndex.length,
 					errorsIndex.length
 				)
-				: await getErrorIndex(
+				: await fetchErrorIndex(
 					count - errorsIndex.length,
 					errorsIndex.length
 				);
