@@ -312,7 +312,7 @@ export const saveBlogFile = async(
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['blog/save'].safeParseAsync(await response.json());
-	if (!parsedResponse.success) {
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
 			text: `Failed to save a blog file named '${fileName}'!`,
@@ -345,12 +345,24 @@ export const newBlogFile = async(fileName: string): Promise<boolean> => {
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['blog/new'].safeParseAsync(await response.json());
-	if (!parsedResponse.success) {
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
-		Monolog.show({
-			text: `Failed to create a new blog file named '${fileName}'!`,
-			durationMs: 3000
-		});
+		if (response.status == 409) {
+
+			Monolog.show({
+				text: `Failed to create a new blog file named '${fileName}' because the file already exists!`,
+				durationMs: 3000
+			});
+
+		} else {
+
+			Monolog.show({
+				text: `Failed to create a new blog file named '${fileName}'!`,
+				durationMs: 3000
+			});
+
+		}
+
 		return false;
 
 	}
@@ -389,7 +401,7 @@ export const removeBlogFile = async(
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['blog/remove'].safeParseAsync(await response.json());
-	if (!parsedResponse.success) {
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
 			text: `Failed to remove a blog file named '${fileName}'!`,
@@ -511,7 +523,7 @@ export const deleteContactForm = async(
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['contact/delete'].safeParseAsync(await response.json());
-	if (!parsedResponse.success) {
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
 			text: `Failed to delete a contact form submission with the ID '${id}'!`,
@@ -624,7 +636,7 @@ export const addEvent = async(newEntry: TNewEventsEntry): Promise<boolean> => {
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['events/add'].safeParseAsync(await response.json());
-	if (!parsedResponse.success) {
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
 			text: `Failed to add new event entry titled '${
@@ -671,7 +683,7 @@ export const deleteEvent = async(
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['events/delete'].safeParseAsync(await response.json());
-	if (!parsedResponse.success) {
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
 			text: `Failed to delete an event entry with the ID '${id}'!`,
@@ -714,7 +726,7 @@ export const editEvent = async(
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['events/edit'].safeParseAsync(await response.json());
-	if (!parsedResponse.success) {
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
 			text: `Failed to edit an event entry with the ID '${id}'!`,
@@ -753,7 +765,7 @@ export const saveEvent = async(
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['events/save'].safeParseAsync(await response.json());
-	if (!parsedResponse.success) {
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
 			text: `Failed to save an event entry with the ID '${id}'!`,
@@ -890,7 +902,7 @@ export const deleteBuild = async(
 		return false;
 
 	const requestBody = ZProtectedPostApiRequestMap['builds/delete'].safeParse({ buildNumber });
-	if (!requestBody.success)
+	if (!requestBody.success || 'error' in parsedResponse.data)
 		return false;
 
 	const response = await fetch(
@@ -1125,7 +1137,7 @@ export const deleteError = async(
 	);
 
 	const parsedResponse = await TProtectedPostApiResponseMap['errors/delete'].safeParseAsync(await response.json());
-	if (!parsedResponse.success) {
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
 			text: `Failed to delete an error with ID '${id}'!`,
