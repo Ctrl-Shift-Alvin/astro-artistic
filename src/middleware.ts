@@ -13,7 +13,25 @@ import {
 	cGetAuthToken
 } from '@/shared/cookies';
 
-export const onRequest = defineMiddleware((
+const noCacheResponse = (response: Response) => {
+
+	response.headers.set(
+		'Cache-Control',
+		'no-cache, no-store, must-revalidate'
+	);
+	response.headers.set(
+		'Pragma',
+		'no-cache'
+	);
+	response.headers.set(
+		'Expires',
+		'0'
+	);
+	return response;
+
+};
+
+export const onRequest = defineMiddleware(async(
 	context,
 	next
 ) => {
@@ -27,8 +45,11 @@ export const onRequest = defineMiddleware((
 
 	if (context.url.pathname.startsWith('/admin/')) {
 
-		if (!isAdminSetup)
-			return context.redirect('/');
+		if (!isAdminSetup) {
+
+			return noCacheResponse(context.redirect('/'));
+
+		}
 
 		const token = cGetAuthToken(context);
 		const isLoginPage = context.url.pathname === '/admin/login/';
@@ -38,10 +59,13 @@ export const onRequest = defineMiddleware((
 			const tokenExpiry = (decode(token) as JwtPayload | null)?.exp;
 			if (tokenExpiry && Date.now() - tokenExpiry * 1000 < 0) {
 
-				if (isLoginPage)
-					return context.redirect('/admin/home/');
+				if (isLoginPage) {
 
-				return next();
+					return noCacheResponse(context.redirect('/admin/home/'));
+
+				}
+
+				return noCacheResponse(await next());
 
 			}
 
@@ -49,9 +73,11 @@ export const onRequest = defineMiddleware((
 
 		if (!isLoginPage) {
 
-			return context.redirect('/admin/login/');
+			return noCacheResponse(context.redirect('/admin/login/'));
 
 		}
+
+		return noCacheResponse(await next());
 
 	}
 
