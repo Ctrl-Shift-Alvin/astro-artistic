@@ -43,18 +43,18 @@ export const checkLogin = (): boolean => {
 
 export const login = async(password: string): Promise<boolean> => {
 
-	const responseBody = ZAuthPostApiRequest.parse({ password });
-	const response = await fetch(
+	const authRequestBody = ZAuthPostApiRequest.parse({ password });
+	const authResponse = await fetch(
 		'/api/auth/',
 		{
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(responseBody),
+			body: JSON.stringify(authRequestBody),
 			credentials: 'include'
 		}
 	);
 
-	if (!response.ok) {
+	if (!authResponse.ok) {
 
 		Monolog.show({
 			text: `Error: Could not authenticate (${response.status})!`,
@@ -64,7 +64,7 @@ export const login = async(password: string): Promise<boolean> => {
 
 	}
 
-	const response1 = await fetch(
+	const testResponse = await fetch(
 		'/api/protected/',
 		{
 			method: 'GET',
@@ -74,11 +74,11 @@ export const login = async(password: string): Promise<boolean> => {
 	);
 
 	const {
-		success: success1,
-		data: data1
-	} = await ZProtectedGetApiResponse.safeParseAsync(await response1.json());
+		success: testResponseSuccess,
+		data: testResponseData
+	} = await ZProtectedGetApiResponse.safeParseAsync(await testResponse.json());
 
-	if (!success1 || 'error' in data1) {
+	if (!testResponseSuccess || 'error' in testResponseData) {
 
 		Monolog.show({
 			text: 'Error: Incorrect password!',
@@ -98,8 +98,8 @@ export const login = async(password: string): Promise<boolean> => {
 				goto('/admin/home/');
 
 			});
+		lsSetAuthTokenExpiry(testResponseData.expiry);
 		setLogoutTimeout();
-		lsSetAuthTokenExpiry(data1.expiry);
 		return true;
 
 	}
