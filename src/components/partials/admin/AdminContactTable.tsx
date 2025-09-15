@@ -6,47 +6,133 @@ import {
 import { A } from '@/components/components/A';
 import { type TContactFormEntry } from '@/components/types';
 import {
-	fetchContactFormIndex,
-	deleteContactForm
+	fetchContactEntryIndex,
+	deleteContactEntry,
+	countContactEntries
 } from '@/frontend/adminApi';
+import { ContactConfig } from '@/shared/config/contact';
 
 export const AdminContactTable = () => {
 
 	const [
-		formSubmissions,
-		setFormSubmissions
+		contactEntryIndex,
+		setContactEntryIndex
 	] = useState<TContactFormEntry[]>([]);
 
-	const get = useCallback(
-		async() => {
+	const [
+		fullIndexCount,
+		setFullIndexCount
+	] = useState(0);
 
-			const result = await fetchContactFormIndex();
-			if (result) {
+	const [
+		contactEntryCount,
+		setContactEntryCount
+	] = useState(ContactConfig.tableInitialEntryCount);
 
-				setFormSubmissions(result);
+	const index = useCallback(
+		async(count: number) => {
+
+			/*
+			 * Because of semi-circular deps, when 'Show more...' is clicked, this is called twice.
+			 * A simple check if something has changed prevents an API request.
+			 */
+			if (count == contactEntryIndex.length)
+				return;
+
+			// If count decreased, just slice the errors index
+			if (contactEntryIndex.length >= count) {
+
+				setContactEntryIndex((prev) => prev.slice(
+					0,
+					count
+				));
+				return;
 
 			}
+
+			// Otherwise, fetch only missing rows
+			const result = await fetchContactEntryIndex(
+				count - contactEntryIndex.length,
+				contactEntryIndex.length
+			);
+
+			if (result == null)
+				return;
+
+			setContactEntryIndex((prev) => [
+				...prev,
+				...result
+			].slice(
+				0,
+				contactEntryCount
+			));
+
+		},
+		[
+			contactEntryCount,
+			contactEntryIndex.length
+		]
+	);
+
+	const count = useCallback(
+		async() => {
+
+			const result = await countContactEntries();
+			if (result === null)
+				return;
+
+			setFullIndexCount(result);
 
 		},
 		[]
 	);
-	const remove = useCallback(
+
+	const del = useCallback(
 		async(id: number) => {
 
-			await deleteContactForm(id);
-			void get();
+			await deleteContactEntry(id);
+			setContactEntryIndex([]); // Refetch all errors, but keep the shown count
+			void index(contactEntryCount);
 
 		},
-		[ get ]
+		[
+			contactEntryCount,
+			index
+		]
 	);
+
+	const increaseCount = useCallback(
+		() => {
+
+			setContactEntryCount((prev) => prev + ContactConfig.tableInitialEntryCount);
+
+		},
+		[]
+	);
+
+	const decreaseCount = useCallback(
+		() => {
+
+			setContactEntryCount((prev) => prev - ContactConfig.tableInitialEntryCount);
+
+		},
+		[]
+	);
+
 	useLayoutEffect(
 		() => {
 
-			void get();
+			void count();
+			void index(contactEntryCount);
 
 		},
-		[ get ]
+		[
+			contactEntryCount,
+			index,
+			count
+		]
 	);
+
 	return (
 		<>
 			<table className={'w-4/6 border-collapse border border-gray-300'}>
@@ -76,7 +162,7 @@ export const AdminContactTable = () => {
 
 				<tbody>
 					{
-						formSubmissions.map((entry) => (
+						contactEntryIndex.map((entry) => (
 							<tr key={entry.id}>
 
 								<td className={'border p-2 underline'}>
@@ -100,7 +186,7 @@ export const AdminContactTable = () => {
 								<td className={'border p-2'}>
 									<A
 										className={'text-red-600'}
-										onClick={() => void remove(entry.id)}
+										onClick={() => void del(entry.id)}
 									>
 										{'D'}
 									</A>
@@ -110,6 +196,41 @@ export const AdminContactTable = () => {
 					}
 				</tbody>
 			</table>
+
+			{
+				contactEntryCount >= ContactConfig.tableInitialEntryCount * 2
+				&& (
+					<A
+						onClick={
+							() => {
+
+								decreaseCount();
+
+							}
+						}
+					>
+						{'Show less...'}
+					</A>
+				)
+			}
+
+			{
+				fullIndexCount > contactEntryCount
+				&& (
+					<A
+						onClick={
+							() => {
+
+								increaseCount();
+
+							}
+						}
+					>
+						{'Show more...'}
+					</A>
+				)
+			}
+
 		</>
 	);
 

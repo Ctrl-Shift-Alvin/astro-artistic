@@ -392,7 +392,7 @@ export const errors_getFewBuilds = (
 	} catch(err: any) {
 
 		throw new Error(
-			'Failed to get few builds!',
+			`Failed to get few builds with count '${count}' and offset '${offset}'!`,
 			{ cause: err }
 		);
 
@@ -526,7 +526,7 @@ export const errors_getFewErrors = (
 	} catch(err: any) {
 
 		throw new Error(
-			'Failed to get few errors!',
+			`Failed to get few errors with count '${count}' and offset '${offset}'!`,
 			{ cause: err }
 		);
 

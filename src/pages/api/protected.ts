@@ -17,9 +17,10 @@ import {
 } from '@/components/types';
 import { cGetAuthToken } from '@/shared/cookies';
 import {
-	contact_dbAll,
-	contact_dbGet,
-	contact_dbRun
+	contact_countEntries,
+	contact_dbRun,
+	contact_getEntry,
+	contact_getFewEntries
 } from '@/backend/database/contact';
 import {
 	events_createPage,
@@ -176,12 +177,54 @@ export async function POST(context: APIContext) {
 
 		case 'contact/index': {
 
+			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+			if (!parsedBody.success) {
+
+				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+				return new Response(
+					JSON.stringify(errorBody),
+					{ status: 400 }
+				);
+
+			}
+
+			const data = parsedBody.data;
+
 			try {
 
-				const result = contact_dbAll('SELECT * FROM submissions');
+				const result = contact_getFewEntries(
+					data.count,
+					data.offset
+				);
 				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					data: result
+				});
+
+				return new Response(
+					JSON.stringify(responseBody),
+					{ status: 200 }
+				);
+
+			} catch {
+
+				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+				return new Response(
+					JSON.stringify(errorBody),
+					{ status: 500 }
+				);
+
+			}
+
+		}
+		case 'contact/count': {
+
+			try {
+
+				const result = contact_countEntries();
+				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+					message: 'success',
+					count: result
 				});
 
 				return new Response(
@@ -216,10 +259,7 @@ export async function POST(context: APIContext) {
 			try {
 
 				const requestDataId = parsedBody.data.id;
-				const result = contact_dbGet(
-					'SELECT * FROM submissions WHERE id=?',
-					requestDataId
-				);
+				const result = contact_getEntry(requestDataId);
 				if (result == undefined) {
 
 					const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'resource-not-found' });

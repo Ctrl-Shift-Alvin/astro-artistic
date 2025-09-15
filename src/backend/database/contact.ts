@@ -267,16 +267,133 @@ export const contact_isDbDuplicateEntry = (
 
 };
 
-export const contact_addForm = (form: TContactFormSubmission) => {
+export const contact_addEntry = (form: TContactFormSubmission) => {
 
-	return contact_dbRun(
-		'INSERT INTO submissions (firstName, lastName, email, phoneNumber, message) VALUES (?, ?, ?, ?, ?)',
-		form.firstName,
-		form.lastName,
-		form.email,
-		form.phoneNumber,
-		form.message
-	);
+	try {
+
+		return contact_dbRun(
+			'INSERT INTO submissions (firstName, lastName, email, phoneNumber, message) VALUES (?, ?, ?, ?, ?)',
+			form.firstName,
+			form.lastName,
+			form.email,
+			form.phoneNumber,
+			form.message
+		);
+
+	} catch(err: any) {
+
+		throw new Error(
+			`Failed to add contact entry from first name '${form.firstName}'!`,
+			{ cause: err }
+		);
+
+	}
+
+};
+export const contact_getEntry = (id: number): TContactFormEntry | undefined => {
+
+	try {
+
+		return contact_dbGet(
+			'SELECT * FROM submissions WHERE id=?',
+			id
+		);
+
+	} catch(err: any) {
+
+		throw new Error(
+			`Failed to get contact entry with ID '${id}'!`,
+			{ cause: err }
+		);
+
+	}
+
+};
+export const contact_getAllEntries = (): TContactFormEntry[] => {
+
+	try {
+
+		return contact_dbAll('SELECT * FROM submissions');
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to get all contact entries!',
+			{ cause: err }
+		);
+
+	}
+
+};
+export const contact_getFewEntries = (
+	count: number,
+	offset: number = 0
+): TContactFormEntry[] => {
+
+	try {
+
+		const result = contact_dbAll(
+			'SELECT * FROM submissions ORDER BY createdAt DESC LIMIT ? OFFSET ?',
+			count,
+			offset
+		);
+		return result;
+
+	} catch(err: any) {
+
+		throw new Error(
+			`Failed to get few contact entries with count '${count}' and offset '${offset}'!`,
+			{ cause: err }
+		);
+
+	}
+
+};
+export const contact_deleteEntry = (id: number) => {
+
+	try {
+
+		return contact_dbRun(
+			'DELETE FROM submissions WHERE id=?',
+			id
+		);
+
+	} catch(err: any) {
+
+		throw new Error(
+			`Failed to delete contact entry with ID '${id}'!`,
+			{ cause: err }
+		);
+
+	}
+
+};
+export const contact_countEntries = (): number => {
+
+	try {
+
+		const result = db
+			.prepare('SELECT COUNT(*) AS count FROM submissions')
+			.get();
+
+		const parsedResult = z
+			.object({
+				count: z.coerce
+					.number()
+					.default(0)
+			})
+			.parse(result);
+
+		return parsedResult.count;
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to count all contact entries!',
+			{ cause: err }
+		);
+
+	}
 
 };
 

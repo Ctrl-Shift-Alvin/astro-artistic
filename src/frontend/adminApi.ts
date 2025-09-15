@@ -427,13 +427,24 @@ export const removeBlogFile = async(
 
 // #region Contact
 
-export const fetchContactFormIndex = async(): Promise<TContactFormEntry[] | null> => {
+export const fetchContactEntryIndex = async(
+	count: number | string,
+	offset?: number | string
+): Promise<TContactFormEntry[] | null> => {
+
+	const requestBody = ZProtectedPostApiRequestMap['contact/index'].safeParse({
+		count,
+		offset
+	});
+	if (!requestBody.success)
+		return null;
 
 	const response = await fetch(
 		'/api/protected/?type=contact/index',
 		{
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestBody.data),
 			credentials: 'include'
 		}
 	);
@@ -452,7 +463,31 @@ export const fetchContactFormIndex = async(): Promise<TContactFormEntry[] | null
 	return parsedResponse.data.data;
 
 };
-export const fetchContactForm = async(
+export const countContactEntries = async(): Promise<number | null> => {
+
+	const response = await fetch(
+		'/api/protected/?type=contact/count',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'include'
+		}
+	);
+
+	const parsedResponse = await TProtectedPostApiResponseMap['contact/count'].safeParseAsync(await response.json());
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		Monolog.show({
+			text: 'Failed to fetch the contact form entry count!',
+			durationMs: 3000
+		});
+		return null;
+
+	}
+	return parsedResponse.data.count;
+
+};
+export const fetchContactEntry = async(
 	id: string | number,
 	gotoPrevUrl: boolean = false
 ): Promise<TContactFormEntry | null> => {
@@ -492,7 +527,7 @@ export const fetchContactForm = async(
 	return parsedResponse.data.data;
 
 };
-export const deleteContactForm = async(
+export const deleteContactEntry = async(
 	id: string | number,
 	gotoPrevUrl: boolean = false
 ): Promise<boolean> => {

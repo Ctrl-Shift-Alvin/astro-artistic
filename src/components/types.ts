@@ -200,7 +200,13 @@ export const ZProtectedGetApiResponse = z.union([
 ]);
 export type TProtectedGetApiResponse = z.infer<typeof ZProtectedGetApiResponse>;
 export const ZProtectedPostApiRequestMap = {
-	'contact/index': z.undefined(),
+	'contact/index': z.object({
+		count: z.coerce.number(),
+		offset: z.coerce
+			.number()
+			.optional()
+	}),
+	'contact/count': z.undefined(),
 	'contact/get': z.object({
 		id: z
 			.coerce
@@ -304,6 +310,10 @@ export const ZProtectedPostApiRequestMap = {
 export const TProtectedPostApiResponseMap = {
 	'contact/index': z.union([
 		ZApiResponseSuccess.extend({ data: ZContactFormEntry.array() }),
+		ZApiResponseError
+	]),
+	'contact/count': z.union([
+		ZApiResponseSuccess.extend({ count: z.coerce.number() }),
 		ZApiResponseError
 	]),
 	'contact/get': z.union([

@@ -5,7 +5,7 @@ import {
 	ZFormSubmissionApiResponse
 } from '@/components/types';
 import {
-	contact_addForm, contact_isDbDuplicateEntry
+	contact_addEntry, contact_isDbDuplicateEntry
 } from '@/backend/database/contact';
 
 export async function POST(context: APIContext) {
@@ -48,7 +48,7 @@ export async function POST(context: APIContext) {
 
 	}
 
-	contact_addForm(data.data);
+	contact_addEntry(data.data);
 
 	const body = ZFormSubmissionApiResponse.parse({ message: 'success' });
 	return new Response(

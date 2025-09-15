@@ -26,6 +26,9 @@ export const ZContact = z.object({
 export type TContact = z.infer<typeof ZContact>;
 
 export const ZContactConfig = z.object({
+	tableInitialEntryCount: z
+		.number()
+		.default(5),
 	contacts: z
 		.record(
 			z.string(),

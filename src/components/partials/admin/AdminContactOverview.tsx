@@ -6,8 +6,8 @@ import {
 import { addAdminButton } from './AdminButtonContainer';
 import { type TContactFormEntry } from '@/components/types';
 import {
-	deleteContactForm,
-	fetchContactForm
+	deleteContactEntry,
+	fetchContactEntry
 } from '@/frontend/adminApi';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 
@@ -21,7 +21,7 @@ export const AdminContactOverview = ({ submissionId }: { submissionId: number | 
 	const get = useCallback(
 		async() => {
 
-			const result = await fetchContactForm(
+			const result = await fetchContactEntry(
 				submissionId,
 				true
 			);
@@ -38,7 +38,7 @@ export const AdminContactOverview = ({ submissionId }: { submissionId: number | 
 	const remove = useCallback(
 		async() => {
 
-			await deleteContactForm(
+			await deleteContactEntry(
 				submissionId,
 				true
 			);

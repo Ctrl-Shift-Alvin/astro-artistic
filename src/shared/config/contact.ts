@@ -1,6 +1,7 @@
 import { ZContactConfig } from './configTypes';
 
 export const ContactConfig = ZContactConfig.parse({
+	tableInitialEntryCount: 2,
 	contacts: {
 		default: {
 			description: '',
