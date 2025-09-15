@@ -19,7 +19,7 @@ import {
 
 export const getPrevUrlQuery = () => {
 
-	return `?prevUrl=${encodeURIComponent(location.pathname)}`;
+	return `?prevUrl=${encodeURIComponent(location.pathname + location.search)}`;
 
 };
 export const gotoPrevOrHome = () => {
@@ -57,7 +57,7 @@ export const login = async(password: string): Promise<boolean> => {
 	if (!authResponse.ok) {
 
 		Monolog.show({
-			text: `Error: Could not authenticate (${response.status})!`,
+			text: `Error: Could not authenticate (${authResponse.status})!`,
 			durationMs: 2000
 		});
 		return false;
@@ -95,7 +95,7 @@ export const login = async(password: string): Promise<boolean> => {
 			})
 			.then(() => {
 
-				goto('/admin/home/');
+				gotoPrevOrHome();
 
 			});
 		lsSetAuthTokenExpiry(testResponseData.expiry);
@@ -156,7 +156,11 @@ export const logout = async(timeout: boolean = false) => {
 			})
 			.then(() => {
 
-				goto('/admin/login/');
+				goto(`/admin/login/${
+					timeout
+						? getPrevUrlQuery()
+						: ''
+				}`);
 
 			});
 
