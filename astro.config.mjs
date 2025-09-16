@@ -55,8 +55,7 @@ export default defineConfig({
 				savePath: '.cert/',
 				hosts: [ 'yourwebsite.eu' ],
 				keyFileName: 'dev-key.pem',
-				certFileName: 'dev-cert.pem',
-				autoUpgrade: true
+				certFileName: 'dev-cert.pem'
 			})
 		]
 	},
