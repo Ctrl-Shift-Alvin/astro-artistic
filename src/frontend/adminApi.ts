@@ -1003,7 +1003,7 @@ export const deleteBuild = async(
 		return false;
 
 	const requestBody = ZProtectedPostApiRequestMap['builds/delete'].safeParse({ buildNumber });
-	if (!requestBody.success || 'error' in parsedResponse.data)
+	if (!requestBody.success)
 		return false;
 
 	const response = await fetch(
