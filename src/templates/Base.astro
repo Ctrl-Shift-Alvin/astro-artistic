@@ -14,6 +14,7 @@ import SizeError from '@/components/astro-components/SizeError.astro';
 import { ReactInit } from '@/components/components/ReactInit';
 import { ScrollUp } from '@/components/components/ScrollUp';
 import { Navbar } from '@/components/partials/Navbar';
+import { MonologProvider } from '@/components/components/MonologProvider';
 
 export interface Props {
 	head: {
@@ -106,6 +107,7 @@ const translation = Astro.locals.translation;
 				<SizeError translation={translation} />
 			</Section>
 			<ReactInit client:only="react" />
+			<MonologProvider client:only="react" />
 			<DialogProvider client:only="react" />
 			<script>
 

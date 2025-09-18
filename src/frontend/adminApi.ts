@@ -1,6 +1,11 @@
+import React, { useEffect } from 'react';
+import { createRoot } from 'react-dom/client';
+import clsx from 'clsx';
 import { goto } from './windowTools';
 import { Dialog } from '@/components/components/DialogProvider';
-import { Monolog } from '@/components/components/MonologProvider';
+import {
+	Monolog, MonologProvider
+} from '@/components/components/MonologProvider';
 import {
 	ZAuthPostApiRequest,
 	ZProtectedGetApiResponse,
@@ -105,6 +110,7 @@ export const login = async(password: string): Promise<boolean> => {
 	}
 
 };
+
 export const logout = async(timeout: boolean = false) => {
 
 	const response = await fetch(
@@ -119,68 +125,124 @@ export const logout = async(timeout: boolean = false) => {
 	lsSetAuthTokenExpiry(null);
 	clearTimeout(currentTimeout);
 
-	// Aggressively delete document immediately
-	document
-		.getElementById('content-div')
-		?.childNodes.forEach((v) => {
+	const contentDiv = document.getElementById('content-div');
 
-			v.remove();
+	// Aggressively delete document immediately
+	if (contentDiv) {
+
+		contentDiv.childNodes.forEach((n) => {
+
+			n.remove();
 
 		});
 
-	const h1 = document.createElement('h1');
-	h1.textContent = 'Logged out!';
-	h1.classList.add(
-		'absolute',
-		'top-20',
-		'left-0',
-		'right-0',
-		'text-4xl',
-		'text-center'
-	);
-	document
-		.getElementById('content-div')
-		?.appendChild(h1);
+		const h1 = document.createElement('h1');
+		h1.textContent = 'Logged out!';
+		h1.classList.add(
+			'absolute',
+			'top-20',
+			'left-0',
+			'right-0',
+			'text-4xl',
+			'text-center'
+		);
+		contentDiv.appendChild(h1);
 
-	if (response.ok) {
+		// Readd MonologManager
+		const newMonologContainer = document.createElement('div');
+		contentDiv.appendChild(newMonologContainer);
 
-		void Monolog
-			.showAsync({
-				text: `${
-					timeout
-						? 'Token expiry: '
-						: ''
-				}Successfully logged out!`,
-				durationMs: 2000,
-				fadeDurationMs: 500
-			})
-			.then(() => {
+		let calledBack = false;
+		const callback = () => {
 
-				goto(`/admin/login/${
-					timeout
-						? getPrevUrlQuery()
-						: ''
-				}`);
+			calledBack = true;
 
-			});
+			if (response.ok) {
 
-	} else {
+				void Monolog
+					.showAsync({
+						text: clsx(
+							timeout && 'Token timeout: ',
+							'Successfully logged out!'
+						),
+						durationMs: 2000,
+						fadeDurationMs: 500
+					})
+					.then(() => {
 
-		void Monolog
-			.showAsync({
-				text: `${
-					timeout
-						? 'Token expiry: '
-						: ''
-				}Partially successfully logged out! (Auth API Endpoint error)`,
-				durationMs: 2000,
-				fadeDurationMs: 500
-			})
-			.then(() => {
+						goto(`/admin/login/${
+							timeout
+								? getPrevUrlQuery()
+								: ''
+						}`);
 
-				goto('/admin/login/');
+					});
 
-			});
+			} else {
+
+				void Monolog
+					.showAsync({
+						text: clsx(
+							timeout && 'Token timeout: ',
+							'Partially successfully logged out! (Auth API Endpoint error)'
+						),
+						durationMs: 2000,
+						fadeDurationMs: 500
+					})
+					.then(() => {
+
+						goto('/admin/login/');
+
+					});
+
+			}
+
+		};
+
+		const MonologProviderWrapper = ({ onReady }: { onReady: ()=> void }) => {
+
+			useEffect(
+				() => {
+
+					onReady();
+
+				},
+				[ onReady ]
+			);
+
+			return React.createElement(MonologProvider);
+
+		};
+		createRoot(newMonologContainer).render(React.createElement(
+			MonologProviderWrapper,
+			{ onReady: callback }
+		));
+
+		setTimeout(
+			() => {
+
+				if (calledBack)
+					return;
+
+				console.error('Failed to redirect using Monolog.showAsync! Falling back.');
+
+				if (response.ok) {
+
+					goto(`/admin/login/${
+						timeout
+							? getPrevUrlQuery()
+							: ''
+					}`);
+
+				} else {
+
+					goto('/admin/login/');
+
+				}
+
+			},
+			3000
+		);
 
 	}
 

@@ -4,4 +4,4 @@ TODO Change class and className patterns, and replace with clsx
 TODO Implement errors API
 TODO Implement middleware for error submission
 TODO Add useful comments throughout project
-TODO Correctly stack monologs
+TODO Persist components using transition:persist tag

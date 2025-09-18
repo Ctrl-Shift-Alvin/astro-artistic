@@ -1,6 +1,8 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
 
+import type { ITranslation } from '@/locales/global';
+import type { MonologEmitter } from '@/components/components/MonologProvider';
 import type { DialogEmitter } from './components/components/DialogProvider';
 
 declare global {
@@ -13,6 +15,7 @@ declare global {
 
 	interface Window {
 		__TRANSLATION__: ITranslation;
+		monologEmitter: MonologEmitter | undefined;
 		dialogEmitter: DialogEmitter | undefined;
 	}
 
