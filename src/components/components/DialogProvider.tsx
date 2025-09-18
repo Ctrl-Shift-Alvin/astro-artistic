@@ -17,7 +17,7 @@ type DialogOptions = {
 	onBackdropClick?: ()=> void;
 };
 
-class DialogEmitter {
+export class DialogEmitter {
 
 	private listener: ((options: DialogOptions)=> void) | null = null;
 
@@ -40,7 +40,16 @@ class DialogEmitter {
 	}
 
 }
-const dialogEmitter = new DialogEmitter();
+const dialogEmitter = (() => {
+
+	if (!window.dialogEmitter) {
+
+		window.dialogEmitter = new DialogEmitter();
+
+	}
+	return window.dialogEmitter;
+
+})();
 
 /**
  * Class with static helper functions for creating dialogs. The DOM must have the DialogProvider component.
