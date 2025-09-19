@@ -1,7 +1,7 @@
 import {
 	type IBlogMarkdownInstance, type IBlogFrontmatter
 } from '../types';
-import { A } from './A';
+import { A } from '../elements/A';
 import { defaultFormatDateString } from '@/shared/dataParse';
 
 export const BlogCard = ({ blogFile }: { blogFile: IBlogMarkdownInstance<IBlogFrontmatter> }) => (

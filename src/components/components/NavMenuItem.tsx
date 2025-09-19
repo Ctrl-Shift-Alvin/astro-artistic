@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { A } from './A';
+import { A } from '../elements/A';
 
 export const NavMenuItem = ({
 	href,

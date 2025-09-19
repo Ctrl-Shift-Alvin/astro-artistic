@@ -3,7 +3,7 @@ import {
 	useLayoutEffect,
 	useState
 } from 'react';
-import { A } from '@/components/components/A';
+import { A } from '@/components/elements/A';
 import { type TContactFormEntry } from '@/components/types';
 import {
 	fetchContactEntryIndex,

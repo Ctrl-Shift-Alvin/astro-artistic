@@ -96,7 +96,7 @@ const translation = Astro.locals.translation;
 				client:only="react"
 			/>
 
-			<div class:list={[`grow pb-5 `,{"pt-26 sm:pt-36 lg:pt-26": !noTopPadding}]}>
+			<div class:list={[`grow pb-5`, {"pt-26 sm:pt-36 lg:pt-26": !noTopPadding}]}>
 				<slot />
 			</div>
 			<ScrollUp scrollYThreshold={0} client:only="react" />
@@ -109,7 +109,7 @@ const translation = Astro.locals.translation;
 			<ReactInit client:only="react" />
 			<MonologProvider client:only="react" />
 			<DialogProvider client:only="react" />
-			<script>
+			<script> /* Start script */
 
 				import '@/string.extensions.ts';
 

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import clsx from 'clsx';
 import { Monolog } from '../components/MonologProvider';
 import { ZContactFormSubmission } from '../types';
-import { A } from '../components/A';
-import { Button } from '../components/Button';
+import { A } from '../elements/A';
+import { Button } from '../elements/Button';
 import { type TContact } from '@/shared/config/configTypes';
 
 export const ContactCard = ({

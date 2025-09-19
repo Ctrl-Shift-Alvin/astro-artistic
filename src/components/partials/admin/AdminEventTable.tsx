@@ -3,8 +3,8 @@ import {
 	useLayoutEffect,
 	useCallback
 } from 'react';
-import { A } from '@/components/components/A';
-import { Button } from '@/components/components/Button';
+import { A } from '@/components/elements/A';
+import { Button } from '@/components/elements/Button';
 import { type TEventEntry } from '@/components/types';
 import {
 	fetchEventIndex,

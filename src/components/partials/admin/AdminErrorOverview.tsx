@@ -11,7 +11,7 @@ import {
 	fetchError
 } from '@/frontend/adminApi';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
-import { A } from '@/components/components/A';
+import { A } from '@/components/elements/A';
 
 export const AdminErrorOverview = ({ submissionId }: { submissionId: number | string }) => {
 

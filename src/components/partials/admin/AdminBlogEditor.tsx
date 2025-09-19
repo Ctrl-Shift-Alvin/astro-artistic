@@ -17,8 +17,8 @@ import {
 	removeBlogFile,
 	saveBlogFile
 } from '@/frontend/adminApi';
-import { A } from '@/components/components/A';
-import { Button } from '@/components/components/Button';
+import { A } from '@/components/elements/A';
+import { Button } from '@/components/elements/Button';
 import {
 	disableUnloadConfirmation,
 	enableUnloadConfirmation

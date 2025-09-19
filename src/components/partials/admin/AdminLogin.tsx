@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import clsx from 'clsx';
-import { Button } from '@/components/components/Button';
+import { Button } from '@/components/elements/Button';
 import { login } from '@/frontend/adminApi';
 
 export const AdminLogin = () => {

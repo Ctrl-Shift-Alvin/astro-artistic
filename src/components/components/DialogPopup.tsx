@@ -1,5 +1,5 @@
 import React, { type ReactNode } from 'react';
-import { Button } from './Button';
+import { Button } from '../elements/Button';
 
 export interface DialogButton {
 	text: ReactNode;

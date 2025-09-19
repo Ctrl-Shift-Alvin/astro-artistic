@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { BlogGallery } from '@/components/partials/BlogGallery';
-import { A } from '@/components/components/A';
+import { A } from '@/components/elements/A';
 import {
 	type IBlogFrontmatter, type IBlogMarkdownInstance
 } from '@/components/types';

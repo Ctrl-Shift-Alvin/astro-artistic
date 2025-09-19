@@ -9,7 +9,7 @@ import {
 	deleteBuild,
 	fetchBuild
 } from '@/frontend/adminApi';
-import { A } from '@/components/components/A';
+import { A } from '@/components/elements/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 
 export const AdminBuildOverview = ({ buildNumber }: { buildNumber: number | string }) => {

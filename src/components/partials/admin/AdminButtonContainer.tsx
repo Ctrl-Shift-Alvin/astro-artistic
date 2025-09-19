@@ -3,7 +3,7 @@ import {
 } from 'react';
 import {
 	Button, type TButtonProps
-} from '@/components/components/Button';
+} from '@/components/elements/Button';
 import { isWindowDefined } from '@/frontend/windowTools';
 
 const ADMIN_BUTTON_CONTAINER_ID = 'adminButtonContainer';
