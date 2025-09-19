@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import clsx from 'clsx';
 import { Monolog } from '../components/MonologProvider';
 import { ZContactFormSubmission } from '../types';
 import { A } from '../elements/A';
 import { Button } from '../elements/Button';
+import { LabeledInput } from '../elements/LabeledInput';
+import { LabeledTextArea } from '../elements/LabeledTextArea';
 import { type TContact } from '@/shared/config/configTypes';
 
 export const ContactCard = ({
@@ -109,11 +110,6 @@ export const ContactCard = ({
 
 	};
 
-	const inputClassName = clsx(
-		'block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white',
-		'outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm/6'
-	);
-
 	return (
 		<>
 			<div
@@ -185,156 +181,116 @@ export const ContactCard = ({
 							<div className={'border-b border-gray-600/40 pb-12'}>
 								<div className={'mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6'}>
 									<div className={'sm:col-span-3'}>
-										<label
-											htmlFor={'first-name'}
-											className={'block text-sm/6 font-medium text-white'}
+										<LabeledInput
+											id={'first-name'}
+											name={'first-name'}
+											type={'text'}
+											autoComplete={'given-name'}
+											value={formData.firstName}
+											onChange={
+												(e) => {
+
+													setFormData({
+														...formData,
+														firstName: e.target.value
+													});
+
+												}
+											}
 										>
 											{window.__TRANSLATION__.contact.firstName}
-										</label>
-
-										<div className={'mt-2'}>
-											<input
-												id={'first-name'}
-												name={'first-name'}
-												type={'text'}
-												autoComplete={'given-name'}
-												className={inputClassName}
-												value={formData.firstName}
-												onChange={
-													(e) => {
-
-														setFormData({
-															...formData,
-															firstName: e.target.value
-														});
-
-													}
-												}
-											/>
-										</div>
+										</LabeledInput>
 									</div>
 
 									<div className={'sm:col-span-3'}>
-										<label
-											htmlFor={'last-name'}
-											className={'block text-sm/6 font-medium text-white'}
+										<LabeledInput
+											id={'last-name'}
+											name={'last-name'}
+											type={'text'}
+											autoComplete={'family-name'}
+											value={formData.lastName}
+											onChange={
+												(e) => {
+
+													setFormData({
+														...formData,
+														lastName: e.target.value
+													});
+
+												}
+											}
 										>
 											{window.__TRANSLATION__.contact.lastName}
-										</label>
-
-										<div className={'mt-2'}>
-											<input
-												id={'last-name'}
-												name={'last-name'}
-												type={'text'}
-												autoComplete={'family-name'}
-												className={inputClassName}
-												value={formData.lastName}
-												onChange={
-													(e) => {
-
-														setFormData({
-															...formData,
-															lastName: e.target.value
-														});
-
-													}
-												}
-											/>
-										</div>
+										</LabeledInput>
 									</div>
 
 									<div className={'sm:col-span-3'}>
-										<label
-											htmlFor={'email'}
-											className={'block text-sm/6 font-medium text-white'}
+										<LabeledInput
+											id={'email'}
+											name={'email'}
+											type={'text'}
+											autoComplete={'email'}
+											value={formData.email}
+											onChange={
+												(e) => {
+
+													setFormData({
+														...formData,
+														email: e.target.value
+													});
+
+												}
+											}
 										>
 											{window.__TRANSLATION__.contact.email}
-										</label>
-
-										<div className={'mt-2'}>
-											<input
-												id={'email'}
-												name={'email'}
-												type={'text'}
-												autoComplete={'email'}
-												className={inputClassName}
-												value={formData.email}
-												onChange={
-													(e) => {
-
-														setFormData({
-															...formData,
-															email: e.target.value
-														});
-
-													}
-												}
-											/>
-										</div>
+										</LabeledInput>
 									</div>
 
 									<div className={'sm:col-span-3'}>
-										<label
-											htmlFor={'phone-number'}
-											className={'block text-sm/6 font-medium text-white'}
-										>
-											{window.__TRANSLATION__.contact.phoneNumber}
-										</label>
+										<LabeledInput
+											id={'phone-number'}
+											name={'phone-number'}
+											type={'text'}
+											autoComplete={'tel'}
+											value={formData.phoneNumber}
+											onChange={
+												(e) => {
 
-										<div className={'mt-2'}>
-											<input
-												id={'phone-number'}
-												name={'phone-number'}
-												type={'text'}
-												autoComplete={'tel'}
-												className={inputClassName}
-												value={formData.phoneNumber}
-												onChange={
-													(e) => {
-
-														setFormData({
-															...formData,
-															phoneNumber: e.target.value.startsWith('00') // Replace 00 with +
-																? `+${e.target.value
-																	.slice(2)
+													setFormData({
+														...formData,
+														phoneNumber: e.target.value.startsWith('00') // Replace 00 with +
+															? `+${e.target.value
+																.slice(2)
+																.replace(
+																	/\s/g,
+																	''
+																)}`
+															: e.target.value.startsWith('0') // Replace first 0 with default code
+																? `+43${e.target.value
+																	.slice(1)
 																	.replace(
 																		/\s/g,
 																		''
 																	)}`
-																: e.target.value.startsWith('0') // Replace first 0 with default code
-																	? `+43${e.target.value
-																		.slice(1)
-																		.replace(
-																			/\s/g,
-																			''
-																		)}`
-																	: e.target.value.replace(
-																		/\s/g,
-																		''
-																	)
-														});
+																: e.target.value.replace(
+																	/\s/g,
+																	''
+																)
+													});
 
-													}
 												}
-											/>
-										</div>
+											}
+										>
+											{window.__TRANSLATION__.contact.phoneNumber}
+										</LabeledInput>
 									</div>
 
 									<div className={'col-span-full'}>
-										<label
-											htmlFor={'message'}
-											className={'block text-sm/6 font-medium text-white'}
-										>
-											{window.__TRANSLATION__.contact.message}
-										</label>
-
 										<div className={'mt-2'}>
-											<textarea
+											<LabeledTextArea
 												id={'message'}
 												name={'message'}
 												rows={3}
-												className={inputClassName}
 												value={formData.message}
 												onChange={
 													(e) => {
@@ -346,7 +302,9 @@ export const ContactCard = ({
 
 													}
 												}
-											/>
+											>
+												{window.__TRANSLATION__.contact.message}
+											</LabeledTextArea>
 										</div>
 									</div>
 								</div>

@@ -23,6 +23,7 @@ import {
 	disableUnloadConfirmation,
 	enableUnloadConfirmation
 } from '@/frontend/windowTools';
+import { LabeledInput } from '@/components/elements/LabeledInput';
 
 export const AdminBlogEditor = () => {
 
@@ -266,15 +267,7 @@ export const AdminBlogEditor = () => {
 					className={'flex flex-col'}
 					onSubmit={onSubmit}
 				>
-					<label
-						className={'text-white'}
-						htmlFor={'fileName'}
-					>
-						{'File Name'}
-					</label>
-
-					<input
-						className={'border-1 border-white text-white'}
+					<LabeledInput
 						name={'fileName'}
 						id={'fileName'}
 						value={formValues.fileName}
@@ -285,7 +278,9 @@ export const AdminBlogEditor = () => {
 
 							}
 						}
-					/>
+					>
+						{'File Name'}
+					</LabeledInput>
 				</form>
 			);
 

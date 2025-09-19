@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import clsx from 'clsx';
 import { Button } from '@/components/elements/Button';
 import { login } from '@/frontend/adminApi';
+import { LabeledInput } from '@/components/elements/LabeledInput';
 
 export const AdminLogin = () => {
 
@@ -32,36 +32,21 @@ export const AdminLogin = () => {
 				<div className={'gap-y-6'}>
 					<div className={'border-b border-gray-600/40 pb-12'}>
 						<div className={'mt-10 gap-x-6 gap-y-8 sm:grid-cols-6'}>
-							<div className={'sm:col-span-3'}>
-								<label
-									htmlFor={'password'}
-									className={'text-sm/6 font-medium text-white'}
-								>
-									{'Password'}
-								</label>
+							<LabeledInput
+								id={'password'}
+								name={'password'}
+								type={'password'}
+								value={password}
+								onChange={
+									(e) => {
 
-								<div className={'mt-2'}>
-									<input
-										id={'password'}
-										name={'password'}
-										type={'password'}
-										className={
-											clsx(
-												'w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-white sm:text-sm/6',
-												'outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600'
-											)
-										}
-										value={password}
-										onChange={
-											(e) => {
+										setPassword(e.target.value);
 
-												setPassword(e.target.value);
-
-											}
-										}
-									/>
-								</div>
-							</div>
+									}
+								}
+							>
+								{'Password'}
+							</LabeledInput>
 						</div>
 					</div>
 				</div>

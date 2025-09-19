@@ -28,6 +28,9 @@ import {
 	disableUnloadConfirmation,
 	goto
 } from '@/frontend/windowTools';
+import { LabeledInput } from '@/components/elements/LabeledInput';
+import { Label } from '@/components/elements/Label';
+import { LabeledCheckbox } from '@/components/elements/LabeledCheckbox';
 
 // eslint-disable-next-line import-x/no-unassigned-import
 import 'react-datepicker/dist/react-datepicker.css';
@@ -310,8 +313,6 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 	);
 
 	const divClassName = clsx('w-full');
-	const labelClassName = clsx('w-full pr-4 text-white font-bold text-center sm:text-left');
-	const inputClassName = clsx('w-full border-1 border-white text-white');
 
 	return (
 		eventEntry
@@ -321,52 +322,32 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 					className={'w-full grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8 text-2xl'}
 				>
 					<div className={divClassName}>
-						<label
-							htmlFor={'id'}
-							className={labelClassName}
-						>
-							{'ID'}
-						</label>
-
-						<input
+						<LabeledInput
 							id={'id'}
-							className={inputClassName}
 							value={
 								eventEntry.id >= 0
 									? eventEntry.id
 									: 'To Be Determined'
 							}
 							disabled={true}
-						/>
+						>
+							{'ID'}
+						</LabeledInput>
 					</div>
 
 					<div className={divClassName}>
-						<label
-							htmlFor={'createdAt'}
-							className={labelClassName}
-						>
-							{'Created At'}
-						</label>
-
-						<input
+						<LabeledInput
 							id={'createdAt'}
-							className={inputClassName}
 							value={eventEntry.createdAt}
 							disabled={true}
-						/>
+						>
+							{'Created At'}
+						</LabeledInput>
 					</div>
 
 					<div className={divClassName}>
-						<label
-							htmlFor={'title'}
-							className={labelClassName}
-						>
-							{'Title'}
-						</label>
-
-						<input
+						<LabeledInput
 							id={'title'}
-							className={inputClassName}
 							value={eventEntry.title}
 							onChange={
 								(e) => {
@@ -378,20 +359,14 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 
 								}
 							}
-						/>
+						>
+							{'Title'}
+						</LabeledInput>
 					</div>
 
 					<div className={divClassName}>
-						<label
-							htmlFor={'location'}
-							className={labelClassName}
-						>
-							{'Location'}
-						</label>
-
-						<input
+						<LabeledInput
 							id={'location'}
-							className={inputClassName}
 							value={eventEntry.location}
 							onChange={
 								(e) => {
@@ -403,29 +378,22 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 
 								}
 							}
-						/>
+						>
+							{'Location'}
+						</LabeledInput>
 					</div>
 
 					<div
 						className={divClassName}
 					>
-						<label
-							htmlFor={'datetime'}
-							className={labelClassName}
-						>
+						<Label htmlFor={'datetime'}>
 							{'Date/Time'}
-						</label>
+						</Label>
 
 						<DatePicker
-							showIcon
 							toggleCalendarOnIconClick
 							showTimeInput
-							className={
-								clsx(
-									inputClassName,
-									'w-full'
-								)
-							}
+							className={'w-full'}
 							id={'datetime'}
 							dateFormat={'dd/MM/yyyy HH:mm'}
 							timeIntervals={15}
@@ -446,18 +414,9 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 					<div
 						className={divClassName}
 					>
-						<label
-							htmlFor={'enablePage'}
-							className={labelClassName.without('sm:text-left')}
-						>
-							{'Enable Page'}
-						</label>
-
-						<input
+						<LabeledCheckbox
 							id={'enablePage'}
-							type={'checkbox'}
 							checked={eventEntry.enablePage}
-							className={'size-5 mx-auto'}
 							onChange={
 								(e) => {
 
@@ -468,7 +427,9 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 
 								}
 							}
-						/>
+						>
+							{'Enable Page'}
+						</LabeledCheckbox>
 					</div>
 				</form>
 
