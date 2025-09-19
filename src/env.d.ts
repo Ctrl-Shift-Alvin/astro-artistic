@@ -17,6 +17,9 @@ declare global {
 		__TRANSLATION__: ITranslation;
 		monologEmitter: MonologEmitter | undefined;
 		dialogEmitter: DialogEmitter | undefined;
+
+		removeLoader?: ()=> void;
+		loaderRemoved?: boolean;
 	}
 
 	interface String {

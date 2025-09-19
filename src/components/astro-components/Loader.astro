@@ -1,9 +1,11 @@
----
----
 <div
 	id="loader"
-	class="fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-1000 opacity-100"
+	class="fixed inset-0 z-50 flex items-center justify-center transition-opacity opacity-100"
 >
+	<script>
+		import { getFadeInOffsetMs } from '@/frontend/windowTools';
+		document.getElementById('loader')?.classList.add(`duration-${getFadeInOffsetMs() ?? 1000}`);
+	</script>
 	<svg
 		class="animate-spin"
 		xmlns="http://www.w3.org/2000/svg"
@@ -28,7 +30,9 @@
 			fill="currentColor"
 			d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
 	</svg>
-	<script is:inline> // Removes loader when react is hydrated
+	<script> // Removes loader when react is hydrated
+
+		import { getFadeInOffsetMs } from '@/frontend/windowTools';
 
 		const loader = document.getElementById('loader');
 		if (!loader) {
@@ -37,14 +41,17 @@
 
 		window.removeLoader = () => {
 
-			if (window.loaderRemoved == true)
+			if (window.loaderRemoved)
 				return;
 
 			loader.classList.replace('opacity-100', 'opacity-0');
 			loader.classList.add('pointer-events-none');
-			setTimeout(() => loader.remove(), 1000);
+			setTimeout(
+				() => loader.remove(),
+				getFadeInOffsetMs()
+			);
 
-			window.removeEventListener('react-hydrated', window.removeLoader);
+			window.removeEventListener('react-hydrated', window.removeLoader!);
 
 			window.loaderRemoved = true;
 			window.removeLoader = undefined;
@@ -55,12 +62,12 @@
 
 	</script>
 
-	<script is:inline> // Removes loader if it times out (after 2s)
+	<script> // Removes loader if it times out
 		setTimeout(() => {
 
 			if (window.loaderRemoved == false) {
 
-				window.removeLoader();
+				window.removeLoader?.();
 				console.error('Loader timed out after 2 seconds!');
 
 			}
