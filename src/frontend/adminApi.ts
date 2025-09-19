@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import clsx from 'clsx';
-import { goto } from './windowTools';
+import {
+	disableUnloadConfirmation,
+	goto
+} from './windowTools';
 import { Dialog } from '@/components/components/DialogProvider';
 import {
 	Monolog, MonologProvider
@@ -156,6 +159,7 @@ export const logout = async(timeout: boolean = false) => {
 		const callback = () => {
 
 			calledBack = true;
+			disableUnloadConfirmation();
 
 			if (response.ok) {
 
