@@ -9,7 +9,7 @@ import { type TContactFormEntry } from '@/components/types';
 import {
 	fetchContactEntryIndex,
 	deleteContactEntry,
-	countContactEntries
+	fetchContactEntryCount
 } from '@/frontend/adminApi';
 import { ContactConfig } from '@/shared/config/contact';
 
@@ -78,7 +78,7 @@ export const AdminContactTable = () => {
 	const count = useCallback(
 		async() => {
 
-			const result = await countContactEntries();
+			const result = await fetchContactEntryCount();
 			if (result === null)
 				return;
 

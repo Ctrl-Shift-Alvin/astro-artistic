@@ -533,7 +533,7 @@ export const fetchContactEntryIndex = async(
 	return parsedResponse.data.data;
 
 };
-export const countContactEntries = async(): Promise<number | null> => {
+export const fetchContactEntryCount = async(): Promise<number | null> => {
 
 	const response = await fetch(
 		'/api/protected/?type=contact/count',
@@ -969,7 +969,7 @@ export const fetchBuild = async(
 	return parsedResponse.data.data;
 
 };
-export const countBuilds = async(): Promise<number | null> => {
+export const fetchBuildCount = async(): Promise<number | null> => {
 
 	const response = await fetch(
 		'/api/protected/?type=builds/count',
@@ -1081,7 +1081,7 @@ export const fetchErrorIndex = async(
 	return parsedResponse.data.data;
 
 };
-export const countErrors = async(): Promise<number | null> => {
+export const fetchErrorCount = async(): Promise<number | null> => {
 
 	const response = await fetch(
 		'/api/protected/?type=errors/count',
@@ -1146,7 +1146,7 @@ export const fetchErrorIndexByBuild = async(
 	return parsedResponse.data.data;
 
 };
-export const countErrorsByBuild = async(buildNumber: number | string): Promise<number | null> => {
+export const fetchErrorCountByBuild = async(buildNumber: number | string): Promise<number | null> => {
 
 	const requestBody = ZProtectedPostApiRequestMap['errors/countBuild'].safeParse({ buildNumber });
 	if (!requestBody.success)

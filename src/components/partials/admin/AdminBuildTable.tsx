@@ -7,7 +7,7 @@ import clsx from 'clsx/lite';
 import { type TBuild } from '@/components/types';
 import {
 	fetchBuildIndex,
-	countBuilds,
+	fetchBuildCount,
 	deleteBuild,
 	getPrevUrlQuery
 } from '@/frontend/adminApi';
@@ -97,7 +97,7 @@ export const AdminBuildTable = () => {
 	const count = useCallback(
 		async() => {
 
-			const result = await countBuilds();
+			const result = await fetchBuildCount();
 			if (result) {
 
 				setFullIndexCount(result);

@@ -8,8 +8,8 @@ import {
 	fetchErrorIndex,
 	deleteError,
 	fetchErrorIndexByBuild,
-	countErrors,
-	countErrorsByBuild,
+	fetchErrorCount,
+	fetchErrorCountByBuild,
 	getPrevUrlQuery
 } from '@/frontend/adminApi';
 import { ErrorsConfig } from '@/shared/config/errors';
@@ -94,8 +94,8 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 		async() => {
 
 			const result = buildNumber
-				? await countErrorsByBuild(buildNumber)
-				: await countErrors();
+				? await fetchErrorCountByBuild(buildNumber)
+				: await fetchErrorCount();
 			if (result === null)
 				return;
 
