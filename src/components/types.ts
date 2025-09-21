@@ -250,7 +250,13 @@ export const ZProtectedPostApiRequestMap = {
 			.positive(),
 		data: ZNewEventEntry
 	}),
-	'blog/index': z.undefined(),
+	'blog/index': z.object({
+		count: z.coerce.number(),
+		offset: z.coerce
+			.number()
+			.optional()
+	}),
+	'blog/count': z.undefined(),
 	'blog/get': z.object({
 		fileName: z
 			.string()
@@ -351,6 +357,10 @@ export const TProtectedPostApiResponseMap = {
 				.endsWith('.md')
 				.array()
 		}),
+		ZApiResponseError
+	]),
+	'blog/count': z.union([
+		ZApiResponseSuccess.extend({ count: z.coerce.number() }),
 		ZApiResponseError
 	]),
 	'blog/get': z.union([

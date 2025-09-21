@@ -1,0 +1,31 @@
+---
+import { getBlog } from '@/backend/blogs';
+import Section from '@/components/astro-components/Section.astro';
+import { AdminBlogEditor } from '@/components/partials/admin/AdminBlogEditor';
+import BaseAdmin from '@/templates/BaseAdmin.astro';
+
+const { fileName } = Astro.params;
+
+if (!fileName || getBlog(fileName) === null) {
+
+	Astro.response.status = 400;
+	Astro.response.statusText = 'bad-request';
+
+}
+---
+<BaseAdmin
+	head={{
+		title: `Blog file name '${fileName}'`,
+		description: `Viewing the blog post with file name '${fileName}'`,
+	}}
+>
+	<Section
+		center
+		title={`Edit Blog File '${fileName}'`}
+	>
+		<AdminBlogEditor
+			fileName={fileName!}
+			client:only="react"
+		/>
+	</Section>
+</BaseAdmin>

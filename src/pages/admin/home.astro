@@ -1,11 +1,11 @@
 ---
 import Section from '@/components/astro-components/Section.astro';
-import { AdminBlogEditor } from '@/components/partials/admin/AdminBlogEditor';
 import { AdminContactTable } from '@/components/partials/admin/AdminContactTable';
 import { AdminEventTable } from '@/components/partials/admin/AdminEventTable';
 import BaseAdmin from '@/templates/BaseAdmin.astro';
 import { AdminBuildTable } from '@/components/partials/admin/AdminBuildTable';
 import { AdminErrorTable } from '@/components/partials/admin/AdminErrorTable';
+import { AdminBlogTable } from '@/components/partials/admin/AdminBlogTable';
 ---
 
 <BaseAdmin
@@ -20,13 +20,13 @@ import { AdminErrorTable } from '@/components/partials/admin/AdminErrorTable';
 	<Section center title="Manage Events">
 		<AdminEventTable client:only="react" />
 	</Section>
-	<Section title="Manage Blog">
-		<AdminBlogEditor client:only="react" />
+	<Section center title="Manage Blog">
+		<AdminBlogTable client:only="react" />
 	</Section>
-	<Section title="Manage Builds" center>
+	<Section center title="Manage Builds">
 		<AdminBuildTable client:only="react" />
 	</Section>
-	<Section title="Manage Errors" center>
+	<Section center title="Manage Errors">
 		<AdminErrorTable client:only="react" />
 	</Section>
 </BaseAdmin>

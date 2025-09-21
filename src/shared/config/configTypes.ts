@@ -54,7 +54,10 @@ export const ZBlogConfig = z.object({
 		title: z.string(),
 		gotoBlogButton: z.string(),
 		maxCardCount: z.number()
-	})
+	}),
+	tableInitialEntryCount: z
+		.number()
+		.default(5)
 });
 export type TBlogConfig = z.infer<typeof ZBlogConfig>;
 

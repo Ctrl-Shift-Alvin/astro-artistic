@@ -43,7 +43,11 @@ import {
 	errors_getFewErrors,
 	errors_getFewErrorsByBuild
 } from '@/backend/database/errors';
-import { blog_createPage } from '@/backend/blogs';
+import {
+	blog_countEntries,
+	blog_createPage,
+	blog_getEntries
+} from '@/backend/blogs';
 
 const SECRET_KEY = import.meta.env.JWT_KEY as string;
 
@@ -609,7 +613,8 @@ export async function POST(context: APIContext) {
 			}
 
 			const {
-				id, data
+				id,
+				data
 			} = parsedBody.data;
 
 			try {
@@ -673,24 +678,59 @@ export async function POST(context: APIContext) {
 
 		case 'blog/index': {
 
-			try {
+			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+			if (!parsedBody.success) {
 
-				const files = readdirSync(
-					BlogConfig.pagesPath,
-					{
-						recursive: false,
-						withFileTypes: true
-					}
+				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+				return new Response(
+					JSON.stringify(errorBody),
+					{ status: 400 }
 				);
 
-				const entries = files
-					.filter((e) => e.isFile() && e.name.endsWith('.md'))
-					.map((e) => e.name);
+			}
+
+			const {
+				count,
+				offset
+			} = parsedBody.data;
+
+			try {
+
+				const result = blog_getEntries(
+					count,
+					offset
+				);
 
 				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
-					data: entries
+					data: result
 				});
+				return new Response(
+					JSON.stringify(responseBody),
+					{ status: 200 }
+				);
+
+			} catch {
+
+				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+				return new Response(
+					JSON.stringify(errorBody),
+					{ status: 500 }
+				);
+
+			}
+
+		}
+		case 'blog/count': {
+
+			try {
+
+				const result = blog_countEntries();
+				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+					message: 'success',
+					count: result
+				});
+
 				return new Response(
 					JSON.stringify(responseBody),
 					{ status: 200 }

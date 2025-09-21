@@ -1,5 +1,5 @@
 import path from 'node:path';
-import fs from 'node:fs';
+import fs, { readdirSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import matter from 'gray-matter';
 import {
@@ -7,15 +7,19 @@ import {
 } from '@/components/types';
 import { BlogConfig } from '@/backend/config/blog';
 
-export function getAllBlogs(): IBlogMarkdownInstance<IBlogFrontmatter>[] {
+export function getBlogUrlPathname(): string {
 
-	const blogUrlPath = BlogConfig.pagesPath
+	return BlogConfig.pagesPath
 		.split(/src[/\\]pages/)[1]!
 		// eslint-disable-next-line custom/newline-per-chained-call
 		.replace(
 			/\\/g,
 			'/'
 		) + '/';
+
+}
+
+export function getAllBlogs(): IBlogMarkdownInstance<IBlogFrontmatter>[] {
 
 	const files = fs.readdirSync(BlogConfig.pagesPath);
 	const posts: IBlogMarkdownInstance<IBlogFrontmatter>[] = [];
@@ -36,7 +40,7 @@ export function getAllBlogs(): IBlogMarkdownInstance<IBlogFrontmatter>[] {
 		} = matter(raw);
 
 		posts.push({
-			url: `${blogUrlPath}${file.replace(
+			url: `${getBlogUrlPathname()}${file.replace(
 				/\.md$/,
 				''
 			)}/`,
@@ -48,16 +52,7 @@ export function getAllBlogs(): IBlogMarkdownInstance<IBlogFrontmatter>[] {
 	return posts;
 
 }
-
 export function getBlog(fileName: string): IBlogMarkdownInstance<IBlogFrontmatter> | null {
-
-	const blogUrlPath = BlogConfig.pagesPath
-		.split(/src[/\\]pages/)[1]!
-		// eslint-disable-next-line custom/newline-per-chained-call
-		.replace(
-			/\\/g,
-			'/'
-		) + '/';
 
 	const files = fs.readdirSync(BlogConfig.pagesPath);
 	for (const file of files) {
@@ -73,7 +68,7 @@ export function getBlog(fileName: string): IBlogMarkdownInstance<IBlogFrontmatte
 		const parsed = matter(raw);
 
 		return {
-			url: `${blogUrlPath}${file.replace(
+			url: `${getBlogUrlPathname()}${file.replace(
 				/\.md$/,
 				''
 			)}/`,
@@ -85,7 +80,6 @@ export function getBlog(fileName: string): IBlogMarkdownInstance<IBlogFrontmatte
 	return null;
 
 }
-
 export function getSortedBlogs() {
 
 	const posts = getAllBlogs();
@@ -97,7 +91,6 @@ export function getSortedBlogs() {
 	return posts;
 
 }
-
 export function getSortedBlogsSliced(
 	start: number,
 	end: number
@@ -179,5 +172,39 @@ export const blog_createPage = async(fileName: string): Promise<boolean> => {
 		return false;
 
 	}
+
+};
+export const blog_countEntries = (): number => {
+
+	return fs.existsSync(BlogConfig.pagesPath)
+		? fs.readdirSync(
+			BlogConfig.pagesPath,
+			{
+				recursive: false,
+				withFileTypes: true
+			}
+		).filter((e) => e.isFile() && e.name.endsWith('.md')).length
+		: 0;
+
+};
+export const blog_getEntries = (
+	count: number,
+	offset: number = 0
+): string[] => {
+
+	const files = readdirSync(
+		BlogConfig.pagesPath,
+		{
+			recursive: false,
+			withFileTypes: true
+		}
+	);
+	return files
+		.filter((e) => e.isFile() && e.name.endsWith('.md'))
+		.slice(
+			offset,
+			offset + count
+		)
+		.map((e) => e.name);
 
 };

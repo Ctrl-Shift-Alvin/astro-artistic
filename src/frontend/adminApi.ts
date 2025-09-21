@@ -293,13 +293,25 @@ export const setLogoutTimeout = (callback?: ()=> void) => {
 
 // #region Blog
 
-export const fetchBlogIndex = async(): Promise<string[] | null> => {
+export const fetchBlogIndex = async(
+	count: number | string,
+	offset?: number | string
+): Promise<string[] | null> => {
+
+	const requestBody = ZProtectedPostApiRequestMap['blog/index'].safeParse({
+		count,
+		offset
+	});
+
+	if (!requestBody.success)
+		return null;
 
 	const response = await fetch(
 		'/api/protected/?type=blog/index',
 		{
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestBody.data),
 			credentials: 'include'
 		}
 	);
@@ -308,7 +320,11 @@ export const fetchBlogIndex = async(): Promise<string[] | null> => {
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
-			text: 'Failed to fetch the blog index!',
+			text: `Failed to fetch blog index with count '${count}'${
+				offset
+					? ` and offset '${offset}'`
+					: ''
+			}!`,
 			durationMs: 3000
 		});
 		return null;
@@ -316,6 +332,30 @@ export const fetchBlogIndex = async(): Promise<string[] | null> => {
 	}
 
 	return parsedResponse.data.data;
+
+};
+export const fetchBlogCount = async(): Promise<number | null> => {
+
+	const response = await fetch(
+		'/api/protected/?type=blog/count',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'include'
+		}
+	);
+
+	const parsedResponse = await TProtectedPostApiResponseMap['blog/count'].safeParseAsync(await response.json());
+	if (!parsedResponse.success || 'error' in parsedResponse.data) {
+
+		Monolog.show({
+			text: 'Failed to fetch blog count!',
+			durationMs: 3000
+		});
+		return null;
+
+	}
+	return parsedResponse.data.count;
 
 };
 export const fetchBlogFile = async(
@@ -358,7 +398,6 @@ export const fetchBlogFile = async(
 	return parsedResponse.data.data;
 
 };
-
 export const saveBlogFile = async(
 	fileName: string,
 	fileContent: string
@@ -523,7 +562,11 @@ export const fetchContactEntryIndex = async(
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
-			text: 'Failed to get all contact form submissions!',
+			text: `Failed to fetch contact submission index with count '${count}'${
+				offset
+					? ` and offset '${offset}'`
+					: ''
+			}!`,
 			durationMs: 3000
 		});
 		return null;
@@ -669,7 +712,7 @@ export const fetchEventIndex = async(): Promise<TEventEntry[] | null> => {
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
-			text: 'Failed to get the event entry index!',
+			text: 'Failed to fetch event entry index!',
 			durationMs: 3000
 		});
 		return null;

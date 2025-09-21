@@ -11,5 +11,6 @@ export const BlogConfig = (translation: ITranslation): TBlogConfig => ZBlogConfi
 		title: translation.blog.recentPosts,
 		gotoBlogButton: translation.blog.gotoBlogButton,
 		maxCardCount: 3
-	}
+	},
+	tableInitialEntryCount: 5
 });

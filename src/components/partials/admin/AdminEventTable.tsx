@@ -165,7 +165,7 @@ export const AdminEventTable = () => {
 				</tbody>
 			</table>
 
-			<div className={'flex w-full flex-row justify-evenly'}>
+			<div className={'flex w-full mt-2 flex-row justify-evenly'}>
 				<Button
 					small={true}
 					href={`/admin/events/new/${getPrevUrlQuery()}`}
