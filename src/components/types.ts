@@ -190,6 +190,12 @@ export const ZErrorSubmission = z.object({
 });
 export type TErrorSubmission = z.infer<typeof ZErrorSubmission>;
 
+export const ZErrorApiRequest = z.object({ data: ZErrorSubmission });
+export type TErrorApiRequest = z.infer<typeof ZErrorApiRequest>;
+
+export const ZErrorApiResponse = ZApiResponse;
+export type TErrorApiResponse = z.infer<typeof ZErrorApiResponse>;
+
 // #endregion
 
 // #region Protected API

@@ -473,6 +473,40 @@ export const errors_addErrorSubmission = (submission: TErrorSubmission) => {
 	}
 
 };
+export const errors_isDuplicateError = (submission: TErrorSubmission): boolean => {
+
+	try {
+
+		const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+		const result = errors_dbGetError(
+			'SELECT id FROM errors WHERE '
+			+ 'status IS ? AND '
+			+ 'statusText IS ? AND '
+			+ 'errorMessage IS ? AND '
+			+ 'errorCause IS ? AND '
+			+ 'errorStack IS ? AND '
+			+ 'createdAt > ?',
+			submission.status ?? null,
+			submission.statusText ?? null,
+			submission.errorMessage ?? null,
+			submission.errorCause ?? null,
+			submission.errorStack ?? null,
+			twentyFourHoursAgo
+		);
+
+		return result !== undefined;
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to check for duplicate errors!',
+			{ cause: err }
+		);
+
+	}
+
+};
 export const errors_getError = (id: number): TError | undefined => {
 
 	try {

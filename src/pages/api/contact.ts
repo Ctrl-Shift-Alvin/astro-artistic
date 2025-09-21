@@ -5,7 +5,8 @@ import {
 	ZContactApiResponse
 } from '@/components/types';
 import {
-	contact_addEntry, contact_isDbDuplicateEntry
+	contact_addEntry,
+	contact_isDbDuplicateEntry
 } from '@/backend/database/contact';
 
 export async function POST(context: APIContext) {
@@ -22,7 +23,8 @@ export async function POST(context: APIContext) {
 	const responseBody = await context.request.json();
 
 	const {
-		data, success
+		data,
+		success
 	} = await ZContactApiRequest.safeParseAsync({ data: responseBody });
 	if (!success) {
 
