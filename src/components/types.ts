@@ -129,11 +129,11 @@ export const ZContactFormEntry = z.object({
 });
 export type TContactFormEntry = z.infer<typeof ZContactFormEntry>;
 
-export const ZFormSubmissionApiRequest = z.object({ data: ZContactFormSubmission });
-export type TFormSubmissionApiRequest = z.infer<typeof ZFormSubmissionApiRequest>;
+export const ZContactApiRequest = z.object({ data: ZContactFormSubmission });
+export type TContactApiRequest = z.infer<typeof ZContactApiRequest>;
 
-export const ZFormSubmissionApiResponse = ZApiResponse;
-export type TFormSubmissionApiResponse = z.infer<typeof ZFormSubmissionApiResponse>;
+export const ZContactApiResponse = ZApiResponse;
+export type TContactApiResponse = z.infer<typeof ZContactApiResponse>;
 
 // #endregion
 

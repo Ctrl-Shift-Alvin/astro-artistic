@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { type APIContext } from 'astro';
 import {
-	ZFormSubmissionApiRequest,
-	ZFormSubmissionApiResponse
+	ZContactApiRequest,
+	ZContactApiResponse
 } from '@/components/types';
 import {
 	contact_addEntry, contact_isDbDuplicateEntry
@@ -12,7 +12,7 @@ export async function POST(context: APIContext) {
 
 	if (context.url.pathname !== '/api/contact/') {
 
-		const errorBody = ZFormSubmissionApiResponse.parse({ error: 'not-found' });
+		const errorBody = ZContactApiResponse.parse({ error: 'not-found' });
 		return new Response(
 			JSON.stringify(errorBody),
 			{ status: 404 }
@@ -23,10 +23,10 @@ export async function POST(context: APIContext) {
 
 	const {
 		data, success
-	} = await ZFormSubmissionApiRequest.safeParseAsync({ data: responseBody });
+	} = await ZContactApiRequest.safeParseAsync({ data: responseBody });
 	if (!success) {
 
-		const errorBody = ZFormSubmissionApiResponse.parse({ error: 'invalid-data' });
+		const errorBody = ZContactApiResponse.parse({ error: 'invalid-data' });
 		return new Response(
 			JSON.stringify(errorBody),
 			{ status: 400 }
@@ -40,7 +40,7 @@ export async function POST(context: APIContext) {
 	)
 	) {
 
-		const errorBody = ZFormSubmissionApiResponse.parse({ error: 'duplicate-data' });
+		const errorBody = ZContactApiResponse.parse({ error: 'duplicate-data' });
 		return new Response(
 			JSON.stringify(errorBody),
 			{ status: 409 }
@@ -50,7 +50,7 @@ export async function POST(context: APIContext) {
 
 	contact_addEntry(data.data);
 
-	const body = ZFormSubmissionApiResponse.parse({ message: 'success' });
+	const body = ZContactApiResponse.parse({ message: 'success' });
 	return new Response(
 		JSON.stringify(body),
 		{ status: 200 }
