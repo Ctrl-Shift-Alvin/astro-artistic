@@ -1,6 +1,7 @@
 import {
 	useCallback, type ReactNode
 } from 'react';
+import clsx from 'clsx/lite';
 import {
 	windowFadeIn,
 	windowFadeOut
@@ -79,7 +80,12 @@ export const A = (props: IAProps) => {
 		<a
 			key={props.key}
 			href={props.href}
-			className={`cursor-pointer ${props.className}`}
+			className={
+				clsx(
+					'cursor-pointer',
+					props.className
+				)
+			}
 			target={props.target}
 			onClick={
 				(e) => {

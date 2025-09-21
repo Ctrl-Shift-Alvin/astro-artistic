@@ -3,6 +3,7 @@ import {
 	useLayoutEffect,
 	useCallback
 } from 'react';
+import clsx from 'clsx/lite';
 import { A } from '@/components/elements/A';
 import { Button } from '@/components/elements/Button';
 import { type TEventEntry } from '@/components/types';
@@ -49,32 +50,35 @@ export const AdminEventTable = () => {
 		[ index ]
 	);
 
+	const tdClassName = clsx('border p-2');
+	const headTdClassName = clsx('border p-2 font-bold');
+
 	return (
 		<>
 			<table className={'w-4/6 border-collapse border border-gray-300'}>
 				<thead>
 					<tr>
-						<td className={'w-1/12 border p-2 font-bold'}>
+						<td className={headTdClassName}>
 							{'ID'}
 						</td>
 
-						<td className={'border p-2 font-bold'}>
+						<td className={headTdClassName}>
 							{'Title'}
 						</td>
 
-						<td className={'border p-2 font-bold'}>
+						<td className={headTdClassName}>
 							{'Location'}
 						</td>
 
-						<td className={'w-1/6 border p-2 font-bold'}>
+						<td className={headTdClassName}>
 							{'Date & Time'}
 						</td>
 
-						<td className={'border p-2 font-bold'}>
+						<td className={headTdClassName}>
 							{'Page'}
 						</td>
 
-						<td className={'border p-2 font-bold'}>
+						<td className={headTdClassName}>
 							{'D'}
 						</td>
 					</tr>
@@ -87,72 +91,76 @@ export const AdminEventTable = () => {
 								a,
 								b
 							) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())
-							.map((entry) => (
-								<tr key={entry.id}>
+							.map((entry) => {
 
-									<td className={'border p-2'}>
-										<A
-											className={'underline'}
-											href={`/admin/events/${entry.id}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
-										>
-											{entry.id}
-										</A>
-									</td>
+								return (
+									<tr key={entry.id}>
 
-									<td className={'border p-2'}>
-										{entry.title}
-									</td>
+										<td className={tdClassName}>
+											<A
+												className={'underline'}
+												href={`/admin/events/${entry.id}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
+											>
+												{entry.id}
+											</A>
+										</td>
 
-									<td className={'border p-2'}>
-										{entry.location}
-									</td>
+										<td className={tdClassName}>
+											{entry.title}
+										</td>
 
-									<td className={'border p-2'}>
-										{
-											Intl
-												.DateTimeFormat(
-													cGetUserLanguage() ?? defaultLanguageCode,
-													{
-														year: 'numeric',
-														month: 'numeric',
-														day: 'numeric',
-														hour: 'numeric',
-														minute: 'numeric'
-													}
-												)
-												.format(new Date(entry.dateTime))
-										}
-									</td>
+										<td className={tdClassName}>
+											{entry.location}
+										</td>
 
-									<td className={'border p-2'}>
-										{
-											entry.enablePage
-												?	(
-													<A
-														className={'underline'}
-														href={`/events/${entry.id}/`}
-													>
-														{'Yes'}
-													</A>
-												)
-												: (
-													<p>
-														{'No'}
-													</p>
-												)
-										}
-									</td>
+										<td className={tdClassName}>
+											{
+												Intl
+													.DateTimeFormat(
+														cGetUserLanguage() ?? defaultLanguageCode,
+														{
+															year: 'numeric',
+															month: 'numeric',
+															day: 'numeric',
+															hour: 'numeric',
+															minute: 'numeric'
+														}
+													)
+													.format(new Date(entry.dateTime))
+											}
+										</td>
 
-									<td className={'border p-2'}>
-										<A
-											className={'text-red-600'}
-											onClick={() => void remove(entry.id)}
-										>
-											{'D'}
-										</A>
-									</td>
-								</tr>
-							))
+										<td className={tdClassName}>
+											{
+												entry.enablePage
+													?	(
+														<A
+															className={'underline'}
+															href={`/events/${entry.id}/`}
+														>
+															{'Yes'}
+														</A>
+													)
+													: (
+														<p>
+															{'No'}
+														</p>
+													)
+											}
+										</td>
+
+										<td className={tdClassName}>
+											<A
+												className={'text-red-600'}
+												onClick={() => void remove(entry.id)}
+											>
+												{'D'}
+											</A>
+										</td>
+									</tr>
+								);
+
+							})
 					}
 				</tbody>
 			</table>

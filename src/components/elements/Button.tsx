@@ -1,6 +1,7 @@
 import {
 	useCallback, type ReactNode
 } from 'react';
+import clsx from 'clsx/lite';
 import {
 	windowFadeIn,
 	windowFadeOut
@@ -67,9 +68,13 @@ export const Button = (props: TButtonProps) => {
 	return (
 		<button
 			className={
-				`${props.small
-					? 'h-10 w-18 text-lg'
-					: 'h-20 w-40 text-2xl'} shrink-0 cursor-pointer rounded-md border-2 border-solid border-white ${props.className}`
+				clsx(
+					props.small
+						? 'h-10 w-18 text-lg'
+						: 'h-20 w-40 text-2xl',
+					'shrink-0 cursor-pointer rounded-md border-2 border-solid border-white',
+					props.className
+				)
 			}
 			type={props.type}
 			form={props.form}

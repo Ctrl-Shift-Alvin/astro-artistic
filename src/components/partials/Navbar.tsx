@@ -2,6 +2,7 @@ import {
 	useCallback,
 	useEffect, useState
 } from 'react';
+import clsx from 'clsx';
 import { LanguageSelect } from '../components/LanguageSelect';
 import { NavMenuItem } from '../components/NavMenuItem';
 import { NavbarConfig } from '@/shared/config/navbar';
@@ -96,9 +97,12 @@ export const Navbar = ({
 			<div
 				id={'hamburger-div'}
 				className={
-					`fixed top-0 z-50 flex h-min w-full justify-center bg-gradient-to-b from-black via-black via-80% to-black/5 py-5 transition-colors duration-500 sm:hidden ${hamburgerBackgroundAlpha && !hamburgerOpen
-						? 'bg-none'
-						: ''}`
+					clsx(
+						'fixed top-0 z-50 flex h-min w-full',
+						'justify-center bg-gradient-to-b from-black via-black via-80% to-black/5 py-5',
+						'transition-colors duration-500 sm:hidden',
+						hamburgerBackgroundAlpha && !hamburgerOpen && 'bg-none'
+					)
 				}
 			>
 				<svg
@@ -139,9 +143,14 @@ export const Navbar = ({
 
 			<nav
 				className={
-					`fixed top-0 z-40 flex w-full flex-col justify-start bg-gradient-to-b from-black via-black via-95% to-gray-900/0 pt-20 pb-7 transition-transform duration-500 sm:hidden ${hamburgerOpen
-						? 'translate-y-0'
-						: '-translate-y-full'}`
+					clsx(
+						'fixed top-0 z-40 pt-20 pb-7 flex w-full flex-col justify-start',
+						'bg-gradient-to-b from-black via-black via-95% to-gray-900/0',
+						'transition-transform duration-500 sm:hidden',
+						hamburgerOpen
+							? 'translate-y-0'
+							: '-translate-y-full'
+					)
 				}
 			>
 				{
@@ -168,9 +177,10 @@ export const Navbar = ({
 
 			<div
 				className={
-					`fixed z-30 h-full w-full ${hamburgerOpen
-						? ''
-						: 'hidden'}`
+					clsx(
+						'fixed z-30 h-full w-full',
+						!hamburgerOpen && 'hidden'
+					)
 				}
 				onMouseDown={
 					() => {

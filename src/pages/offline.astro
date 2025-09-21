@@ -1,12 +1,12 @@
 ---
 import BaseLight from '@/templates/BaseLight.astro';
-import { defaultAnimationDurationMs } from '@/frontend/windowTools';
+import { DEFAULT_ANIMATION_DURATION_MS } from '@/frontend/windowTools';
 
 const translation = Astro.locals.translation;
 ---
 <BaseLight>
 
-	<script is:inline define:vars={{ animDuration: defaultAnimationDurationMs }}>
+	<script is:inline define:vars={{ animDuration: DEFAULT_ANIMATION_DURATION_MS }}>
 
 		const tryRedirect = async () => {
 			

@@ -15,7 +15,7 @@ const { title, description, imageSource, alternate, buttonText, buttonUrl }
 ---
 
 <div
-  class:list={["flex flex-col items-center lg:justify-between lg:gap-x-24", {"lg:flex-row-reverse": alternate, "lg:flex-row": !alternate}]}
+  class:list={[ "flex flex-col items-center lg:justify-between lg:gap-x-24", { "lg:flex-row-reverse": alternate, "lg:flex-row": !alternate }]}
 >
 	<div class="w-full">
 		<h1 class="w-full text-center text-3xl font-bold">
@@ -25,7 +25,7 @@ const { title, description, imageSource, alternate, buttonText, buttonUrl }
 		{
 			description && (
 				<p
-  				class:list={["mt-6 text-justify text-xl newlines leading-9", {"lg:text-right": alternate, "lg:text-left": !alternate}]}
+  				class:list={[ "mt-6 text-justify text-xl newlines leading-9", { "lg:text-right": alternate, "lg:text-left": !alternate } ]}
 				>
 					{description}
 				</p>

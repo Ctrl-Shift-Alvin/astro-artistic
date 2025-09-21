@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import clsx from 'clsx';
 import { Monolog } from '../components/MonologProvider';
 import { ZContactFormSubmission } from '../types';
 import { A } from '../elements/A';
@@ -114,20 +115,23 @@ export const ContactCard = ({
 		<>
 			<div
 				className={
-					`flex flex-col items-center ${
+					clsx(
+						'flex flex-col items-center sm:justify-between md:gap-x-24',
 						alternate
 							? 'lg:flex-row-reverse'
 							: 'lg:flex-row'
-					} sm:justify-between md:gap-x-24`
+					)
 				}
 			>
 				<div>
-
 					<p
 						className={
-							`text-center ${alternate
-								? 'lg:text-right'
-								: 'lg:text-left'} newlines text-xl leading-9`
+							clsx(
+								'text-center newlines text-xl leading-9',
+								alternate
+									? 'lg:text-right'
+									: 'lg:text-left'
+							)
 						}
 					>
 						{contactData.description}
@@ -135,9 +139,12 @@ export const ContactCard = ({
 
 					<p
 						className={
-							`text-center ${alternate
-								? 'lg:text-right'
-								: 'lg:text-left'} text-xl leading-9`
+							clsx(
+								'text-center text-xl leading-9',
+								alternate
+									? 'lg:text-right'
+									: 'lg:text-left'
+							)
 						}
 					>
 						{window.__TRANSLATION__.contact.email}
@@ -154,9 +161,12 @@ export const ContactCard = ({
 
 					<p
 						className={
-							`mb-4 text-center ${alternate
-								? 'lg:text-right'
-								: 'lg:text-left'} text-xl leading-9`
+							clsx(
+								'mb-4 text-center text-xl leading-9',
+								alternate
+									? 'lg:text-right'
+									: 'lg:text-left'
+							)
 						}
 					>
 						{window.__TRANSLATION__.contact.phoneNumber}

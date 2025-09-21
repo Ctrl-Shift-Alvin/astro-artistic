@@ -3,6 +3,7 @@ import {
 	useMemo,
 	useState
 } from 'react';
+import clsx from 'clsx/lite';
 import { BlogCard } from '../components/BlogCard';
 import {
 	type IBlogFrontmatter,
@@ -97,7 +98,12 @@ export const BlogGallery = ({
 	return blogFileListProcessed.length > 0
 		? (
 			<div
-				className={`grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 ${className}`}
+				className={
+					clsx(
+						'grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3',
+						className
+					)
+				}
 			>
 				{
 					blogFileListProcessed.map((instance) => (

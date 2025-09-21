@@ -6,6 +6,7 @@ import {
 	useState
 } from 'react';
 import { type z } from 'zod';
+import clsx from 'clsx/lite';
 import { AdminMarkdownEditor } from './AdminMarkdownEditor';
 import { Dialog } from '@/components/components/DialogProvider';
 import { Monolog } from '@/components/components/MonologProvider';
@@ -360,9 +361,10 @@ export const AdminBlogEditor = () => {
 									<tr key={row.fileName}>
 										<td
 											className={
-												`${row.isSelected
-													? 'font-bold'
-													: ''} p-2`
+												clsx(
+													'p-2',
+													row.isSelected && 'font-bold'
+												)
 											}
 										>
 											<A

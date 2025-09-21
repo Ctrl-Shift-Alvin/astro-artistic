@@ -6,7 +6,7 @@ export function isWindowDefined(): boolean {
 
 export const smoothScroll = (
 	targetY: number,
-	durationMs: number
+	durationMs: number = animationDurationMs
 ) => {
 
 	const startY = window.scrollY;
@@ -78,12 +78,10 @@ export const windowFadeIn = () => {
 		return;
 	animatedObjects.forEach((e: Element) => {
 
-		e.classList.add('opacity-100');
-
-	});
-	animatedObjects.forEach((e: Element) => {
-
-		e.classList.remove('opacity-0');
+		e.classList.replace(
+			'opacity-0',
+			'opacity-100'
+		);
 
 	});
 
@@ -95,12 +93,10 @@ export const windowFadeOut = async() => {
 		return;
 	animatedObjects.forEach((e: Element) => {
 
-		e.classList.remove('opacity-100');
-
-	});
-	animatedObjects.forEach((e: Element) => {
-
-		e.classList.add('opacity-0');
+		e.classList.replace(
+			'opacity-100',
+			'opacity-0'
+		);
 
 	});
 	return new Promise((resolve) => setTimeout(
@@ -128,8 +124,8 @@ export const windowRefresh = () => {
 
 };
 
-export const defaultAnimationDurationMs = 400;
-export const defaultFadeInOffsetMs = 200;
+export const DEFAULT_ANIMATION_DURATION_MS = 400;
+export const DEFAULT_FADE_IN_OFFSET_MS = 200;
 
 export function initWindowAnimations(
 	_animationDurationMs?: number,
@@ -139,8 +135,8 @@ export function initWindowAnimations(
 	// Start opacity transition
 	const elements = document.querySelectorAll('.windowtools-transition');
 	animatedObjects = elements; // Pass query result to tools, for future windowRefresh() references
-	setAnimationDurationMs(_animationDurationMs || defaultAnimationDurationMs);
-	setFadeInOffsetMs(_fadeInOffsetMs || defaultFadeInOffsetMs);
+	setAnimationDurationMs(_animationDurationMs || DEFAULT_ANIMATION_DURATION_MS);
+	setFadeInOffsetMs(_fadeInOffsetMs || DEFAULT_FADE_IN_OFFSET_MS);
 
 	animatedObjects.forEach((e: Element) => {
 

@@ -3,6 +3,7 @@ import {
 	useLayoutEffect,
 	useState
 } from 'react';
+import clsx from 'clsx';
 import { A } from '@/components/elements/A';
 import { type TContactFormEntry } from '@/components/types';
 import {
@@ -162,37 +163,52 @@ export const AdminContactTable = () => {
 
 				<tbody>
 					{
-						contactEntryIndex.map((entry) => (
-							<tr key={entry.id}>
+						contactEntryIndex.map((entry) => {
 
-								<td className={'border p-2 underline'}>
-									<A href={`/admin/submission/contact/${entry.id}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}>
-										{entry.id}
-									</A>
-								</td>
+							const tdClassName = clsx('border p-2');
+							return (
+								<tr key={entry.id}>
 
-								<td className={'border p-2'}>
-									{entry.firstName}
-								</td>
+									<td className={tdClassName}>
+										<A
+											href={`/admin/submission/contact/${entry.id}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
+											className={'underline'}
+										>
+											{entry.id}
+										</A>
+									</td>
 
-								<td className={'border p-2'}>
-									{entry.lastName}
-								</td>
+									<td className={tdClassName}>
+										{entry.firstName}
+									</td>
 
-								<td className={'max-w-44 truncate border p-2 overflow-ellipsis'}>
-									{entry.message}
-								</td>
+									<td className={tdClassName}>
+										{entry.lastName}
+									</td>
 
-								<td className={'border p-2'}>
-									<A
-										className={'text-red-600'}
-										onClick={() => void del(entry.id)}
+									<td
+										className={
+											clsx(
+												tdClassName,
+												'max-w-44 truncate overflow-ellipsis'
+											)
+										}
 									>
-										{'D'}
-									</A>
-								</td>
-							</tr>
-						))
+										{entry.message}
+									</td>
+
+									<td className={tdClassName}>
+										<A
+											className={'text-red-600'}
+											onClick={() => void del(entry.id)}
+										>
+											{'D'}
+										</A>
+									</td>
+								</tr>
+							);
+
+						})
 					}
 				</tbody>
 			</table>

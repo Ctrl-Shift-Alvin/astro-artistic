@@ -1,5 +1,4 @@
 TODO Better blog editor
-TODO Change class and className patterns, and replace with clsx
 TODO Implement errors API
 TODO Implement middleware for error submission
 TODO Add useful comments throughout project

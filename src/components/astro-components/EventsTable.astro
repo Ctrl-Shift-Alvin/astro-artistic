@@ -1,5 +1,5 @@
 ---
-import { ITranslation } from '@/locales/global';
+import { type ITranslation } from '@/locales/global';
 import { events_getAllRelevantEntries } from '@/backend/database/events';
 import { A } from '../elements/A';
 import { EventsConfig } from '@/backend/config/events';
@@ -42,10 +42,10 @@ const eventPagesUrl = EventsConfig.pagesPath
 					.map((entry) => (
 						<tr>
 
-							<td class:list={["py-3 px-2 text-center", {"line-through": entry.datePassed}]}>
+							<td class:list={[ "py-3 px-2 text-center", { "line-through": entry.datePassed } ]}>
 								{defaultFormatDateTimeString(entry.date)}
 							</td>
-							<td class:list={["py-3 px-2 text-center",{"line-through": entry.datePassed}]}>
+							<td class:list={[ "py-3 px-2 text-center",{ "line-through": entry.datePassed } ]}>
 
 								{entry.data.enablePage
 									? (
@@ -56,7 +56,7 @@ const eventPagesUrl = EventsConfig.pagesPath
 									: entry.data.title}
 
 							</td>
-							<td class:list={["py-3 px-2 text-center", {"line-through": entry.datePassed}]}>
+							<td class:list={[ "py-3 px-2 text-center", { "line-through": entry.datePassed } ]}>
 								{entry.data.location}
 							</td>
 

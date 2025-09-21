@@ -54,16 +54,12 @@ const { title, imageUrl } = Astro.props;
 
 				if (window.innerWidth < 640) {
 
-					// fixed navbar would cover content, so account for that
-					smoothScroll(
-						window.innerHeight -
-							(document.querySelector('#hamburger-div')?.scrollHeight || 0),
-						1000
-					);
+					// Fixed navbar would cover content, so scroll a bit less to keep the content below the navbar
+					smoothScroll(window.innerHeight - (document.getElementById('hamburger-div')?.scrollHeight || 0));
 
 				} else {
 
-					smoothScroll(window.innerHeight, 1000);
+					smoothScroll(window.innerHeight);
 
 				}
 			});
