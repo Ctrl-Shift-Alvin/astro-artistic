@@ -14,6 +14,7 @@ import {
 import { ErrorsConfig } from '@/shared/config/errors';
 import { A } from '@/components/elements/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
+import { TrashcanIcon } from '@/components/components/icons/TrashcanIcon';
 
 export const AdminBuildTable = () => {
 
@@ -165,9 +166,7 @@ export const AdminBuildTable = () => {
 							{'Was Git Dirty'}
 						</td>
 
-						<td className={'border p-2 font-bold'}>
-							{'D'}
-						</td>
+						<td />
 					</tr>
 				</thead>
 
@@ -276,16 +275,12 @@ export const AdminBuildTable = () => {
 										className={
 											clsx(
 												tdClassName,
+												'w-px',
 												entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-l-1'
 											)
 										}
 									>
-										<A
-											className={'text-red-600 text-center'}
-											onClick={() => void remove(entry.buildNumber)}
-										>
-											{'D'}
-										</A>
+										<TrashcanIcon onClick={() => void remove(entry.buildNumber)} />
 									</td>
 								</tr>
 							);

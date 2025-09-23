@@ -19,6 +19,7 @@ import { Monolog } from '@/components/components/MonologProvider';
 import { LabeledInput } from '@/components/elements/LabeledInput';
 import { ZProtectedPostApiRequestMap } from '@/components/types';
 import { Button } from '@/components/elements/Button';
+import { TrashcanIcon } from '@/components/components/icons/TrashcanIcon';
 
 export const AdminBlogTable = () => {
 
@@ -256,9 +257,7 @@ export const AdminBlogTable = () => {
 							{'File Name'}
 						</td>
 
-						<td className={'border p-2 font-bold'}>
-							{'D'}
-						</td>
+						<td />
 					</tr>
 				</thead>
 
@@ -279,13 +278,15 @@ export const AdminBlogTable = () => {
 										</A>
 									</td>
 
-									<td className={tdClassName}>
-										<A
-											className={'text-red-600'}
-											onClick={() => void remove(entry)}
-										>
-											{'D'}
-										</A>
+									<td
+										className={
+											clsx(
+												tdClassName,
+												'w-px'
+											)
+										}
+									>
+										<TrashcanIcon onClick={() => void remove(entry)} />
 									</td>
 								</tr>
 							);

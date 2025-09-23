@@ -12,6 +12,7 @@ import {
 	fetchContactEntryCount
 } from '@/frontend/adminApi';
 import { ContactConfig } from '@/shared/config/contact';
+import { TrashcanIcon } from '@/components/components/icons/TrashcanIcon';
 
 export const AdminContactTable = () => {
 
@@ -155,9 +156,7 @@ export const AdminContactTable = () => {
 							{'Message'}
 						</td>
 
-						<td className={'border p-2 font-bold'}>
-							{'D'}
-						</td>
+						<td />
 					</tr>
 				</thead>
 
@@ -197,13 +196,15 @@ export const AdminContactTable = () => {
 										{entry.message}
 									</td>
 
-									<td className={tdClassName}>
-										<A
-											className={'text-red-600'}
-											onClick={() => void del(entry.id)}
-										>
-											{'D'}
-										</A>
+									<td
+										className={
+											clsx(
+												tdClassName,
+												'w-px'
+											)
+										}
+									>
+										<TrashcanIcon onClick={() => void del(entry.id)} />
 									</td>
 								</tr>
 							);

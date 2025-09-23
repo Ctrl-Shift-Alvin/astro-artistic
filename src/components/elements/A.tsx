@@ -13,8 +13,8 @@ import {
 	type TActionPayload
 } from '@/shared/actions';
 
-type IAProps = {
-	children: ReactNode;
+export type IAProps = {
+	children?: ReactNode;
 	className?: string;
 	href?: string;
 	target?: '_blank' | '_self' | '_parent' | '_top';

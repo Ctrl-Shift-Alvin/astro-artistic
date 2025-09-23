@@ -3,6 +3,7 @@ import React, {
 	useLayoutEffect,
 	useState
 } from 'react';
+import clsx from 'clsx/lite';
 import { type TError } from '@/components/types';
 import {
 	fetchErrorIndex,
@@ -15,6 +16,7 @@ import {
 import { ErrorsConfig } from '@/shared/config/errors';
 import { A } from '@/components/elements/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
+import { TrashcanIcon } from '@/components/components/icons/TrashcanIcon';
 
 export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 
@@ -188,9 +190,7 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 							{'Error Cause'}
 						</td>
 
-						<td className={'border p-2 font-bold'}>
-							{'D'}
-						</td>
+						<td className={'border p-2'} />
 
 					</tr>
 				</thead>
@@ -264,14 +264,14 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 
 										<td
 											rowSpan={2}
-											className={tdClassName}
+											className={
+												clsx(
+													tdClassName,
+													'w-px'
+												)
+											}
 										>
-											<A
-												className={'text-red-600 text-center'}
-												onClick={() => void del(entry.id)}
-											>
-												{'D'}
-											</A>
+											<TrashcanIcon onClick={() => void del(entry.id)} />
 										</td>
 
 									</tr>

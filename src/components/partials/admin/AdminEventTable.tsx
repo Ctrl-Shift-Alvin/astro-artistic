@@ -14,6 +14,7 @@ import {
 } from '@/frontend/adminApi';
 import { cGetUserLanguage } from '@/shared/cookies';
 import { defaultLanguageCode } from '@/backend/i18n';
+import { TrashcanIcon } from '@/components/components/icons/TrashcanIcon';
 
 export const AdminEventTable = () => {
 
@@ -78,9 +79,7 @@ export const AdminEventTable = () => {
 							{'Page'}
 						</td>
 
-						<td className={headTdClassName}>
-							{'D'}
-						</td>
+						<td />
 					</tr>
 				</thead>
 
@@ -149,13 +148,15 @@ export const AdminEventTable = () => {
 											}
 										</td>
 
-										<td className={tdClassName}>
-											<A
-												className={'text-red-600'}
-												onClick={() => void remove(entry.id)}
-											>
-												{'D'}
-											</A>
+										<td
+											className={
+												clsx(
+													tdClassName,
+													'w-px'
+												)
+											}
+										>
+											<TrashcanIcon onClick={() => void remove(entry.id)} />
 										</td>
 									</tr>
 								);
