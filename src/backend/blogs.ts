@@ -3,7 +3,8 @@ import fs, { readdirSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import matter from 'gray-matter';
 import {
-	type IBlogMarkdownInstance, type IBlogFrontmatter
+	type TBlogMarkdownInstance,
+	type TBlogFrontmatter
 } from '@/components/types';
 import { BlogConfig } from '@/backend/config/blog';
 
@@ -19,10 +20,10 @@ export function getBlogUrlPathname(): string {
 
 }
 
-export function getAllBlogs(): IBlogMarkdownInstance<IBlogFrontmatter>[] {
+export function getAllBlogs(): TBlogMarkdownInstance[] {
 
 	const files = fs.readdirSync(BlogConfig.pagesPath);
-	const posts: IBlogMarkdownInstance<IBlogFrontmatter>[] = [];
+	const posts: TBlogMarkdownInstance[] = [];
 
 	for (const file of files) {
 
@@ -44,7 +45,8 @@ export function getAllBlogs(): IBlogMarkdownInstance<IBlogFrontmatter>[] {
 				/\.md$/,
 				''
 			)}/`,
-			frontmatter: frontmatter as IBlogFrontmatter,
+			fileName: file,
+			frontmatter: frontmatter as TBlogFrontmatter,
 			content
 		});
 
@@ -52,7 +54,7 @@ export function getAllBlogs(): IBlogMarkdownInstance<IBlogFrontmatter>[] {
 	return posts;
 
 }
-export function getBlog(fileName: string): IBlogMarkdownInstance<IBlogFrontmatter> | null {
+export function getBlog(fileName: string): TBlogMarkdownInstance | null {
 
 	const files = fs.readdirSync(BlogConfig.pagesPath);
 	for (const file of files) {
@@ -72,7 +74,8 @@ export function getBlog(fileName: string): IBlogMarkdownInstance<IBlogFrontmatte
 				/\.md$/,
 				''
 			)}/`,
-			frontmatter: parsed.data as IBlogFrontmatter,
+			fileName: file,
+			frontmatter: parsed.data as TBlogFrontmatter,
 			content: parsed.content
 		};
 

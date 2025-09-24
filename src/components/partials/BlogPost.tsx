@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { type IBlogFrontmatter } from '@/components/types';
+import { type TBlogFrontmatter } from '@/components/types';
 import { GlobalTranslation } from '@/locales/global';
 import { defaultFormatDateString } from '@/shared/dataParse';
 
@@ -7,7 +7,7 @@ export const BlogPost = ({
 	blogHeader,
 	children
 }: {
-	blogHeader: IBlogFrontmatter;
+	blogHeader: TBlogFrontmatter;
 	children: ReactNode;
 }) => (
 	<>

@@ -32,19 +32,25 @@ export type TStatusArray = z.infer<typeof ZStatusArray>;
 
 // #region Blog API
 
-export interface IBlogFrontmatter {
-	title: string;
-	description: string;
-	pubDate: string;
-	imgSrc: string;
-	imgAlt: string;
-	draft: boolean;
-}
-export interface IBlogMarkdownInstance<T extends Record<string, any>> {
-	url: string;
-	frontmatter: IBlogFrontmatter & T;
-	content: string;
-}
+export const ZBlogFrontmatter = z.object({
+	title: z.string(),
+	description: z.string(),
+	pubDate: z.coerce.date(),
+	imgSrc: z.string(),
+	imgAlt: z.string(),
+	draft: z
+		.boolean()
+		.default(false)
+});
+export type TBlogFrontmatter = z.infer<typeof ZBlogFrontmatter>;
+
+export const ZBlogMarkdownInstance = z.object({
+	url: z.string(),
+	fileName: z.string(),
+	frontmatter: ZBlogFrontmatter,
+	content: z.string()
+});
+export type TBlogMarkdownInstance = z.infer<typeof ZBlogMarkdownInstance>;
 
 // #endregion
 

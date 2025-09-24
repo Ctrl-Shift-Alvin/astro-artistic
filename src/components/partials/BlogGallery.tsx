@@ -5,17 +5,14 @@ import {
 } from 'react';
 import clsx from 'clsx/lite';
 import { BlogCard } from '../components/BlogCard';
-import {
-	type IBlogFrontmatter,
-	type IBlogMarkdownInstance
-} from '@/components/types';
+import { type TBlogMarkdownInstance } from '@/components/types';
 
 export const BlogGallery = ({
 	blogFileList,
 	cutRemainder = true,
 	className
 }: {
-	blogFileList: IBlogMarkdownInstance<IBlogFrontmatter>[];
+	blogFileList: TBlogMarkdownInstance[];
 	cutRemainder?: boolean;
 	className?: string;
 }) => {

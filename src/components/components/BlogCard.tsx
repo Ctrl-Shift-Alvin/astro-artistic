@@ -1,10 +1,8 @@
-import {
-	type IBlogMarkdownInstance, type IBlogFrontmatter
-} from '../types';
+import { type TBlogMarkdownInstance } from '../types';
 import { A } from '../elements/A';
 import { defaultFormatDateString } from '@/shared/dataParse';
 
-export const BlogCard = ({ blogFile }: { blogFile: IBlogMarkdownInstance<IBlogFrontmatter> }) => (
+export const BlogCard = ({ blogFile }: { blogFile: TBlogMarkdownInstance }) => (
 	<A
 		className={'hover:translate-y-1'}
 		href={blogFile.url}

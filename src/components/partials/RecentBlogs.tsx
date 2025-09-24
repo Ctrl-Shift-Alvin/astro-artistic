@@ -1,13 +1,10 @@
 import { useMemo } from 'react';
 import { BlogGallery } from '@/components/partials/BlogGallery';
 import { A } from '@/components/elements/A';
-import {
-	type IBlogFrontmatter,
-	type IBlogMarkdownInstance
-} from '@/components/types';
+import { type TBlogMarkdownInstance } from '@/components/types';
 import { BlogConfig } from '@/shared/config/blog';
 
-export const RecentBlogs = ({ recentBlogFiles }: { recentBlogFiles: IBlogMarkdownInstance<IBlogFrontmatter>[] }) => {
+export const RecentBlogs = ({ recentBlogFiles }: { recentBlogFiles: TBlogMarkdownInstance[] }) => {
 
 	const config = useMemo(
 		() => BlogConfig(window.__TRANSLATION__),

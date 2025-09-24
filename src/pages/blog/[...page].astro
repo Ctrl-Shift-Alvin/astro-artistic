@@ -2,10 +2,7 @@
 import PaginationButtons from '@/components/astro-components/PaginationButtons.astro';
 import Section from '@/components/astro-components/Section.astro';
 import { BlogGallery } from '@/components/partials/BlogGallery';
-import {
-	type IBlogFrontmatter,
-	type IBlogMarkdownInstance
-} from '@/components/types';
+import { type TBlogMarkdownInstance } from '@/components/types';
 import { BlogConfig } from '@/shared/config/blog';
 import { GlobalTranslation } from '@/locales/global';
 import Base from '@/templates/Base.astro';
@@ -25,8 +22,8 @@ const pageSize = config.pageSize;
 const startIndex = (Number(page) - 1) * pageSize;
 const endIndex = startIndex + pageSize;
 
-const posts: IBlogMarkdownInstance<IBlogFrontmatter>[] = getSortedBlogs();
-const paginatedPosts: IBlogMarkdownInstance<IBlogFrontmatter>[] = posts.slice(
+const posts: TBlogMarkdownInstance[] = getSortedBlogs();
+const paginatedPosts: TBlogMarkdownInstance[] = posts.slice(
 	startIndex,
 	endIndex
 );
