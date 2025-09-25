@@ -1,5 +1,5 @@
 import path from 'node:path';
-import fs, { readdirSync } from 'node:fs';
+import fs from 'node:fs';
 import { spawn } from 'node:child_process';
 import matter from 'gray-matter';
 import {
@@ -188,26 +188,5 @@ export const blog_countEntries = (): number => {
 			}
 		).filter((e) => e.isFile() && e.name.endsWith('.md')).length
 		: 0;
-
-};
-export const blog_getEntries = (
-	count: number,
-	offset: number = 0
-): string[] => {
-
-	const files = readdirSync(
-		BlogConfig.pagesPath,
-		{
-			recursive: false,
-			withFileTypes: true
-		}
-	);
-	return files
-		.filter((e) => e.isFile() && e.name.endsWith('.md'))
-		.slice(
-			offset,
-			offset + count
-		)
-		.map((e) => e.name);
 
 };

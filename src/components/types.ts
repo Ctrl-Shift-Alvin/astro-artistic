@@ -357,12 +357,7 @@ export const TProtectedPostApiResponseMap = {
 	'events/save': ZApiResponse,
 	'events/edit': ZApiResponse,
 	'blog/index': z.union([
-		ZApiResponseSuccess.extend({
-			data: z
-				.string()
-				.endsWith('.md')
-				.array()
-		}),
+		ZApiResponseSuccess.extend({ data: ZBlogMarkdownInstance.array() }),
 		ZApiResponseError
 	]),
 	'blog/count': z.union([

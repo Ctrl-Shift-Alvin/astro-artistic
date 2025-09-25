@@ -18,7 +18,8 @@ import {
 	type TContactFormEntry,
 	type TError,
 	type TEventEntry,
-	type TNewEventEntry
+	type TNewEventEntry,
+	type TBlogMarkdownInstance
 } from '@/components/types';
 import {
 	lsGetAuthTokenExpiry,
@@ -296,7 +297,7 @@ export const setLogoutTimeout = (callback?: ()=> void) => {
 export const fetchBlogIndex = async(
 	count: number | string,
 	offset?: number | string
-): Promise<string[] | null> => {
+): Promise<TBlogMarkdownInstance[] | null> => {
 
 	const requestBody = ZProtectedPostApiRequestMap['blog/index'].safeParse({
 		count,

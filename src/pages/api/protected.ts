@@ -46,7 +46,7 @@ import {
 import {
 	blog_countEntries,
 	blog_createPage,
-	blog_getEntries
+	getSortedBlogsSliced
 } from '@/backend/blogs';
 
 const SECRET_KEY = import.meta.env.JWT_KEY as string;
@@ -696,9 +696,9 @@ export async function POST(context: APIContext) {
 
 			try {
 
-				const result = blog_getEntries(
-					count,
-					offset
+				const result = getSortedBlogsSliced(
+					offset ?? 0,
+					(offset ?? 0) + count
 				);
 
 				const responseBody = TProtectedPostApiResponseMap[requestType].parse({

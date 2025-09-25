@@ -17,9 +17,14 @@ import { A } from '@/components/elements/A';
 import { Dialog } from '@/components/components/DialogProvider';
 import { Monolog } from '@/components/components/MonologProvider';
 import { LabeledInput } from '@/components/elements/LabeledInput';
-import { ZProtectedPostApiRequestMap } from '@/components/types';
+import {
+	ZProtectedPostApiRequestMap,
+	type TBlogMarkdownInstance
+} from '@/components/types';
 import { Button } from '@/components/elements/Button';
 import { TrashcanIcon } from '@/components/components/icons/TrashcanIcon';
+import { defaultLanguageCode } from '@/backend/i18n';
+import { cGetUserLanguage } from '@/shared/cookies';
 
 export const AdminBlogTable = () => {
 
@@ -31,7 +36,7 @@ export const AdminBlogTable = () => {
 	const [
 		blogIndex,
 		setBlogIndex
-	] = useState<string[]>([]);
+	] = useState<TBlogMarkdownInstance[]>([]);
 
 	const [
 		fullIndexCount,
@@ -257,6 +262,14 @@ export const AdminBlogTable = () => {
 							{'File Name'}
 						</td>
 
+						<td className={'border p-2 font-bold'}>
+							{'Title'}
+						</td>
+
+						<td className={'border p-2 font-bold'}>
+							{'Publication Date'}
+						</td>
+
 						<td />
 					</tr>
 				</thead>
@@ -267,15 +280,36 @@ export const AdminBlogTable = () => {
 
 							const tdClassName = clsx('border p-2');
 							return (
-								<tr key={entry}>
+								<tr key={entry.fileName}>
 
 									<td className={tdClassName}>
 										<A
-											href={`/admin/blogs/${entry}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
+											href={`/admin/blogs/${entry.fileName}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
 											className={'underline'}
 										>
-											{entry}
+											{entry.fileName}
 										</A>
+									</td>
+
+									<td className={tdClassName}>
+										{entry.frontmatter.title}
+									</td>
+
+									<td className={tdClassName}>
+										{
+											Intl
+												.DateTimeFormat(
+													cGetUserLanguage() ?? defaultLanguageCode,
+													{
+														year: 'numeric',
+														month: 'numeric',
+														day: 'numeric',
+														hour: 'numeric',
+														minute: 'numeric'
+													}
+												)
+												.format(new Date(entry.frontmatter.pubDate))
+										}
 									</td>
 
 									<td
@@ -286,7 +320,7 @@ export const AdminBlogTable = () => {
 											)
 										}
 									>
-										<TrashcanIcon onClick={() => void remove(entry)} />
+										<TrashcanIcon onClick={() => void remove(entry.fileName)} />
 									</td>
 								</tr>
 							);

@@ -17,10 +17,9 @@ if (idOrNew !== true) {
 		if (!idOrNew)
 			throw new Error();
 
-	} catch {
+	} catch {		
 
-		Astro.response.status = 400;
-		Astro.response.statusText = 'bad-request';
+		return Astro.rewrite('/404/');
 
 	}
 }
