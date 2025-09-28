@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import Database from 'better-sqlite3';
 import z from 'zod';
-import { ErrorsConfig as SharedErrorsConfig } from '@/shared/config/errors';
 import { ErrorsConfig } from '@/backend/config/errors';
 import {
 	type TError,
@@ -12,20 +11,13 @@ import {
 import {
 	ZError,
 	ZBuild
-} from '@/components/types';
-
-if (!SharedErrorsConfig.enable)
-	process.exit(0);
+}
+	from '@/components/types';
 
 process.on(
 	'exit',
 	() => db.close()
 );
-
-declare global {
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	interface Window { __BUILD__: TBuild }
-}
 
 const db = new Database(ErrorsConfig.dbPath);
 const CURRENT_VERSION = 0;
@@ -66,6 +58,7 @@ const errors_createDbIfNotExists = (): boolean => {
 				+ 'createdAt DATETIME DEFAULT (strftime(\'%Y-%m-%d %H:%M:%f\', \'now\')),'
 				+ 'buildNumber INTEGER NOT NULL,'
 				+ 'isClient BOOLEAN NOT NULL CHECK (isClient IN (0, 1)),'
+				+ 'url TEXT NOT NULL,'
 				+ 'status INTEGER CHECK (status>0 AND status<600),'
 				+ 'statusText TEXT,'
 				+ 'errorMessage TEXT,'
@@ -359,6 +352,22 @@ export const errors_getBuild = (buildNumber: number): TBuild | undefined => {
 	}
 
 };
+export const errors_getCurrentBuild = (): TBuild | undefined => {
+
+	try {
+
+		return errors_dbGetBuild('SELECT * FROM builds ORDER BY buildNumber DESC LIMIT 1');
+
+	} catch(err: any) {
+
+		throw new Error(
+			'Failed to get current build!',
+			{ cause: err }
+		);
+
+	}
+
+};
 export const errors_getAllBuilds = (): TBuild[] => {
 
 	try {
@@ -453,9 +462,12 @@ export const errors_addErrorSubmission = (submission: TErrorSubmission) => {
 
 		return errors_dbRun(
 		// eslint-disable-next-line @stylistic/max-len
-			'INSERT INTO errors (buildNumber, isClient, status, statusText, errorMessage, errorCause, errorStack) VALUES (?,?,?,?,?,?,?)',
+			'INSERT INTO errors (buildNumber, isClient, url, status, statusText, errorMessage, errorCause, errorStack) VALUES (?,?,?,?,?,?,?,?)',
 			submission.buildNumber,
-			submission.isClient,
+			submission.isClient
+				? 1
+				: 0,
+			submission.url,
 			submission.status,
 			submission.statusText,
 			submission.errorMessage,
@@ -480,13 +492,19 @@ export const errors_isDuplicateError = (submission: TErrorSubmission): boolean =
 		const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
 		const result = errors_dbGetError(
-			'SELECT id FROM errors WHERE '
+			'SELECT * FROM errors WHERE '
+			+ 'url IS ? AND '
+			+ 'isClient IS ? AND '
 			+ 'status IS ? AND '
 			+ 'statusText IS ? AND '
 			+ 'errorMessage IS ? AND '
 			+ 'errorCause IS ? AND '
 			+ 'errorStack IS ? AND '
-			+ 'createdAt > ?',
+			+ 'createdAt > ? LIMIT 1',
+			submission.url,
+			submission.isClient
+				? 1
+				: 0,
 			submission.status ?? null,
 			submission.statusText ?? null,
 			submission.errorMessage ?? null,

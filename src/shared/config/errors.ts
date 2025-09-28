@@ -1,9 +1,23 @@
 import { ZErrorsConfig } from './configTypes';
 
 export const ErrorsConfig = ZErrorsConfig.parse({
-	enable: true,
-	enableUserLogging: true,
-	enableApiLogging: true,
+	enableJsLogging: true,
+	enableResponseLogging: true,
+	responseLoggingStatusCodes: [
+		400,
+		401,
+		403,
+		404,
+		414,
+		421,
+		431,
+		451,
+		500,
+		501,
+		502,
+		504,
+		508
+	],
 	tableInitialBuildCount: 2,
 	tableInitialErrorCount: 2
 });

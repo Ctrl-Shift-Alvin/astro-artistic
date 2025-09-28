@@ -113,12 +113,16 @@ const translation = Astro.locals.translation;
 
 				import '@/string.extensions.ts';
 
-				// Initializes window animations
 				import { initWindowAnimations } from '@/frontend/windowTools';
+				import { setupJsErrorHandler } from '@/frontend/errorService';
 
+				setupJsErrorHandler();
+
+				// Initializes window animations
 				window.addEventListener('react-hydrated', () => {
 					initWindowAnimations(800, 200);
 				});
+
 			</script>
 		</div>
 	</body>

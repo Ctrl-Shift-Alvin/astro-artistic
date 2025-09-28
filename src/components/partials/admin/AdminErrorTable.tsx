@@ -171,6 +171,10 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 						</td>
 
 						<td className={'border p-2 font-bold'}>
+							{'URL'}
+						</td>
+
+						<td className={'border p-2 font-bold'}>
 							{'Is Client'}
 						</td>
 
@@ -239,6 +243,10 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 										</td>
 
 										<td className={tdClassName}>
+											{entry.url}
+										</td>
+
+										<td className={tdClassName}>
 											{
 												entry.isClient
 													? 'Yes'
@@ -267,7 +275,7 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 											className={
 												clsx(
 													tdClassName,
-													'w-px'
+													'w-px border-b-4'
 												)
 											}
 										>

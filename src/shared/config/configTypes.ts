@@ -122,34 +122,9 @@ export type TNavbarConfig = z.infer<typeof ZNavbarConfig>;
 // #region Errors Config
 
 export const ZErrorsConfig = z.object({
-	enable: z.boolean(),
-	enableUserLogging: z.boolean(),
-	enableApiLogging: z.boolean(),
-	userStatusCodes: ZStatusArray.default([
-		400,
-		401,
-		403,
-		414,
-		421,
-		431,
-		451,
-		500,
-		501,
-		502,
-		504,
-		508
-	]),
-	apiStatusCodes: ZStatusArray.default([
-		400,
-		414,
-		421,
-		431,
-		500,
-		501,
-		502,
-		504,
-		508
-	]),
+	enableJsLogging: z.boolean(),
+	enableResponseLogging: z.boolean(),
+	responseLoggingStatusCodes: ZStatusArray,
 	tableInitialBuildCount: z
 		.number()
 		.default(5),

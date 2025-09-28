@@ -8,10 +8,14 @@ import {
 	errors_addErrorSubmission,
 	errors_isDuplicateError
 } from '@/backend/database/errors';
+import { ErrorsConfig } from '@/shared/config/errors';
 
 export async function POST(context: APIContext) {
 
-	if (context.url.pathname !== '/api/errors/') {
+	if (
+		context.url.pathname !== '/api/errors/'
+		|| !ErrorsConfig.enableJsLogging
+	) {
 
 		const errorBody = ZErrorApiResponse.parse({ error: 'not-found' });
 		return new Response(
@@ -20,12 +24,10 @@ export async function POST(context: APIContext) {
 		);
 
 	}
-	const responseBody = await context.request.json();
+	const requestBody = await context.request.json();
+	const parsedResponse = await ZErrorApiRequest.safeParseAsync(requestBody);
 
-	const {
-		data, success
-	} = await ZErrorApiRequest.safeParseAsync({ data: responseBody });
-	if (!success) {
+	if (!parsedResponse.success) {
 
 		const errorBody = ZErrorApiResponse.parse({ error: 'invalid-data' });
 		return new Response(
@@ -35,7 +37,7 @@ export async function POST(context: APIContext) {
 
 	}
 
-	if (errors_isDuplicateError(data.data)) {
+	if (errors_isDuplicateError(parsedResponse.data.data)) {
 
 		const errorBody = ZErrorApiResponse.parse({ error: 'duplicate-data' });
 		return new Response(
@@ -45,7 +47,10 @@ export async function POST(context: APIContext) {
 
 	}
 
-	errors_addErrorSubmission(data.data);
+	errors_addErrorSubmission({
+		...parsedResponse.data.data,
+		isClient: true
+	});
 
 	const body = ZErrorApiResponse.parse({ message: 'success' });
 	return new Response(

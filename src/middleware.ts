@@ -4,6 +4,7 @@ import {
 	type JwtPayload
 } from 'jsonwebtoken';
 import { isAdminSetup } from './backend/admin';
+import { ErrorsConfig } from './shared/config/errors';
 import {
 	getTranslation,
 	getDefaultTranslation
@@ -12,6 +13,7 @@ import {
 	cGetUserLanguage,
 	cGetAuthToken
 } from '@/shared/cookies';
+import { submitErrorResponse } from '@/backend/errors';
 
 const noCacheResponse = (response: Response) => {
 
@@ -81,6 +83,24 @@ export const onRequest = defineMiddleware(async(
 
 	}
 
-	return next();
+	const response = await next();
+
+	void new Promise(() => {
+
+		if (
+			ErrorsConfig.enableResponseLogging
+			&& ErrorsConfig.responseLoggingStatusCodes.includes(response.status)
+		) {
+
+			submitErrorResponse(
+				context.url.href,
+				response.clone()
+			);
+
+		}
+
+	});
+
+	return response;
 
 });

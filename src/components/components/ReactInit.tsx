@@ -1,22 +1,11 @@
-import {
-	useEffect,
-	useLayoutEffect
-} from 'react';
+import { useLayoutEffect } from 'react';
 
 /**
- * Provides the window events 'react-hydrated' and 'react-hydrated-layout'.
+ * Provides the window event 'react-hydrated'.
  */
 export const ReactInit = () => {
 
 	useLayoutEffect(
-		() => {
-
-			window.dispatchEvent(new Event('react-hydrated-layout'));
-
-		},
-		[]
-	);
-	useEffect(
 		() => {
 
 			window.dispatchEvent(new Event('react-hydrated'));

@@ -161,6 +161,9 @@ export const ZError = z.object({
 	createdAt: z.string(),
 	buildNumber: z.coerce.number(),
 	isClient: z.coerce.boolean(),
+	url: z
+		.string()
+		.nonempty(),
 	status: ZStatusCode.nullish(),
 	statusText: z
 		.string()
@@ -180,6 +183,9 @@ export type TError = z.infer<typeof ZError>;
 export const ZErrorSubmission = z.object({
 	buildNumber: z.coerce.number(),
 	isClient: z.coerce.boolean(),
+	url: z
+		.string()
+		.nonempty(),
 	status: ZStatusCode.nullish(),
 	statusText: z
 		.string()

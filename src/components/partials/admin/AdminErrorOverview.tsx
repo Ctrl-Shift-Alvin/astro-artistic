@@ -106,6 +106,16 @@ export const AdminErrorOverview = ({ submissionId }: { submissionId: number | st
 					</p>
 				</div>
 
+				<div className={'col-span-full'}>
+					<h1 className={'font-bold'}>
+						{'URL'}
+					</h1>
+
+					<p>
+						{submission?.url}
+					</p>
+				</div>
+
 				<div>
 					<h1 className={'font-bold'}>
 						{'Build Number'}
