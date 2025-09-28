@@ -1,6 +1,8 @@
 // Npm run createPost {file_name} {title?}
 import {
-	existsSync, mkdirSync, writeFileSync
+	existsSync,
+	mkdirSync,
+	writeFileSync
 } from 'node:fs';
 import { join } from 'node:path';
 

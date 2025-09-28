@@ -5,7 +5,12 @@ const translation = Astro.locals.translation;
 
 ---
 
-<BaseLight>
+<BaseLight
+	head={{
+		title: translation.fourTwentyNine.title,
+		description: translation.fourTwentyNine.description
+	}}
+>
 	<h1 class="mt-15 w-10/12 text-center text-4xl font-bold">
 			{translation.fourTwentyNine.title}
 	</h1>

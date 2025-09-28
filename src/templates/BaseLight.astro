@@ -1,16 +1,22 @@
 ---
 import { GlobalTranslation } from '@/locales/global';
-
 import '@/styles/global.css';
 
+export type Props = {
+	head: {
+		title: string;
+		description: string;
+	}
+}
+const { head } = Astro.props;
 const translation = Astro.locals.translation;
 
 ---
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>{translation.fourTwentyNine.title}</title>
-	<meta name="description" content={translation.fourTwentyNine.description} />
+	<title>{head.title}</title>
+	<meta name="description" content={head.description} />
 	<meta name="author" content={GlobalTranslation.author} />
 	<meta name="theme-color" content="#000000" />
 
