@@ -10,10 +10,9 @@ import { type APIContext } from 'astro';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import {
 	ZApiResponse,
-	ZEventEntry,
 	ZProtectedGetApiResponse,
 	ZProtectedPostApiRequestMap,
-	TProtectedPostApiResponseMap
+	ZProtectedPostApiResponseMap
 } from '@/components/types';
 import { cGetAuthToken } from '@/shared/cookies';
 import {
@@ -24,7 +23,6 @@ import {
 } from '@/backend/database/contact';
 import {
 	events_createPage,
-	events_dbGet,
 	events_dbRun,
 	events_getAllEntries,
 	events_getEntry
@@ -123,7 +121,7 @@ export async function POST(context: APIContext) {
 
 	if (context.url.pathname !== '/api/protected/') {
 
-		const errorBody = ZProtectedGetApiResponse.parse({ error: 'not-found' });
+		const errorBody = ZApiResponse.parse({ error: 'not-found' });
 		return new Response(
 			JSON.stringify(errorBody),
 			{ status: 404 }
@@ -135,7 +133,7 @@ export async function POST(context: APIContext) {
 
 	if (!token) {
 
-		const errorBody = ZProtectedGetApiResponse.parse({ error: 'unauthorized' });
+		const errorBody = ZApiResponse.parse({ error: 'unauthorized' });
 		return new Response(
 			JSON.stringify(errorBody),
 			{ status: 401 }
@@ -153,7 +151,7 @@ export async function POST(context: APIContext) {
 
 	} catch {
 
-		const errorBody = ZProtectedGetApiResponse.parse({ error: 'bad-token' });
+		const errorBody = ZApiResponse.parse({ error: 'bad-token' });
 		return new Response(
 			JSON.stringify(errorBody),
 			{ status: 401 }
@@ -177,30 +175,39 @@ export async function POST(context: APIContext) {
 		.catch(() => undefined);
 
 	const requestType = getParam('type');
-	switch (requestType) {
+	if (!requestType || !(requestType in ZProtectedPostApiRequestMap)) {
 
-		case 'contact/index': {
+		const errorBody = ZApiResponse.parse({ error: 'bad-request-type' });
+		return new Response(
+			JSON.stringify(errorBody),
+			{ status: 400 }
+		);
 
-			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
-			if (!parsedBody.success) {
+	}
+	try {
 
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
-				);
+		switch (requestType) {
 
-			}
+			case 'contact/index': {
 
-			const data = parsedBody.data;
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
 
-			try {
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				const data = parsedBody.data;
 
 				const result = contact_getFewEntries(
 					data.count,
 					data.offset
 				);
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					data: result
 				});
@@ -210,23 +217,11 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
-
-		}
-		case 'contact/count': {
-
-			try {
+			case 'contact/count': {
 
 				const result = contact_countEntries();
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					count: result
 				});
@@ -236,44 +231,32 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
+			case 'contact/get': {
 
-		}
-		case 'contact/get': {
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
 
-			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
-			if (!parsedBody.success) {
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
 
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
-				);
-
-			}
-
-			try {
+				}
 
 				const requestDataId = parsedBody.data.id;
 				const result = contact_getEntry(requestDataId);
-				if (result == undefined) {
+				if (result === undefined) {
 
-					const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'resource-not-found' });
+					const responseBody = ZProtectedPostApiResponseMap[requestType].parse({ message: 'resource-not-found' });
 					return new Response(
 						JSON.stringify(responseBody),
 						{ status: 404 }
 					);
 
 				}
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					data: result
 				});
@@ -283,63 +266,39 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
+			case 'contact/delete': {
 
-		}
-		case 'contact/delete': {
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
 
-			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
-			if (!parsedBody.success) {
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
 
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
-				);
+				}
 
-			}
-
-			const requestDataId = parsedBody.data.id;
-			try {
-
+				const requestDataId = parsedBody.data.id;
 				contact_dbRun(
 					'DELETE FROM submissions WHERE id=?',
 					requestDataId
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
 				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
+					JSON.stringify(responseBody),
+					{ status: 200 }
 				);
 
 			}
 
-			const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
-			return new Response(
-				JSON.stringify(responseBody),
-				{ status: 200 }
-			);
-
-		}
-
-		case 'events/index': {
-
-			try {
+			case 'events/index': {
 
 				const entries = events_getAllEntries();
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					data: entries
 				});
@@ -348,33 +307,21 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
+			case 'events/add': {
 
-		}
-		case 'events/add': {
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
 
-			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
-			if (!parsedBody.success) {
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
 
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
-				);
+				}
 
-			}
-
-			const newEntry = parsedBody.data.data;
-			try {
-
+				const newEntry = parsedBody.data.data;
 				const { lastInsertRowid: id } = events_dbRun(
 					'INSERT INTO events (title, dateTime, location, enablePage) VALUES (?, ?, ?, ?)',
 					newEntry.title,
@@ -395,39 +342,27 @@ export async function POST(context: APIContext) {
 
 				}
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
 				return new Response(
 					JSON.stringify(responseBody),
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
+			case 'events/delete': {
 
-		}
-		case 'events/delete': {
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
 
-			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
-			if (!parsedBody.success) {
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
 
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
-				);
+				}
 
-			}
-
-			const { id } = parsedBody.data;
-			try {
-
+				const { id } = parsedBody.data;
 				events_dbRun(
 					'DELETE FROM events WHERE id=?',
 					id
@@ -443,44 +378,31 @@ export async function POST(context: APIContext) {
 
 				}
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
 				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
+					JSON.stringify(responseBody),
+					{ status: 200 }
 				);
 
 			}
+			case 'events/get': {
 
-			const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
-			return new Response(
-				JSON.stringify(responseBody),
-				{ status: 200 }
-			);
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
 
-		}
-		case 'events/get': {
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
 
-			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
-			if (!parsedBody.success) {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
-				);
-
-			}
-			const { id } = parsedBody.data;
-
-			try {
+				}
+				const { id } = parsedBody.data;
 
 				const entry = events_getEntry(id);
-
 				if (!entry) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].safeParse({ error: 'resource-not-found' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].safeParse({ error: 'resource-not-found' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 404 }
@@ -497,7 +419,7 @@ export async function POST(context: APIContext) {
 					);
 					if (!existsSync(filePath)) {
 
-						const errorBody = TProtectedPostApiResponseMap[requestType].safeParse({
+						const errorBody = ZProtectedPostApiResponseMap[requestType].safeParse({
 							message: 'content-not-found',
 							data: entry
 						});
@@ -513,7 +435,7 @@ export async function POST(context: APIContext) {
 						{ encoding: 'utf8' }
 					);
 
-					const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+					const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 						message: 'success',
 						data: entry,
 						file: fileContent
@@ -525,7 +447,7 @@ export async function POST(context: APIContext) {
 
 				}
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					data: entry
 				});
@@ -534,31 +456,19 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
+			case 'events/save': {
 
-		}
-		case 'events/save': {
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
 
-			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
-			if (!parsedBody.success) {
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
 
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
-				);
-
-			}
-
-			try {
+				}
 
 				const {
 					id, data: fileContent
@@ -570,7 +480,7 @@ export async function POST(context: APIContext) {
 				);
 				if (!existsSync(filePath)) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'resource-not-found' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'resource-not-found' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 404 }
@@ -582,51 +492,35 @@ export async function POST(context: APIContext) {
 					filePath,
 					fileContent
 				);
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
 				return new Response(
 					JSON.stringify(responseBody),
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
+			case 'events/edit': {
 
-		}
-		case 'events/edit': {
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
 
-			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
-			if (!parsedBody.success) {
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
 
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
-				);
+				}
 
-			}
+				const {
+					id,
+					data
+				} = parsedBody.data;
 
-			const {
-				id,
-				data
-			} = parsedBody.data;
+				const result = events_getEntry(id);
+				if (!result) {
 
-			try {
-
-				const result = events_dbGet(
-					'SELECT * FROM events WHERE id=?',
-					id
-				);
-				const parsedResult = ZEventEntry.safeParse(result);
-				if (!parsedResult.success) {
-
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 400 }
@@ -658,50 +552,38 @@ export async function POST(context: APIContext) {
 
 				}
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
 				return new Response(
 					JSON.stringify(responseBody),
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
 
-		}
+			case 'blog/index': {
 
-		case 'blog/index': {
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
 
-			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
-			if (!parsedBody.success) {
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
 
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
-				);
+				}
 
-			}
-
-			const {
-				count,
-				offset
-			} = parsedBody.data;
-
-			try {
+				const {
+					count,
+					offset
+				} = parsedBody.data;
 
 				const result = getSortedBlogsSliced(
 					offset ?? 0,
 					(offset ?? 0) + count
 				);
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					data: result
 				});
@@ -710,23 +592,11 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
-
-		}
-		case 'blog/count': {
-
-			try {
+			case 'blog/count': {
 
 				const result = blog_countEntries();
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					count: result
 				});
@@ -736,25 +606,13 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
-
-		}
-		case 'blog/get': {
-
-			try {
+			case 'blog/get': {
 
 				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
 				if (!parsedBody.success) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 400 }
@@ -770,7 +628,7 @@ export async function POST(context: APIContext) {
 				);
 				if (!existsSync(filePath)) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].safeParse({ error: 'not-found' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].safeParse({ error: 'not-found' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 404 }
@@ -783,7 +641,7 @@ export async function POST(context: APIContext) {
 					{ encoding: 'utf8' }
 				);
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					data: fileContent
 				});
@@ -792,180 +650,168 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(responseBody),
-					{ status: 500 }
-				);
-
 			}
+			case 'blog/save': {
 
-		}
-		case 'blog/save': {
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
 
-			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
-			if (!parsedBody.success) {
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
 
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
+				}
+
+				const {
+					fileName,
+					data: fileContent
+				} = parsedBody.data;
+
+				const filePath = path.join(
+					BlogConfig.pagesPath,
+					fileName
 				);
+				if (!existsSync(filePath)) {
 
-			}
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
 
-			const {
-				fileName,
-				data: fileContent
-			} = parsedBody.data;
+				}
 
-			const filePath = path.join(
-				BlogConfig.pagesPath,
-				fileName
-			);
-			if (!existsSync(filePath)) {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
+				writeFileSync(
+					filePath,
+					fileContent
 				);
-
-			}
-
-			writeFileSync(
-				filePath,
-				fileContent
-			);
-			const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
-			return new Response(
-				JSON.stringify(responseBody),
-				{ status: 200 }
-			);
-
-		}
-		case 'blog/new': {
-
-			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
-			if (!parsedBody.success) {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
-				);
-
-			}
-
-			const { fileName } = parsedBody.data;
-
-			const existingFiles = readdirSync(
-				BlogConfig.pagesPath,
-				{ withFileTypes: true }
-			);
-			const existing = existingFiles.map((e) => e.name);
-
-			if (existing.find((e) => e === fileName)) {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 409 }
-				);
-
-			}
-
-			const result = await blog_createPage(fileName);
-
-			if (result) {
-
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
 				return new Response(
 					JSON.stringify(responseBody),
 					{ status: 200 }
 				);
 
-			} else {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
-
-		}
-		case 'blog/remove': {
-
-			const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
-			if (!parsedBody.success) {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
-				);
-
-			}
-
-			const { fileName } = parsedBody.data;
-
-			const filePath = path.join(
-				BlogConfig.pagesPath,
-				fileName
-			);
-			if (!existsSync(filePath)) {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-filename' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
-				);
-
-			}
-
-			const files = readdirSync(
-				BlogConfig.pagesPath,
-				{
-					recursive: false,
-					withFileTypes: true
-				}
-			);
-
-			if (!files
-				.map((e) => e.name)
-				.find((e) => e === fileName)
-			) {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-filename' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 400 }
-				);
-
-			}
-
-			rmSync(filePath);
-
-			const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
-			return new Response(
-				JSON.stringify(responseBody),
-				{ status: 200 }
-			);
-
-		}
-
-		case 'builds/index': {
-
-			try {
+			case 'blog/new': {
 
 				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
 				if (!parsedBody.success) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				const { fileName } = parsedBody.data;
+
+				const existingFiles = readdirSync(
+					BlogConfig.pagesPath,
+					{ withFileTypes: true }
+				);
+				const existing = existingFiles.map((e) => e.name);
+
+				if (existing.find((e) => e === fileName)) {
+
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 409 }
+					);
+
+				}
+
+				const result = await blog_createPage(fileName);
+
+				if (result) {
+
+					const responseBody = ZProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
+					return new Response(
+						JSON.stringify(responseBody),
+						{ status: 200 }
+					);
+
+				} else {
+
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 500 }
+					);
+
+				}
+
+			}
+			case 'blog/remove': {
+
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
+
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				const { fileName } = parsedBody.data;
+
+				const filePath = path.join(
+					BlogConfig.pagesPath,
+					fileName
+				);
+				if (!existsSync(filePath)) {
+
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-filename' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				const files = readdirSync(
+					BlogConfig.pagesPath,
+					{
+						recursive: false,
+						withFileTypes: true
+					}
+				);
+
+				if (!files
+					.map((e) => e.name)
+					.find((e) => e === fileName)
+				) {
+
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-filename' });
+					return new Response(
+						JSON.stringify(errorBody),
+						{ status: 400 }
+					);
+
+				}
+
+				rmSync(filePath);
+
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
+				return new Response(
+					JSON.stringify(responseBody),
+					{ status: 200 }
+				);
+
+			}
+
+			case 'builds/index': {
+
+				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+				if (!parsedBody.success) {
+
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 400 }
@@ -978,7 +824,7 @@ export async function POST(context: APIContext) {
 					parsedBody.data.offset
 				);
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					data: result
 				});
@@ -987,62 +833,50 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
+			case 'builds/count': {
 
-		}
-		case 'builds/count': {
+				try {
 
-			try {
+					const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
+					if (!parsedBody.success) {
 
-				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
-				if (!parsedBody.success) {
+						const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+						return new Response(
+							JSON.stringify(errorBody),
+							{ status: 400 }
+						);
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					}
+
+					const result = errors_countBuilds();
+
+					const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
+						message: 'success',
+						count: result
+					});
+					return new Response(
+						JSON.stringify(responseBody),
+						{ status: 200 }
+					);
+
+				} catch {
+
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
 					return new Response(
 						JSON.stringify(errorBody),
-						{ status: 400 }
+						{ status: 500 }
 					);
 
 				}
 
-				const result = errors_countBuilds();
-
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
-					message: 'success',
-					count: result
-				});
-				return new Response(
-					JSON.stringify(responseBody),
-					{ status: 200 }
-				);
-
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
-
-		}
-		case 'builds/get': {
-
-			try {
+			case 'builds/get': {
 
 				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
 				if (!parsedBody.success) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 400 }
@@ -1054,7 +888,7 @@ export async function POST(context: APIContext) {
 
 				if (result == undefined) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'resource-not-found' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'resource-not-found' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 404 }
@@ -1062,7 +896,7 @@ export async function POST(context: APIContext) {
 
 				}
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					data: result
 				});
@@ -1071,25 +905,13 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
-
-		}
-		case 'builds/delete': {
-
-			try {
+			case 'builds/delete': {
 
 				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
 				if (!parsedBody.success) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 400 }
@@ -1099,32 +921,20 @@ export async function POST(context: APIContext) {
 
 				errors_deleteBuild(parsedBody.data.buildNumber);
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
 				return new Response(
 					JSON.stringify(responseBody),
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
 
-		}
-
-		case 'errors/index': {
-
-			try {
+			case 'errors/index': {
 
 				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
 				if (!parsedBody.success) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 400 }
@@ -1137,7 +947,7 @@ export async function POST(context: APIContext) {
 					parsedBody.data.offset
 				);
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					data: result
 				});
@@ -1146,25 +956,13 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
-
-		}
-		case 'errors/count': {
-
-			try {
+			case 'errors/count': {
 
 				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
 				if (!parsedBody.success) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 400 }
@@ -1174,7 +972,7 @@ export async function POST(context: APIContext) {
 
 				const result = errors_countErrors();
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					count: result
 				});
@@ -1183,25 +981,13 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
-
-		}
-		case 'errors/indexBuild': {
-
-			try {
+			case 'errors/indexBuild': {
 
 				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
 				if (!parsedBody.success) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 400 }
@@ -1215,7 +1001,7 @@ export async function POST(context: APIContext) {
 					parsedBody.data.offset
 				);
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					data: result
 				});
@@ -1224,25 +1010,13 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
-
-		}
-		case 'errors/countBuild': {
-
-			try {
+			case 'errors/countBuild': {
 
 				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
 				if (!parsedBody.success) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 400 }
@@ -1252,7 +1026,7 @@ export async function POST(context: APIContext) {
 
 				const result = errors_countErrorsByBuild(parsedBody.data.buildNumber);
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					count: result
 				});
@@ -1261,25 +1035,13 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
-
-		}
-		case 'errors/get': {
-
-			try {
+			case 'errors/get': {
 
 				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
 				if (!parsedBody.success) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 400 }
@@ -1288,10 +1050,9 @@ export async function POST(context: APIContext) {
 				}
 
 				const result = errors_getError(parsedBody.data.id);
-
 				if (result == undefined) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'resource-not-found' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'resource-not-found' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 404 }
@@ -1299,7 +1060,7 @@ export async function POST(context: APIContext) {
 
 				}
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({
 					message: 'success',
 					data: result
 				});
@@ -1308,25 +1069,13 @@ export async function POST(context: APIContext) {
 					{ status: 200 }
 				);
 
-			} catch {
-
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
-				return new Response(
-					JSON.stringify(errorBody),
-					{ status: 500 }
-				);
-
 			}
-
-		}
-		case 'errors/delete': {
-
-			try {
+			case 'errors/delete': {
 
 				const parsedBody = ZProtectedPostApiRequestMap[requestType].safeParse(body);
 				if (!parsedBody.success) {
 
-					const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
+					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-request' });
 					return new Response(
 						JSON.stringify(errorBody),
 						{ status: 400 }
@@ -1337,33 +1086,36 @@ export async function POST(context: APIContext) {
 				errors_deleteError(parsedBody.data.id);
 				console.log('Deleted');
 
-				const responseBody = TProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
+				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
 				return new Response(
 					JSON.stringify(responseBody),
 					{ status: 200 }
 				);
 
-			} catch {
+			}
 
-				const errorBody = TProtectedPostApiResponseMap[requestType].parse({ error: 'server-error' });
+			default: {
+
+				const errorBody = ZApiResponse.parse({ error: 'bad-request-type' });
 				return new Response(
 					JSON.stringify(errorBody),
-					{ status: 500 }
+					{ status: 400 }
 				);
 
 			}
 
 		}
 
-		default: {
+	} catch {
 
-			const errorBody = ZApiResponse.parse({ error: 'bad-request-type' });
-			return new Response(
-				JSON.stringify(errorBody),
-				{ status: 400 }
-			);
+		const errorBody = ZProtectedPostApiResponseMap[
+			requestType as keyof typeof ZProtectedPostApiResponseMap
+		].parse({ error: 'server-error' });
 
-		}
+		return new Response(
+			JSON.stringify(errorBody),
+			{ status: 500 }
+		);
 
 	}
 

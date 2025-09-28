@@ -13,7 +13,7 @@ import {
 	ZAuthPostApiRequest,
 	ZProtectedGetApiResponse,
 	ZProtectedPostApiRequestMap,
-	TProtectedPostApiResponseMap,
+	ZProtectedPostApiResponseMap,
 	type TBuild,
 	type TContactFormEntry,
 	type TError,
@@ -317,7 +317,7 @@ export const fetchBlogIndex = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['blog/index'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['blog/index'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -346,7 +346,7 @@ export const fetchBlogCount = async(): Promise<number | null> => {
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['blog/count'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['blog/count'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -378,7 +378,7 @@ export const fetchBlogFile = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['blog/get'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['blog/get'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		void Monolog
@@ -421,7 +421,7 @@ export const saveBlogFile = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['blog/save'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['blog/save'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -454,7 +454,7 @@ export const newBlogFile = async(fileName: string): Promise<boolean> => {
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['blog/new'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['blog/new'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		if (response.status == 409) {
@@ -510,7 +510,7 @@ export const removeBlogFile = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['blog/remove'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['blog/remove'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -559,7 +559,7 @@ export const fetchContactEntryIndex = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['contact/index'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['contact/index'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -588,7 +588,7 @@ export const fetchContactEntryCount = async(): Promise<number | null> => {
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['contact/count'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['contact/count'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -620,7 +620,7 @@ export const fetchContactEntry = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['contact/get'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['contact/get'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		void Monolog
@@ -671,7 +671,7 @@ export const deleteContactEntry = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['contact/delete'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['contact/delete'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -709,7 +709,7 @@ export const fetchEventIndex = async(): Promise<TEventEntry[] | null> => {
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['events/index'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['events/index'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -745,7 +745,7 @@ export const fetchEvent = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['events/get'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['events/get'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		void Monolog
@@ -784,7 +784,7 @@ export const addEvent = async(newEntry: TNewEventEntry): Promise<boolean> => {
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['events/add'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['events/add'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -831,7 +831,7 @@ export const deleteEvent = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['events/delete'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['events/delete'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -874,7 +874,7 @@ export const editEvent = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['events/edit'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['events/edit'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -913,7 +913,7 @@ export const saveEvent = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['events/save'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['events/save'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -957,7 +957,7 @@ export const fetchBuildIndex = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['builds/index'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['builds/index'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -993,7 +993,7 @@ export const fetchBuild = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['builds/get'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['builds/get'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		void Monolog
@@ -1024,7 +1024,7 @@ export const fetchBuildCount = async(): Promise<number | null> => {
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['builds/count'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['builds/count'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -1064,7 +1064,7 @@ export const deleteBuild = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['builds/delete'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['builds/delete'].safeParseAsync(await response.json());
 	if (!parsedResponse.success) {
 
 		Monolog.show({
@@ -1108,7 +1108,7 @@ export const fetchErrorIndex = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['errors/index'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['errors/index'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -1136,7 +1136,7 @@ export const fetchErrorCount = async(): Promise<number | null> => {
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['errors/count'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['errors/count'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -1173,7 +1173,7 @@ export const fetchErrorIndexByBuild = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['errors/indexBuild'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['errors/indexBuild'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -1206,7 +1206,7 @@ export const fetchErrorCountByBuild = async(buildNumber: number | string): Promi
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['errors/countBuild'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['errors/countBuild'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({
@@ -1238,7 +1238,7 @@ export const fetchError = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['errors/get'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['errors/get'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		void Monolog
@@ -1285,7 +1285,7 @@ export const deleteError = async(
 		}
 	);
 
-	const parsedResponse = await TProtectedPostApiResponseMap['errors/delete'].safeParseAsync(await response.json());
+	const parsedResponse = await ZProtectedPostApiResponseMap['errors/delete'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
 		Monolog.show({

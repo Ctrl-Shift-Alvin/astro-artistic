@@ -331,7 +331,7 @@ export const ZProtectedPostApiRequestMap = {
 	'errors/delete': z.object({ id: z.coerce.number() })
 } as const;
 
-export const TProtectedPostApiResponseMap = {
+export const ZProtectedPostApiResponseMap = {
 	'contact/index': z.union([
 		ZApiResponseSuccess.extend({ data: ZContactFormEntry.array() }),
 		ZApiResponseError
