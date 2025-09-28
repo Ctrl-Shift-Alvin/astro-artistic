@@ -199,13 +199,13 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 					{
 						errorsIndex.map((entry) => {
 
-							const isErrorExapanded = expandedRows[entry.buildNumber] ?? false;
+							const isErrorExapanded = expandedRows[entry.id] ?? false;
 
 							const toggleIsErrorExpanded = () => {
 
 								setExpandedRows((previous) => ({
 									...previous,
-									[entry.buildNumber]: !isErrorExapanded
+									[entry.id]: !isErrorExapanded
 								}));
 
 							};
