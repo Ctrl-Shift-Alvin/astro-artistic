@@ -12,6 +12,10 @@ import {
 import { A } from '@/components/elements/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 
+/**
+ * An overview of a single build including its corresponding errors,
+ * and a way to access all of them, that works through the protected admin API.
+ */
 export const AdminBuildOverview = ({ buildNumber }: { buildNumber: number | string }) => {
 
 	const [

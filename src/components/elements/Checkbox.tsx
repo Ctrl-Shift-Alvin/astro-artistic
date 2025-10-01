@@ -4,6 +4,9 @@ import {
 	type InputHTMLAttributes
 } from 'react';
 
+/**
+ * A styled `<select>` element of type 'checkbox'.
+ */
 export const Checkbox = (props: InputHTMLAttributes<HTMLInputElement>) => {
 
 	const processedprops = useMemo(

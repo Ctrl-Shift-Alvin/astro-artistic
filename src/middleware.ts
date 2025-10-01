@@ -4,7 +4,7 @@ import {
 	type JwtPayload
 } from 'jsonwebtoken';
 import { isAdminSetup } from './backend/admin';
-import { ErrorsConfig } from './shared/config/errors';
+import { ErrorsConfig } from './backend/config/errors';
 import {
 	getTranslation,
 	getDefaultTranslation

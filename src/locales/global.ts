@@ -5,6 +5,9 @@ export const GlobalTranslation = {
 	author: 'Maxwell Max Maxunwell'
 };
 
+/**
+ * The translation type for one language.
+ */
 export const ZTranslation = z.object({
 	meta: z.object({
 		title: z.string(),
@@ -139,4 +142,8 @@ export const ZTranslation = z.object({
 		homeButton: z.string()
 	})
 });
-export type ITranslation = z.infer<typeof ZTranslation>;
+
+/**
+ * The translation type for one language.
+ */
+export type TTranslation = z.infer<typeof ZTranslation>;

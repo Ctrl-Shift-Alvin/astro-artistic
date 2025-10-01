@@ -4,13 +4,21 @@ import {
 } from '@/components/types';
 import { ErrorsConfig } from '@/shared/config/errors';
 
+/**
+ * Submit an error to the errors API.
+ *
+ * @param error The new error to submit.
+ */
 async function submitError(error: TErrorSubmission) {
 
 	const parsedRequest = ZErrorApiRequest.safeParse({ data: error });
 
 	if (!parsedRequest.success) {
 
-		console.error('Failed to submit error to API!');
+		console.error(
+			'Error submitting error to API:',
+			parsedRequest.error
+		);
 		return;
 
 	}
@@ -44,6 +52,10 @@ async function submitError(error: TErrorSubmission) {
 
 }
 
+/**
+ * Setup an error handler for JS that submits errors to the error API using `submitError()`
+ * when an error or unhandled promise rejection occurs.
+ */
 export function setupJsErrorHandler() {
 
 	if (!ErrorsConfig.enableJsLogging) {

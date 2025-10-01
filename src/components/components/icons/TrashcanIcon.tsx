@@ -2,6 +2,9 @@ import {
 	A, type IAProps
 } from '@/components/elements/A';
 
+/**
+ * A trashcan icon surrounded by an A component, to which props are passed.
+ */
 export const TrashcanIcon = (props: IAProps) => {
 
 	return (

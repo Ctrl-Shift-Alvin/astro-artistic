@@ -1,2 +1,2 @@
-TODO Add useful comments throughout project
 TODO Add server maintenance feature/page
+TODO Add undefined zod types for empty API requests, for better type safety (no body where it shouldn't be).

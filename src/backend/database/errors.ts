@@ -23,15 +23,24 @@ const db = new Database(ErrorsConfig.dbPath);
 const CURRENT_VERSION = 0;
 const updateQueries: string[][] = []; // updateQueries[0] updates to 1, updateQueries[1] updates to 2, etc.
 
-// Returns true if the database was just created
+/**
+ * Create the database if it doesn't exist, and initialize it.
+ *
+ * When changing the structure make sure to update the version by 1,
+ * and add a new update query that yields the same exact structure
+ * as a now newly created DB. **There should be no difference between an *updated* and *new* DB!**
+ * @returns `true` if the database was just created. Otherwise `false`.
+ */
 const errors_createDbIfNotExists = (): boolean => {
 
+	// If file exists AND is not empty, do not proceed
 	if (fs.existsSync(ErrorsConfig.dbPath) && fs.statSync(ErrorsConfig.dbPath).size > 1) {
 
 		return false;
 
 	}
 
+	// Create directory if it doesn't exist
 	const dir = path.dirname(ErrorsConfig.dbPath);
 	if (!fs.existsSync(dir)) {
 
@@ -70,19 +79,12 @@ const errors_createDbIfNotExists = (): boolean => {
 				+ 'CREATE INDEX idx_errors_buildNumber ON errors(buildNumber);' // Index by buildNumber
 				+ 'CREATE INDEX idx_errors_createdAt ON errors(createdAt);'; // Index by createdAt
 
-		const dbVersionQuery = 'user_version = 0;';
-
+		const dbVersionQuery = `user_version = ${CURRENT_VERSION};`;
 		db.pragma('foreign_keys = 1');
 		db
 			.exec(dbSetupQuery)
 			.pragma(dbVersionQuery);
 
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		if (CURRENT_VERSION > 0) {
-
-			errors_updateDb();
-
-		}
 		return true;
 
 	} catch(err: any) {
@@ -95,6 +97,15 @@ const errors_createDbIfNotExists = (): boolean => {
 	}
 
 };
+
+/**
+ * Applies the update operations from `updateQueries` sequentially, based on the DB's version
+ * compared to `CURRENT_VERSION`.
+ *
+ * E.g. updating from version 5 to latest version 10 applies `updateQueries[5-9][...]` sequentially.
+ * @returns `true` if any update operations were applied successfully. Otherwise `false`.
+ * @throws if any update operations should be applied but fail. The transaction is reversed and the DB is unchanged.
+ */
 const errors_updateDb = () => {
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -103,7 +114,7 @@ const errors_updateDb = () => {
 
 	if (startDbVersion == CURRENT_VERSION) {
 
-		return;
+		return false;
 
 	}
 
@@ -142,6 +153,12 @@ const errors_updateDb = () => {
 
 };
 
+/**
+ * Run a query on the errors/builds database with params and return its result.
+ * @param query The query to run.
+ * @param params The params to provide to the query.
+ * @returns The result of the operation.
+ */
 export const errors_dbRun = (
 	query: string,
 	...params: unknown[]
@@ -171,6 +188,13 @@ export const errors_dbRun = (
 	}
 
 };
+
+/**
+ * Run a query on the builds database with params, then parse and validate its *first* result.
+ * @param query The query to run.
+ * @param params The params to provide to the query.
+ * @returns The parsed and validated `TBuild` object. Otherwise, `undefined`.
+ */
 export const errors_dbGetBuild = (
 	query: string,
 	...params: unknown[]
@@ -204,6 +228,13 @@ export const errors_dbGetBuild = (
 	}
 
 };
+
+/**
+ * Run a query on the builds database with params, then parse and validate all results.
+ * @param query The query to run.
+ * @param params The params to provide to the query.
+ * @returns The parsed and validated `TBuild` array. Otherwise, an empty array.
+ */
 export const errors_dbAllBuild = (
 	query: string,
 	...params: unknown[]
@@ -237,6 +268,13 @@ export const errors_dbAllBuild = (
 	}
 
 };
+
+/**
+ * Run a query on the errors database with params, then parse and validate its *first* result.
+ * @param query The query to run.
+ * @param params The params to provide to the query.
+ * @returns The parsed and validated `TError` object. Otherwise, `undefined`.
+ */
 export const errors_dbGetError = (
 	query: string,
 	...params: unknown[]
@@ -270,6 +308,13 @@ export const errors_dbGetError = (
 	}
 
 };
+
+/**
+ * Run a query on the errors database with params, then parse and validate all results.
+ * @param query The query to run.
+ * @param params The params to provide to the query.
+ * @returns The parsed and validated `TError` array. Otherwise, an empty array.
+ */
 export const errors_dbAllError = (
 	query: string,
 	...params: unknown[]
@@ -304,6 +349,11 @@ export const errors_dbAllError = (
 
 };
 
+/**
+ * Add a new entry to the builds database.
+ *
+ * @returns The result of the DB operation.
+ */
 export const errors_addBuild = (build: {
 	createdAt: string;
 	gitBranch: string;
@@ -333,6 +383,12 @@ export const errors_addBuild = (build: {
 	}
 
 };
+
+/**
+ * Get an entry by its ID from the builds database.
+ *
+ * @returns The first parsed and validated entry that was found. Otherwise, `undefined`.
+ */
 export const errors_getBuild = (buildNumber: number): TBuild | undefined => {
 
 	try {
@@ -352,6 +408,14 @@ export const errors_getBuild = (buildNumber: number): TBuild | undefined => {
 	}
 
 };
+
+/**
+ * Returns the latest entry from the builds database.
+ *
+ * Uses the `createdAt` field to order the entries in descending order, and returns the first result.
+ *
+ * @returns The latest (current) build from the builds database.
+ */
 export const errors_getCurrentBuild = (): TBuild | undefined => {
 
 	try {
@@ -368,6 +432,14 @@ export const errors_getCurrentBuild = (): TBuild | undefined => {
 	}
 
 };
+
+/**
+ * Get all entries from the builds database.
+ *
+ * **WARNING: Can be *very* slow, this gets *ALL* entries in the database and loads them into RAM.**
+ *
+ * @returns All entries found in the database. Otherwise, an empty array.
+ */
 export const errors_getAllBuilds = (): TBuild[] => {
 
 	try {
@@ -384,6 +456,15 @@ export const errors_getAllBuilds = (): TBuild[] => {
 	}
 
 };
+
+/**
+ * Get a certain number of entries, by an optional offset, from the builds database.
+ *
+ * @param count The number of entries that should be retrieved.
+ * @param offset The offset at which to start counting the entries.
+ * @returns An array of length between `0` and `count`, depending on the available entries and `count`.
+ * 	Otherwise, an empty array.
+ */
 export const errors_getFewBuilds = (
 	count: number,
 	offset: number = 0
@@ -408,6 +489,12 @@ export const errors_getFewBuilds = (
 	}
 
 };
+
+/**
+ * Delete an entry by an ID from the builds database. Also deletes all errors that belong to this build!
+ *
+ * @returns The result of the DB operation.
+ */
 export const errors_deleteBuild = (buildNumber: number) => {
 
 	try {
@@ -427,6 +514,10 @@ export const errors_deleteBuild = (buildNumber: number) => {
 	}
 
 };
+
+/**
+ * Get the number of entries in the builds database.
+ */
 export const errors_countBuilds = (): number => {
 
 	try {
@@ -456,6 +547,11 @@ export const errors_countBuilds = (): number => {
 
 };
 
+/**
+ * Add a new entry to the errors database.
+ *
+ * @returns The result of the DB operation.
+ */
 export const errors_addErrorSubmission = (submission: TErrorSubmission) => {
 
 	try {
@@ -485,6 +581,16 @@ export const errors_addErrorSubmission = (submission: TErrorSubmission) => {
 	}
 
 };
+
+/**
+ * Check if an existing entry with equivalent parameters is found in the contact submissions database.
+ *
+ * The check works against the following values: `url`, `isClient`, `status`, `statusText`, `errorMessage`,
+ * `errorCause`, `errorStack` and `createdAt` (positive within 24 hours).
+ *
+ * @param submission The object to check against.
+ * @returns `true` if an existing entry is found. Otherwise, `false`.
+ */
 export const errors_isDuplicateError = (submission: TErrorSubmission): boolean => {
 
 	try {
@@ -525,6 +631,12 @@ export const errors_isDuplicateError = (submission: TErrorSubmission): boolean =
 	}
 
 };
+
+/**
+ * Get an entry by its ID from the errors database.
+ *
+ * @returns The first parsed and validated entry that was found. Otherwise, `undefined`.
+ */
 export const errors_getError = (id: number): TError | undefined => {
 
 	try {
@@ -544,6 +656,14 @@ export const errors_getError = (id: number): TError | undefined => {
 	}
 
 };
+
+/**
+ * Get all entries from the errors database.
+ *
+ * **WARNING: Can be *very* slow, this gets *ALL* entries in the database and loads them into RAM.**
+ *
+ * @returns All entries found in the database. Otherwise, an empty array.
+ */
 export const errors_getAllErrors = (): TError[] => {
 
 	try {
@@ -560,6 +680,15 @@ export const errors_getAllErrors = (): TError[] => {
 	}
 
 };
+
+/**
+ * Get a certain number of entries, by an optional offset, from the errors database.
+ *
+ * @param count The number of entries that should be retrieved.
+ * @param offset The offset at which to start counting the entries.
+ * @returns An array of length between `0` and `count`, depending on the available entries and `count`.
+ * 	Otherwise, an empty array.
+ */
 export const errors_getFewErrors = (
 	count: number,
 	offset: number = 0
@@ -585,6 +714,16 @@ export const errors_getFewErrors = (
 	}
 
 };
+
+/**
+ * Get a certain number of entries, by an optional offset, from the errors database, that belong to a build number.
+ *
+ * @param buildNumber The build number from the builds database used to retrieve the errors.
+ * @param count The number of entries that should be retrieved.
+ * @param offset The offset at which to start counting the entries.
+ * @returns An array of length between `0` and `count`, depending on the available entries and `count`.
+ * 	Otherwise, an empty array.
+ */
 export const errors_getFewErrorsByBuild = (
 	buildNumber: number,
 	count: number,
@@ -612,6 +751,12 @@ export const errors_getFewErrorsByBuild = (
 	}
 
 };
+
+/**
+ * Delete an entry by an ID from the errors database.
+ *
+ * @returns The result of the DB operation.
+ */
 export const errors_deleteError = (id: number) => {
 
 	try {
@@ -631,6 +776,10 @@ export const errors_deleteError = (id: number) => {
 	}
 
 };
+
+/**
+ * Get the number of entries in the errors database.
+ */
 export const errors_countErrors = (): number => {
 
 	try {
@@ -659,6 +808,12 @@ export const errors_countErrors = (): number => {
 	}
 
 };
+
+/**
+ * Get the number of entries, that belong to a build numbers, from the errors database.
+ *
+ * @param buildNumber The build number from the builds database used to retrieve the error count.
+ */
 export const errors_countErrorsByBuild = (buildNumber: number): number => {
 
 	try {

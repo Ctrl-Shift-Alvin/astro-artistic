@@ -78,6 +78,10 @@ function parseArgs() {
 
 }
 
+/**
+ * Generates a random 32-byte JWT key, and converts it to a Base-64 string.
+ * @returns A Base-64 string that represents the new 32-byte JWT key.
+ */
 function generateJwtKey() {
 
 	// 32 bytes = 256 bits, cryptographically strong
@@ -107,6 +111,7 @@ async function createEnvContent(
 
 async function main() {
 
+	// If .env already exists, don't override it
 	if (existsSync('.env')) {
 
 		console.error('.env file already exists. Aborting.');

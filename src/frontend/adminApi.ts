@@ -26,11 +26,22 @@ import {
 	lsSetAuthTokenExpiry
 } from '@/frontend/localStorage';
 
+/**
+ * Get the URL query with a single value `prevUrl` set to the current location pathname.
+ *
+ * Also includes the current URL query to the pathname.
+ *
+ * @returns The encoded URL query including the '?'.
+ */
 export const getPrevUrlQuery = () => {
 
 	return `?prevUrl=${encodeURIComponent(location.pathname + location.search)}`;
 
 };
+
+/**
+ * Read and decode the URL query value `prevUrl` and navigate. If the value is not defined, navigate to `/admin/home/`.
+ */
 export const gotoPrevOrHome = () => {
 
 	const prevUrl = new URLSearchParams(location.search).get('prevUrl');
@@ -41,6 +52,14 @@ export const gotoPrevOrHome = () => {
 // #region Auth API
 
 let currentTimeout: NodeJS.Timeout;
+
+/**
+ * Check if the client is authenticated to the protected admin API.
+ *
+ * Uses the protected admin API.
+ *
+ * @returns `true` if the client is authenticated to the protected admin API. Otherwise, `false`.
+ */
 export const checkLogin = (): boolean => {
 
 	const tokenExpiry = lsGetAuthTokenExpiry();
@@ -50,6 +69,14 @@ export const checkLogin = (): boolean => {
 
 };
 
+/**
+ * Try to authenticate to the protected admin API using a password.
+ *
+ * Uses the auth admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param password The password to use for authentication.
+ * @returns A promise that resolves to `true` if the authentication was successful, or `false` if it wasn't.
+ */
 export const login = async(password: string): Promise<boolean> => {
 
 	const authRequestBody = ZAuthPostApiRequest.parse({ password });
@@ -115,6 +142,13 @@ export const login = async(password: string): Promise<boolean> => {
 
 };
 
+/**
+ * Logout from the protected admin API.
+ *
+ * Uses the auth admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param timeout Should the `prevUrl` query value be provided for the redirect URL? (default `false`)
+ */
 export const logout = async(timeout: boolean = false) => {
 
 	const response = await fetch(
@@ -253,6 +287,11 @@ export const logout = async(timeout: boolean = false) => {
 
 };
 
+/**
+ * Set a timeout that logs the client out from the protected admin API just before its token expires.
+ *
+ * @param callback An optional callback that is called if and after the logout occured.
+ */
 export const setLogoutTimeout = (callback?: ()=> void) => {
 
 	const tokenExpiry = lsGetAuthTokenExpiry();
@@ -294,6 +333,14 @@ export const setLogoutTimeout = (callback?: ()=> void) => {
 
 // #region Blog
 
+/**
+ * Fetch the blog post file index.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param count The maximum entry length.
+ * @param offset Optionally offset the returned results by a number.
+ */
 export const fetchBlogIndex = async(
 	count: number | string,
 	offset?: number | string
@@ -335,6 +382,13 @@ export const fetchBlogIndex = async(
 	return parsedResponse.data.data;
 
 };
+
+/**
+ * Fetch the blog post file count.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ */
 export const fetchBlogCount = async(): Promise<number | null> => {
 
 	const response = await fetch(
@@ -359,6 +413,14 @@ export const fetchBlogCount = async(): Promise<number | null> => {
 	return parsedResponse.data.count;
 
 };
+
+/**
+ * Fetch a blog file by its file name.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param gotoPrevUrl `true` to call `gotoPrevOrHome()` after the action. (Default `false`)
+ */
 export const fetchBlogFile = async(
 	fileName: string,
 	gotoPrevUrl: boolean = false
@@ -399,6 +461,15 @@ export const fetchBlogFile = async(
 	return parsedResponse.data.data;
 
 };
+
+/**
+ * Save a blog file with a new file content.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param fileName The file name to save to.
+ * @param fileContent The file content to save.
+ */
 export const saveBlogFile = async(
 	fileName: string,
 	fileContent: string
@@ -438,6 +509,14 @@ export const saveBlogFile = async(
 	return true;
 
 };
+
+/**
+ * Create a new blog file with a file name.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param fileName
+ */
 export const newBlogFile = async(fileName: string): Promise<boolean> => {
 
 	const requestBody = ZProtectedPostApiRequestMap['blog/new'].safeParse({ fileName });
@@ -483,6 +562,16 @@ export const newBlogFile = async(fileName: string): Promise<boolean> => {
 	return true;
 
 };
+
+/**
+ * Delete a blog file using its name.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param fileName
+ * @param gotoPrevUrl
+ * @returns
+ */
 export const removeBlogFile = async(
 	fileName: string,
 	gotoPrevUrl: boolean = false
@@ -537,6 +626,14 @@ export const removeBlogFile = async(
 
 // #region Contact
 
+/**
+ * Fetch the contact form submission entry index.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param count The maximum entry count to fetch.
+ * @param offset The number by which to offset the entries.
+ */
 export const fetchContactEntryIndex = async(
 	count: number | string,
 	offset?: number | string
@@ -577,6 +674,13 @@ export const fetchContactEntryIndex = async(
 	return parsedResponse.data.data;
 
 };
+
+/**
+ * Fetch the contact form submission entry count.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ */
 export const fetchContactEntryCount = async(): Promise<number | null> => {
 
 	const response = await fetch(
@@ -601,6 +705,14 @@ export const fetchContactEntryCount = async(): Promise<number | null> => {
 	return parsedResponse.data.count;
 
 };
+
+/**
+ * Fetches a contact form submission entry by its ID.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param gotoPrevUrl `true` to call `gotoPrevOrHome()` after the action. (Default `false`)
+ */
 export const fetchContactEntry = async(
 	id: string | number,
 	gotoPrevUrl: boolean = false
@@ -641,6 +753,15 @@ export const fetchContactEntry = async(
 	return parsedResponse.data.data;
 
 };
+
+/**
+ * Deletes a contact form submission entry using its ID.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param id The ID of the entry to be deleted.
+ * @param gotoPrevUrl `true` to call `gotoPrevOrHome()` after the action. (Default `false`)
+ */
 export const deleteContactEntry = async(
 	id: string | number,
 	gotoPrevUrl: boolean = false
@@ -698,6 +819,12 @@ export const deleteContactEntry = async(
 
 // #region Events
 
+/**
+ * Fetch the event entry index.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ */
 export const fetchEventIndex = async(): Promise<TEventEntry[] | null> => {
 
 	const response = await fetch(
@@ -723,6 +850,15 @@ export const fetchEventIndex = async(): Promise<TEventEntry[] | null> => {
 	return parsedResponse.data.data;
 
 };
+
+/**
+ *
+ * Fetch an event entry by its ID.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param gotoPrevUrl `true` to call `gotoPrevOrHome()` after the action. (Default `false`)
+ */
 export const fetchEvent = async(
 	id: string | number,
 	gotoPrevUrl: boolean = false
@@ -768,6 +904,12 @@ export const fetchEvent = async(
 	};
 
 };
+
+/**
+ * Add a new event entry.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ */
 export const addEvent = async(newEntry: TNewEventEntry): Promise<boolean> => {
 
 	const requestBody = ZProtectedPostApiRequestMap['events/add'].safeParse({ data: newEntry });
@@ -804,6 +946,12 @@ export const addEvent = async(newEntry: TNewEventEntry): Promise<boolean> => {
 	return true;
 
 };
+
+/**
+ * Add an event entry by its ID.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ */
 export const deleteEvent = async(
 	id: string | number,
 	gotoPrevUrl: boolean = false
@@ -852,6 +1000,12 @@ export const deleteEvent = async(
 	return true;
 
 };
+
+/**
+ * Edit an event entry by its ID.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ */
 export const editEvent = async(
 	id: string | number,
 	newEntry: TNewEventEntry
@@ -891,6 +1045,16 @@ export const editEvent = async(
 	return true;
 
 };
+
+/**
+ *
+ * Save the page of an event entry using its ID.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param id The ID of the event entry.
+ * @param content The content of the event entry page.
+ */
 export const saveEvent = async(
 	id: string | number,
 	content: string
@@ -935,6 +1099,14 @@ export const saveEvent = async(
 
 // #region Errors & Builds
 
+/**
+ * Fetch the build index.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param count The maximum entry count to fetch.
+ * @param offset The number by which to offset the entries.
+ */
 export const fetchBuildIndex = async(
 	count: number | string,
 	offset?: number | string
@@ -974,6 +1146,13 @@ export const fetchBuildIndex = async(
 	return parsedResponse.data.data;
 
 };
+
+/**
+ * Fetch a build by its ID.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ */
 export const fetchBuild = async(
 	buildNumber: number | string,
 	gotoPrevUrl: boolean = false
@@ -1013,6 +1192,13 @@ export const fetchBuild = async(
 	return parsedResponse.data.data;
 
 };
+
+/**
+ * Fetch the build count.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ */
 export const fetchBuildCount = async(): Promise<number | null> => {
 
 	const response = await fetch(
@@ -1037,6 +1223,13 @@ export const fetchBuildCount = async(): Promise<number | null> => {
 	return parsedResponse.data.count;
 
 };
+
+/**
+ * Delete a build by its ID and its corresponding errors.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ */
 export const deleteBuild = async(
 	buildNumber: number | string,
 	gotoPrevUrl: boolean = false
@@ -1086,6 +1279,14 @@ export const deleteBuild = async(
 
 };
 
+/**
+ * Fetch the error index.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param count The maximum entry count to fetch.
+ * @param offset The number by which to offset the entries.
+ */
 export const fetchErrorIndex = async(
 	count: number | string,
 	offset?: number | string
@@ -1125,6 +1326,13 @@ export const fetchErrorIndex = async(
 	return parsedResponse.data.data;
 
 };
+
+/**
+ * Fetch the error count.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ */
 export const fetchErrorCount = async(): Promise<number | null> => {
 
 	const response = await fetch(
@@ -1149,6 +1357,16 @@ export const fetchErrorCount = async(): Promise<number | null> => {
 	return parsedResponse.data.count;
 
 };
+
+/**
+ * Fetch the error index corresponding to a build by the build's ID.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param buildNumber The errors' corresponding build number.
+ * @param count The maximum entry count to fetch.
+ * @param offset The number by which to offset the entries.
+ */
 export const fetchErrorIndexByBuild = async(
 	buildNumber: number | string,
 	count: number | string,
@@ -1190,6 +1408,14 @@ export const fetchErrorIndexByBuild = async(
 	return parsedResponse.data.data;
 
 };
+
+/**
+ * Fetch the error count corresponding to a build by the build's ID.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param buildNumber The errors' corresponding build number.
+ */
 export const fetchErrorCountByBuild = async(buildNumber: number | string): Promise<number | null> => {
 
 	const requestBody = ZProtectedPostApiRequestMap['errors/countBuild'].safeParse({ buildNumber });
@@ -1219,6 +1445,13 @@ export const fetchErrorCountByBuild = async(buildNumber: number | string): Promi
 	return parsedResponse.data.count;
 
 };
+
+/**
+ * Fetch an error by its ID.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ */
 export const fetchError = async(
 	id: number | string,
 	gotoPrevUrl: boolean = false
@@ -1258,6 +1491,13 @@ export const fetchError = async(
 	return parsedResponse.data.data;
 
 };
+
+/**
+ * Delete an error by its ID.
+ *
+ * Uses the protected admin API, and shows the result (if necessary) using a Monolog.
+ *
+ */
 export const deleteError = async(
 	id: number | string,
 	gotoPrevUrl: boolean = false

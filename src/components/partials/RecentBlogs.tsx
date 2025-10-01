@@ -1,15 +1,11 @@
-import { useMemo } from 'react';
 import { BlogGallery } from '@/components/partials/BlogGallery';
 import { A } from '@/components/elements/A';
 import { type TBlogMarkdownInstance } from '@/components/types';
-import { BlogConfig } from '@/shared/config/blog';
 
+/**
+ * A blog post gallery consisting of multiple blog cards of the most recent blog posts.
+ */
 export const RecentBlogs = ({ recentBlogFiles }: { recentBlogFiles: TBlogMarkdownInstance[] }) => {
-
-	const config = useMemo(
-		() => BlogConfig(window.__TRANSLATION__),
-		[]
-	);
 
 	return (
 		<>
@@ -18,7 +14,7 @@ export const RecentBlogs = ({ recentBlogFiles }: { recentBlogFiles: TBlogMarkdow
 					href={'/blog/'}
 					className={'text-lg'}
 				>
-					{config.recentBlogsCard.gotoBlogButton}
+					{window.__TRANSLATION__.blog.gotoBlogButton}
 					{' '}
 					{'→'}
 				</A>

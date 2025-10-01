@@ -1,13 +1,13 @@
 ---
 import {
 	GlobalTranslation,
-	type ITranslation
+	type TTranslation
 } from '@/locales/global';
 import { A } from '../elements/A';
 import { isAdminSetup } from '@/backend/admin';
 
 export interface Props {
-	translation: ITranslation;
+	translation: TTranslation;
 }
 
 const { translation } = Astro.props;

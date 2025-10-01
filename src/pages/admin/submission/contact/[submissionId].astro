@@ -4,6 +4,8 @@ import { AdminContactOverview } from '@/components/partials/admin/AdminContactOv
 import BaseAdmin from '@/templates/BaseAdmin.astro';
 
 const { submissionId = '-1' } = Astro.params;
+
+// Check if buildNumber is a valid number
 let submissionIdInt;
 try {
 

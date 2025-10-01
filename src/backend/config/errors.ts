@@ -6,5 +6,21 @@ export const ErrorsConfig = ZErrorsConfig.parse({
 		process.cwd(),
 		'data',
 		'errors.db'
-	)
+	),
+	enableResponseLogging: true,
+	responseLoggingStatusCodes: [
+		400,
+		401,
+		403,
+		404,
+		414,
+		421,
+		431,
+		451,
+		500,
+		501,
+		502,
+		504,
+		508
+	]
 });

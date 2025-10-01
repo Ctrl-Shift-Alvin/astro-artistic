@@ -1,16 +1,21 @@
 import {
 	useCallback,
-	useEffect, useState
+	useEffect,
+	useState
 } from 'react';
 import clsx from 'clsx';
 import { LanguageSelect } from '../components/LanguageSelect';
 import { NavMenuItem } from '../components/NavMenuItem';
 import { NavbarConfig } from '@/shared/config/navbar';
 import {
-	cGetUserLanguage, cSetUserLanguage
+	cGetUserLanguage,
+	cSetUserLanguage
 } from '@/shared/cookies';
 import { windowRefresh } from '@/frontend/windowTools';
 
+/**
+ * The page's navbar. On smaller screens, it collapses into a hamburger.
+ */
 export const Navbar = ({
 	availableLanguages,
 	defaultLanguageCode
@@ -154,7 +159,7 @@ export const Navbar = ({
 				}
 			>
 				{
-					NavbarConfig(window.__TRANSLATION__).map((item) => (
+					NavbarConfig(window.__TRANSLATION__).items.map((item) => (
 						<ol
 							key={item.name}
 							className={'flex flex-col justify-start text-center text-2xl'}
@@ -195,7 +200,7 @@ export const Navbar = ({
 				className={'absolute z-50 hidden w-full justify-center pt-8 pb-18 sm:flex'}
 			>
 				{
-					NavbarConfig(window.__TRANSLATION__).map((item) => (
+					NavbarConfig(window.__TRANSLATION__).items.map((item) => (
 						<ol
 							key={item.name}
 							className={'mx-5 font-medium text-gray-200'}

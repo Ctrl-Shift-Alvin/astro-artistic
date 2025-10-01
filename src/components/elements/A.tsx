@@ -23,6 +23,11 @@ export type IAProps = {
 	key?: string;
 };
 
+/**
+ * A styled `<a>` element with extra 'Action' functionality and href animations.
+ *
+ * @see actions.ts
+ */
 export const A = (props: IAProps) => {
 
 	const clicked = useCallback(

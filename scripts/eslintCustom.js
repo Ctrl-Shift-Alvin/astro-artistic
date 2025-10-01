@@ -1,6 +1,6 @@
 export const rules = {
 
-	// ESLint rule for putting newlines between function argument definitions
+	/** ESLint rule for putting newlines between function argument definitions. */
 	'function-args-newline': {
 		meta: {
 			type: 'layout',
@@ -64,7 +64,7 @@ export const rules = {
 		}
 	},
 
-	// ESLint rule for putting end parens on their own line if the start/end parens are not on the same line
+	/** ESLint rule for putting end parens on their own line if the start/end parens are not on the same line. */
 	'condition-paren-newline': {
 		meta: {
 			type: 'layout',
@@ -147,6 +147,7 @@ export const rules = {
 		}
 	},
 
+	/** ESLint rule for adding newlines between more than 1 chained function call.*/
 	'newline-per-chained-call': {
 		meta: {
 			type: 'layout',

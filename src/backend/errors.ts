@@ -5,6 +5,11 @@ import {
 } from '@/backend/database/errors';
 import { ZErrorSubmission } from '@/components/types';
 
+/**
+ * Log an error response by the server to a client, in the errors database.
+ * @param url The source URL of the `error` response.
+ * @param error The error response.
+ */
 export const submitErrorResponse = (
 	url: string,
 	error: Response

@@ -3,6 +3,9 @@ import { Button } from '@/components/elements/Button';
 import { login } from '@/frontend/adminApi';
 import { LabeledInput } from '@/components/elements/LabeledInput';
 
+/**
+ * The login form for the admin page. Tries to authenticate the client to the admin protected API.
+ */
 export const AdminLogin = () => {
 
 	const [

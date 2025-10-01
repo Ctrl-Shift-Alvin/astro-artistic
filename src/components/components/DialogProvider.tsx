@@ -9,6 +9,7 @@ import {
 	type DialogButton
 } from './DialogPopup';
 import { DialogConfig } from '@/shared/config/dialog';
+import { isWindowDefined } from '@/frontend/windowTools';
 
 type DialogOptions = {
 	title: ReactNode;
@@ -17,6 +18,9 @@ type DialogOptions = {
 	onBackdropClick?: ()=> void;
 };
 
+/**
+ * A subscribe/listener emitter for a DialogProvider. You probably shouldn't use this.
+ */
 export class DialogEmitter {
 
 	private listener: ((options: DialogOptions)=> void) | null = null;
@@ -40,16 +44,18 @@ export class DialogEmitter {
 	}
 
 }
-const dialogEmitter = (() => {
+const dialogEmitter = isWindowDefined()
+	? (() => {
 
-	if (!window.dialogEmitter) {
+		if (!window.dialogEmitter) {
 
-		window.dialogEmitter = new DialogEmitter();
+			window.dialogEmitter = new DialogEmitter();
 
-	}
-	return window.dialogEmitter;
+		}
+		return window.dialogEmitter;
 
-})();
+	})()
+	: new DialogEmitter();
 
 /**
  * Class with static helper functions for creating dialogs. The DOM must have the DialogProvider component.
@@ -272,7 +278,7 @@ export class Dialog {
 }
 
 /**
- * The dialog provider that has to be present for the helper functions to work.
+ * The component that has to be present for the DialogProvider helper functions to work.
  */
 export const DialogProvider: React.FC = () => {
 

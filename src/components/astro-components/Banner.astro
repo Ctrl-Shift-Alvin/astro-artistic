@@ -4,7 +4,10 @@ export interface Props {
 	imageUrl: string;
 }
 
-const { title, imageUrl } = Astro.props;
+const {
+	title,
+	imageUrl
+} = Astro.props;
 ---
 
 <section class="relative h-dvh w-full overflow-hidden">
@@ -45,9 +48,12 @@ const { title, imageUrl } = Astro.props;
 		</div>
 	</div>
 	<script>
-		import { smoothScroll } from '@/frontend/windowTools';
+		import {
+			isWindowDefined,
+			smoothScroll
+		} from '@/frontend/windowTools';
 
-		if (typeof window !== 'undefined') {
+		if (isWindowDefined()) {
 
 			const btn = document.getElementById('banner-scroll-btn');
 			btn?.addEventListener('click', () => {

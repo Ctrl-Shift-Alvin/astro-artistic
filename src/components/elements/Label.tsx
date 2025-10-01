@@ -4,6 +4,9 @@ import {
 	type LabelHTMLAttributes
 } from 'react';
 
+/**
+ * A styled `<label>` element.
+ */
 export const Label = (props: LabelHTMLAttributes<HTMLLabelElement>) => {
 
 	const processedprops = useMemo(

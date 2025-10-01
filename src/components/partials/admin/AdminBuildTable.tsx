@@ -16,6 +16,9 @@ import { A } from '@/components/elements/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 import { TrashcanIcon } from '@/components/components/icons/TrashcanIcon';
 
+/**
+ * A table for an overview of all builds, and a way to access each of them, that works through the protected admin API.
+ */
 export const AdminBuildTable = () => {
 
 	const [

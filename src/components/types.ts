@@ -2,36 +2,74 @@ import { z } from 'zod';
 
 // #region API General
 
+/**
+ * The body of a successful API response containing a `message` property.
+ */
 export const ZApiResponseSuccess = z.object({ message: z.string() });
+
+/**
+ * The body of a successful API response containing a `message` property.
+ */
 export type TApiResponseSuccess = z.infer<typeof ZApiResponseSuccess>;
 
+/**
+ * The body of an error API response containing an `error` and optional `message` property.
+ */
 export const ZApiResponseError = z.object({
 	error: z.string(),
 	message: z
 		.string()
 		.optional()
 });
+
+/**
+ * The body of an error API response containing an `error` and optional `message` property.
+ */
 export type TApiResponseError = z.infer<typeof ZApiResponseError>;
 
+/**
+ * A union of the body of a successful and an error API response.
+ */
 export const ZApiResponse = z.union([
 	ZApiResponseSuccess,
 	ZApiResponseError
 ]);
+
+/**
+ * A union of a successful and an error API response.
+ */
 export type TApiResponse = z.infer<typeof ZApiResponse>;
 
+/**
+ * A valid status code between 100 and 599.
+ */
 export const ZStatusCode = z
 	.int()
 	.min(100)
 	.max(599);
+
+/**
+ * A valid status code between 100 and 599.
+ */
 export type TStatusCode = z.infer<typeof ZStatusCode>;
 
+/**
+ * An array of valid status codes (`ZStatusCode`).
+ */
 export const ZStatusArray = z.array(ZStatusCode);
+
+/**
+ * An array of valid status codes (`TStatusCode`).
+ */
 export type TStatusArray = z.infer<typeof ZStatusArray>;
 
 // #endregion
 
 // #region Blog API
 
+/**
+ * The frontmatter of a blog post.
+ */
 export const ZBlogFrontmatter = z.object({
 	title: z.string(),
 	description: z.string(),
@@ -42,20 +80,34 @@ export const ZBlogFrontmatter = z.object({
 		.boolean()
 		.default(false)
 });
+
+/**
+ * The frontmatter of a blog post.
+ */
 export type TBlogFrontmatter = z.infer<typeof ZBlogFrontmatter>;
 
+/**
+ * An instace of a blog post, including its frontmatter and content.
+ */
 export const ZBlogMarkdownInstance = z.object({
 	url: z.string(),
 	fileName: z.string(),
 	frontmatter: ZBlogFrontmatter,
 	content: z.string()
 });
+
+/**
+ * An instace of a blog post, including its frontmatter and content.
+ */
 export type TBlogMarkdownInstance = z.infer<typeof ZBlogMarkdownInstance>;
 
 // #endregion
 
 // #region Events
 
+/**
+ * An event entry. (represents a row in the events DB)
+ */
 export const ZEventEntry = z.object({
 	id: z.coerce.number(),
 	title: z
@@ -68,8 +120,15 @@ export const ZEventEntry = z.object({
 	enablePage: z.coerce.boolean(),
 	createdAt: z.string()
 });
+
+/**
+ * An event entry. (represents a row in the events DB)
+ */
 export type TEventEntry = z.infer<typeof ZEventEntry>;
 
+/**
+ * A to-be-added event entry. (represents the data needed, to add a new row to the events DB)
+ */
 export const ZNewEventEntry = z.object({
 	title: z
 		.string()
@@ -80,9 +139,20 @@ export const ZNewEventEntry = z.object({
 		.nonempty(),
 	enablePage: z.boolean()
 });
+
+/**
+ * A to-be-added event entry. (represents the data needed, to add a new row to the events DB)
+ */
 export type TNewEventEntry = z.infer<typeof ZNewEventEntry>;
 
+/**
+ * The frontmatter of an event page.
+ */
 export interface IEventFrontmatter { id: number }
+
+/**
+ * An instace of an event page, including its frontmatter and content.
+ */
 export interface IEventMarkdownInstance<T extends Record<string, any>> {
 	url: string;
 	frontmatter: IEventFrontmatter & T;
@@ -93,6 +163,9 @@ export interface IEventMarkdownInstance<T extends Record<string, any>> {
 
 // #region Contact API
 
+/**
+ * A contact form submission. (represents a row to be added to the contact form submissions DB)
+ */
 export const ZContactFormSubmission = z.object({
 	firstName: z.string(),
 	lastName: z.string(),
@@ -111,8 +184,15 @@ export const ZContactFormSubmission = z.object({
 		.string()
 		.nullish()
 });
+
+/**
+ * A contact form submission. (represents a row to be added to the contact form submissions DB)
+ */
 export type TContactFormSubmission = z.infer<typeof ZContactFormSubmission>;
 
+/**
+ * A contact form submission entry. (represents a row in the contact form submissions DB)
+ */
 export const ZContactFormEntry = z.object({
 	id: z.coerce.number(),
 	createdAt: z.string(),
@@ -133,18 +213,39 @@ export const ZContactFormEntry = z.object({
 		.string()
 		.optional()
 });
+
+/**
+ * A contact form submission entry. (represents a row in the contact form submissions DB)
+ */
 export type TContactFormEntry = z.infer<typeof ZContactFormEntry>;
 
+/**
+ * The body of a contact API request.
+ */
 export const ZContactApiRequest = z.object({ data: ZContactFormSubmission });
+
+/**
+ * The body of a contact API request.
+ */
 export type TContactApiRequest = z.infer<typeof ZContactApiRequest>;
 
+/**
+ * The body of a contact API response.
+ */
 export const ZContactApiResponse = ZApiResponse;
+
+/**
+ * The body of a contact API response.
+ */
 export type TContactApiResponse = z.infer<typeof ZContactApiResponse>;
 
 // #endregion
 
 // #region Errors API
 
+/**
+ * A build entry. (represents a row in the builds DB)
+ */
 export const ZBuild = z.object({
 	buildNumber: z.coerce.number(),
 	createdAt: z.string(),
@@ -154,8 +255,15 @@ export const ZBuild = z.object({
 		.min(40),
 	isGitDirty: z.coerce.boolean()
 });
+
+/**
+ * A build entry. (represents a row in the builds DB)
+ */
 export type TBuild = z.infer<typeof ZBuild>;
 
+/**
+ * An error entry. (represents a row in the errors DB)
+ */
 export const ZError = z.object({
 	id: z.coerce.number(),
 	createdAt: z.string(),
@@ -178,8 +286,15 @@ export const ZError = z.object({
 		.string()
 		.nullish()
 });
+
+/**
+ * An error entry. (represents a row in the errors DB)
+ */
 export type TError = z.infer<typeof ZError>;
 
+/**
+ * An error submission. (represents a row to be added to the errors DB)
+ */
 export const ZErrorSubmission = z.object({
 	buildNumber: z.coerce.number(),
 	isClient: z.coerce.boolean(),
@@ -200,23 +315,52 @@ export const ZErrorSubmission = z.object({
 		.string()
 		.nullish()
 });
+
+/**
+ * An error submission. (represents a row to be added to the errors DB)
+ */
 export type TErrorSubmission = z.infer<typeof ZErrorSubmission>;
 
+/**
+ * The body of an error submission API request.
+ */
 export const ZErrorApiRequest = z.object({ data: ZErrorSubmission });
+
+/**
+ * The body of an error submission API request.
+ */
 export type TErrorApiRequest = z.infer<typeof ZErrorApiRequest>;
 
+/**
+ * The body of an error submission API response.
+ */
 export const ZErrorApiResponse = ZApiResponse;
+
+/**
+ * The body of an error submission API response.
+ */
 export type TErrorApiResponse = z.infer<typeof ZErrorApiResponse>;
 
 // #endregion
 
 // #region Protected API
 
+/**
+ * The body of a protected API GET response.
+ */
 export const ZProtectedGetApiResponse = z.union([
 	ZApiResponseSuccess.extend({ expiry: z.number() }),
 	ZApiResponseError
 ]);
+
+/**
+ * The body of a protected API GET response.
+ */
 export type TProtectedGetApiResponse = z.infer<typeof ZProtectedGetApiResponse>;
+
+/**
+ * A map of the body of a protected API POST request, based on the request type.
+ */
 export const ZProtectedPostApiRequestMap = {
 	'contact/index': z.object({
 		count: z.coerce.number(),
@@ -331,6 +475,9 @@ export const ZProtectedPostApiRequestMap = {
 	'errors/delete': z.object({ id: z.coerce.number() })
 } as const;
 
+/**
+ * A map of the body of a protected API POST response, based on the request type.
+ */
 export const ZProtectedPostApiResponseMap = {
 	'contact/index': z.union([
 		ZApiResponseSuccess.extend({ data: ZContactFormEntry.array() }),
@@ -417,17 +564,38 @@ export const ZProtectedPostApiResponseMap = {
 
 // #region Auth API
 
+/**
+ * The body of an auth API POST request.
+ */
 export const ZAuthPostApiRequest = z.object({
 	password: z
 		.string()
 		.optional()
 });
+
+/**
+ * The body of an auth API POST request.
+ */
 export type TAuthPostApiRequest = z.infer<typeof ZAuthPostApiRequest>;
 
+/**
+ * The body of an auth API POST response.
+ */
 export const ZAuthPostApiResponse = ZApiResponse;
+
+/**
+ * The body of an auth API POST response.
+ */
 export type TAuthPostApiResponse = z.infer<typeof ZAuthPostApiResponse>;
 
+/**
+ * The body of an auth API DELETE response.
+ */
 export const ZAuthDeleteApiResponse = ZApiResponse;
+
+/**
+ * The body of an auth API DELETE response.
+ */
 export type TAuthDeleteApiResponse = z.infer<typeof ZAuthDeleteApiResponse>;
 
 // #endregion

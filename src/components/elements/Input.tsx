@@ -4,6 +4,9 @@ import {
 	type InputHTMLAttributes
 } from 'react';
 
+/**
+ * A styled `<input>`.
+ */
 export const Input = (props: InputHTMLAttributes<HTMLInputElement>) => {
 
 	const processedprops = useMemo(

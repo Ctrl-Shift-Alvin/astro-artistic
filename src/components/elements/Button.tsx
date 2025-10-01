@@ -24,6 +24,11 @@ export type TButtonProps = {
 	actionPayload?: TActionPayload;
 };
 
+/**
+ * A styled `<button>` element with extra 'Action' functionality and href animations.
+ *
+ * @see actions.ts
+ */
 export const Button = (props: TButtonProps) => {
 
 	const click = useCallback(

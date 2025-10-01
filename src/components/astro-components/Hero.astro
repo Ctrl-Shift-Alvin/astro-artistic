@@ -1,26 +1,24 @@
 ---
 import { HeroConfig } from '@/shared/config/hero';
 import { A } from '../elements/A';
-import { type ITranslation } from '@/locales/global';
+import { type TTranslation } from '@/locales/global';
 
 export interface Props {
-	translation: ITranslation;
+	translation: TTranslation;
 }
 const { translation } = Astro.props;
-
-const heroConfig = HeroConfig(translation);
 ---
 
 <div class="w-auto">
-	<h1 class="w-full text-center text-3xl font-bold">{heroConfig.title}</h1>
+	<h1 class="w-full text-center text-3xl font-bold">{translation.heroAvatar.title}</h1>
 
 	<p class="newlines mt-6 text-justify text-xl leading-9">
-		{heroConfig.description}
+		{translation.heroAvatar.description}
 	</p>
 
 	<div class="mt-3 flex w-full justify-center gap-1 lg:justify-start">
 		{
-			heroConfig.heroSocialButtons.map((item) => (
+			HeroConfig.heroSocialButtons.map((item) => (
 				<A href={item.href} target="_blank" client:only="react">
 					<img
 						class="mx-4 size-12 hover:size-11"
@@ -35,7 +33,7 @@ const heroConfig = HeroConfig(translation);
 </div>
 <img
 	class="mt-5 h-80 rounded-md object-cover lg:w-64"
-	src={heroConfig.avatarImageSource}
+	src={HeroConfig.avatarImageSource}
 	alt="Avatar image"
 	loading="lazy"
 />

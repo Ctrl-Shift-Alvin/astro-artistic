@@ -4,6 +4,9 @@ import {
 	type TextareaHTMLAttributes
 } from 'react';
 
+/**
+ * A styled `<textarea>` element.
+ */
 export const TextArea = (props: TextareaHTMLAttributes<HTMLTextAreaElement>) => {
 
 	const processedprops = useMemo(

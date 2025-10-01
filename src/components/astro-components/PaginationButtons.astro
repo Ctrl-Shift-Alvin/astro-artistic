@@ -7,7 +7,12 @@ export interface Props {
 	currentPageText: string | number;
 	className?: string;
 }
-const { prevHref, nextHref, currentPageText, className } = Astro.props;
+const {
+	prevHref,
+	nextHref,
+	currentPageText,
+	className
+} = Astro.props;
 ---
 
 <div class:list={["flex justify-center gap-25", className]}>

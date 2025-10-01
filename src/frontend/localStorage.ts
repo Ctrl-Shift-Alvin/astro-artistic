@@ -9,8 +9,7 @@ function addLocalStorage(
 
 		if (value === null) {
 
-			if (isWindowDefined())
-				localStorage.removeItem(key);
+			localStorage.removeItem(key);
 
 		} else {
 
@@ -29,10 +28,29 @@ function getLocalStorage(key: string): string | null {
 
 	if (isWindowDefined())
 		return localStorage.getItem(key);
+
 	return null;
 
 }
 
+/*
+ * All functions here are prefixed with 'ls' for 'local storage'.
+ * Each key should have an exported get function, and set function with an `any | null` type.
+ * Passing `null` deletes the key.
+ *
+ * This makes the code somewhere else much prettier, if you just see `lsSetKeyXXX(myValue)` instead of a whole block.
+ *
+ * E.g.:
+ *
+ * export function lsSetKeyXXX(value: string | null)
+ * export function lsGetKeyXXX()
+ */
+
+/**
+ * Set the `authToken` key in the local storage.
+ *
+ * @param token The value to set. Set to null to delete the key.
+ */
 export function lsSetAuthTokenExpiry(token: number | null) {
 
 	addLocalStorage(
@@ -44,6 +62,9 @@ export function lsSetAuthTokenExpiry(token: number | null) {
 
 }
 
+/**
+ * Get the `authToken` key from the local storage.
+ */
 export function lsGetAuthTokenExpiry(): number | null {
 
 	const expiry = getLocalStorage('authToken');

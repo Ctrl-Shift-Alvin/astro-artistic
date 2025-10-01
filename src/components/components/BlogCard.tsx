@@ -2,6 +2,11 @@ import { type TBlogMarkdownInstance } from '../types';
 import { A } from '../elements/A';
 import { defaultFormatDateString } from '@/shared/dataParse';
 
+/**
+ * A blog card that summarizes a blog post.
+ *
+ * @param blogFile The blog post instance the card represents.
+ */
 export const BlogCard = ({ blogFile }: { blogFile: TBlogMarkdownInstance }) => (
 	<A
 		className={'hover:translate-y-1'}

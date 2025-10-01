@@ -8,81 +8,134 @@ import {
 } from '@/components/types';
 import { BlogConfig } from '@/backend/config/blog';
 
+/**
+ * Get the URL pathname of the blog posts, based on `BlogConfig.pagesPath`.
+ * @returns The URL pathname of the blog posts page.
+ */
 export function getBlogUrlPathname(): string {
 
-	return BlogConfig.pagesPath
-		.split(/src[/\\]pages/)[1]!
+	try {
+
+		return BlogConfig.pagesPath
+			.split(/src[/\\]pages/)[1]!
 		// eslint-disable-next-line custom/newline-per-chained-call
-		.replace(
-			/\\/g,
-			'/'
-		) + '/';
+			.replace(
+				/\\/g,
+				'/'
+			) + '/';
+
+	} catch(err: any) {
+
+		console.error(
+			'Failed to parse blog URL pathname:\n ',
+			err
+		);
+		return '/blog/';
+
+	}
 
 }
 
+/**
+ * Get all blogs (.md files) in the blogs directory.
+ */
 export function getAllBlogs(): TBlogMarkdownInstance[] {
 
-	const files = fs.readdirSync(BlogConfig.pagesPath);
-	const posts: TBlogMarkdownInstance[] = [];
+	try {
 
-	for (const file of files) {
+		const files = fs.readdirSync(BlogConfig.pagesPath);
+		const posts: TBlogMarkdownInstance[] = [];
 
-		if (!file.endsWith('.md'))
-			continue;
+		for (const file of files) {
 
-		const fullPath = path.join(
-			BlogConfig.pagesPath,
-			file
+			if (!file.endsWith('.md'))
+				continue;
+
+			const fullPath = path.join(
+				BlogConfig.pagesPath,
+				file
+			);
+			const raw = fs.readFileSync(fullPath);
+			const {
+				data: frontmatter,
+				content
+			} = matter(raw);
+
+			posts.push({
+				url: `${getBlogUrlPathname()}${file.replace(
+					/\.md$/,
+					''
+				)}/`,
+				fileName: file,
+				frontmatter: frontmatter as TBlogFrontmatter,
+				content
+			});
+
+		}
+		return posts;
+
+	} catch(err: any) {
+
+		console.error(
+			'Failed to get all blog instances:\n ',
+			err
 		);
-		const raw = fs.readFileSync(fullPath);
-		const {
-			data: frontmatter,
-			content
-		} = matter(raw);
-
-		posts.push({
-			url: `${getBlogUrlPathname()}${file.replace(
-				/\.md$/,
-				''
-			)}/`,
-			fileName: file,
-			frontmatter: frontmatter as TBlogFrontmatter,
-			content
-		});
+		return [];
 
 	}
-	return posts;
 
 }
+
+/**
+ * Get a single blog post instance by its file name in the directory.
+ *
+ * @returns The blog post instance if the file exists. Otherwise, `null`.
+ */
 export function getBlog(fileName: string): TBlogMarkdownInstance | null {
 
-	const files = fs.readdirSync(BlogConfig.pagesPath);
-	for (const file of files) {
+	try {
 
-		if (file !== fileName)
-			continue;
+		const files = fs.readdirSync(BlogConfig.pagesPath);
+		for (const file of files) {
 
-		const fullPath = path.join(
-			BlogConfig.pagesPath,
-			file
+			if (file !== fileName)
+				continue;
+
+			const fullPath = path.join(
+				BlogConfig.pagesPath,
+				file
+			);
+			const raw = fs.readFileSync(fullPath);
+			const parsed = matter(raw);
+
+			return {
+				url: `${getBlogUrlPathname()}${file.replace(
+					/\.md$/,
+					''
+				)}/`,
+				fileName: file,
+				frontmatter: parsed.data as TBlogFrontmatter,
+				content: parsed.content
+			};
+
+		}
+		return null;
+
+	} catch(err: any) {
+
+		console.error(
+			`Failed to get blog instance with file name '${fileName}':\n `,
+			err
 		);
-		const raw = fs.readFileSync(fullPath);
-		const parsed = matter(raw);
-
-		return {
-			url: `${getBlogUrlPathname()}${file.replace(
-				/\.md$/,
-				''
-			)}/`,
-			fileName: file,
-			frontmatter: parsed.data as TBlogFrontmatter,
-			content: parsed.content
-		};
+		return null;
 
 	}
-	return null;
 
 }
+
+/**
+ * Get all blogs sorted by their publication date in descending order.
+ */
 export function getSortedBlogs() {
 
 	const posts = getAllBlogs();
@@ -94,9 +147,13 @@ export function getSortedBlogs() {
 	return posts;
 
 }
+
+/**
+ * Get all blogs sorted by their publication date in descending order, sliced by a start and end value.
+ */
 export function getSortedBlogsSliced(
-	start: number,
-	end: number
+	start?: number,
+	end?: number
 ) {
 
 	const sortedPosts = getSortedBlogs();
@@ -107,26 +164,38 @@ export function getSortedBlogsSliced(
 
 }
 
+/**
+ * Create a new blog post page using a file name.
+ *
+ * @param fileName The file name to use when creating the new post page.
+ * @returns `true` if the page was created successfully. Otherwise, `false`.
+ */
 export const blog_createPage = async(fileName: string): Promise<boolean> => {
 
-	if (!fs.existsSync(BlogConfig.pagesPath))
-		fs.mkdirSync(BlogConfig.pagesPath);
-
-	const existingFiles = fs.readdirSync(
-		BlogConfig.pagesPath,
-		{ withFileTypes: true }
-	);
-
-	if (existingFiles
-		.map((e) => e.name)
-		.find((e) => e === `${fileName}.md`)
-	) {
-
-		return false;
-
-	}
-
 	try {
+
+		if (!fs.existsSync(BlogConfig.pagesPath)) {
+
+			fs.mkdirSync(
+				BlogConfig.pagesPath,
+				{ recursive: true }
+			);
+
+		}
+
+		const existingFiles = fs.readdirSync(
+			BlogConfig.pagesPath,
+			{ withFileTypes: true }
+		);
+
+		if (existingFiles
+			.map((e) => e.name)
+			.find((e) => e === `${fileName}.md`)
+		) {
+
+			return false;
+
+		}
 
 		await new Promise((
 			resolve,
@@ -177,16 +246,32 @@ export const blog_createPage = async(fileName: string): Promise<boolean> => {
 	}
 
 };
+
+/**
+ * Count the existing blog posts (files).
+ */
 export const blog_countEntries = (): number => {
 
-	return fs.existsSync(BlogConfig.pagesPath)
-		? fs.readdirSync(
-			BlogConfig.pagesPath,
-			{
-				recursive: false,
-				withFileTypes: true
-			}
-		).filter((e) => e.isFile() && e.name.endsWith('.md')).length
-		: 0;
+	try {
+
+		return fs.existsSync(BlogConfig.pagesPath)
+			? fs.readdirSync(
+				BlogConfig.pagesPath,
+				{
+					recursive: false,
+					withFileTypes: true
+				}
+			).filter((e) => e.isFile() && e.name.endsWith('.md')).length
+			: 0;
+
+	} catch(err: any) {
+
+		console.error(
+			'Failed to count blog entries:\n ',
+			err
+		);
+		return 0;
+
+	}
 
 };

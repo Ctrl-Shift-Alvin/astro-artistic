@@ -7,7 +7,14 @@ import {
 	MonologPopup,
 	type TMonologProps
 } from './MonologPopup';
+import {
+	DEFAULT_ANIMATION_DURATION_MS,
+	isWindowDefined
+} from '@/frontend/windowTools';
 
+/**
+ * A subscribe/listener emitter for a MonologProvider. You probably shouldn't use this.
+ */
 export class MonologEmitter {
 
 	nextId: number = 0;
@@ -33,24 +40,36 @@ export class MonologEmitter {
 	}
 
 }
-const monologEmitter = (() => {
+const monologEmitter = isWindowDefined()
+	? (() => {
 
-	if (!window.monologEmitter) {
+		if (!window.monologEmitter) {
 
-		window.monologEmitter = new MonologEmitter();
+			window.monologEmitter = new MonologEmitter();
 
-	}
-	return window.monologEmitter;
+		}
+		return window.monologEmitter;
 
-})();
+	})()
+	: new MonologEmitter();
 
+/**
+ * Class with static helper functions for creating monologs. The DOM must have the MonologProvider component.
+ */
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class Monolog {
 
+	/**
+	 * Create and show a monolog popup.
+	 *
+	 * @param durationMs The duration (ms) *between* the fade-in and fade-out animations.
+	 * @param fadeDurationMs The duration (ms) for both the fade-in and fade-out animations.
+	 * 	Defaults to `DEFAULT_ANIMATION_DURATION_MS`.
+	 */
 	static show({
 		text,
 		durationMs = 2000,
-		fadeDurationMs = 500,
+		fadeDurationMs = DEFAULT_ANIMATION_DURATION_MS,
 		className
 	}: {
 		text: string;
@@ -68,10 +87,18 @@ export class Monolog {
 
 	}
 
+	/**
+	 * Asynchronously create and show a monolog popup.
+	 *
+	 * @param durationMs The duration (ms) *between* the fade-in and fade-out animations.
+	 * @param fadeDurationMs The duration (ms) for both the fade-in and fade-out animations.
+	 * 	Defaults to `DEFAULT_ANIMATION_DURATION_MS`.
+	 * @returns A promise that finishes when the popup has completely disappeared. (After `durationMs + 2*fadeDurationMs`)
+	 */
 	static showAsync({
 		text,
 		durationMs = 2000,
-		fadeDurationMs = 500,
+		fadeDurationMs = DEFAULT_ANIMATION_DURATION_MS,
 		className
 	}: {
 		text: string;
@@ -96,6 +123,9 @@ export class Monolog {
 
 }
 
+/**
+ * The component that has to be present for the MonologProvider helper functions to work.
+ */
 export const MonologProvider = () => {
 
 	const [

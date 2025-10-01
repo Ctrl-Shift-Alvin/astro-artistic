@@ -1,7 +1,6 @@
 ---
-import Section from '@/components/astro-components/Section.astro';
 import { AdminButtonContainer } from '@/components/partials/admin/AdminButtonContainer';
-import { AdminLogout } from '@/components/partials/admin/AdminLogout';
+import { logout } from '@/frontend/adminApi';
 import { GlobalTranslation } from '@/locales/global';
 import Base from '@/templates/Base.astro';
 
@@ -34,8 +33,18 @@ const adminButtons = pathname !== '/admin/home/'
 <Base head={{ title, description }}>
 
 	<slot />
-	<Section center>
-		<AdminLogout client:only="react" />
-	</Section>
-	<AdminButtonContainer buttons={adminButtons} client:only="react" />
+	<AdminButtonContainer buttons={adminButtons} client:only="react">
+		{
+			{
+				children: 'Logout',
+				onClick: () => void logout()
+			}
+		}
+	</AdminButtonContainer>
+	<script>
+
+		import { setLogoutTimeout } from '@/frontend/adminApi';
+		setLogoutTimeout();
+
+	</script>
 </Base>

@@ -17,6 +17,11 @@ export interface DialogPopupProps {
 	onBackdropClick?: React.MouseEventHandler<HTMLDivElement>;
 }
 
+/**
+ * A dialog popup. Use is not recommended.
+ *
+ * @see DialogProvider
+ */
 export const DialogPopup: React.FC<DialogPopupProps> = ({
 	isOpen,
 	title,

@@ -8,6 +8,9 @@ import { LabeledInput } from '../elements/LabeledInput';
 import { LabeledTextArea } from '../elements/LabeledTextArea';
 import { type TContact } from '@/shared/config/configTypes';
 
+/**
+ * A card that allows users to submit a contact form using the contact API.
+ */
 export const ContactCard = ({
 	alternate,
 	enableContactForm = true,

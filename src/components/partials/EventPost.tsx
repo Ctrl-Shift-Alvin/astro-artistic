@@ -2,7 +2,10 @@ import { type ReactNode } from 'react';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 import { type TEventEntry } from '@/components/types';
 
-export const EventsPost = ({
+/**
+ * Renders an event page and its header info. Pass the event page contents as children.
+ */
+export const EventPost = ({
 	eventEntry,
 	children
 }: {

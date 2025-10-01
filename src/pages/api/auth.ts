@@ -4,7 +4,9 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { cSetAuthToken } from '@/shared/cookies';
 import {
-	ZAuthDeleteApiResponse, ZAuthPostApiRequest, ZAuthPostApiResponse
+	ZAuthDeleteApiResponse,
+	ZAuthPostApiRequest,
+	ZAuthPostApiResponse
 } from '@/components/types';
 import { isAdminSetup } from '@/backend/admin';
 

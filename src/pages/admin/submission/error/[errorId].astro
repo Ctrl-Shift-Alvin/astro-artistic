@@ -6,6 +6,8 @@ import BaseAdmin from '@/templates/BaseAdmin.astro';
 const { errorId = '-1' } = Astro.params;
 
 let errorIdInt;
+
+// Check if buildNumber is a valid number
 try {
 
 	errorIdInt = parseInt(errorId);

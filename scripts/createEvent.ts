@@ -1,6 +1,8 @@
 // Npm run createEvent {id}
 import {
-	existsSync, mkdirSync, writeFileSync
+	existsSync,
+	mkdirSync,
+	writeFileSync
 } from 'node:fs';
 import { join } from 'node:path';
 import { EventsConfig } from '@/backend/config/events';
@@ -13,9 +15,10 @@ if (!process.argv[2]) {
 
 }
 
+// Parse arguments and other values
 const id = Number.parseInt(process.argv[2]);
 const fileDir = EventsConfig.pagesPath;
-const fileName
+const fileName // Append .md if it's missing
 	= process.argv[2].endsWith('.md')
 		? process.argv[2]
 		: `${process.argv[2]}.md`;
@@ -39,6 +42,7 @@ id: '${id}'
 Write your event
 `;
 
+// Create file if it doesn't exist
 if (!existsSync(fileDir)) {
 
 	mkdirSync(
@@ -47,9 +51,7 @@ if (!existsSync(fileDir)) {
 	);
 	console.log(`File dir ${fileDir} did not exist, so it was created`);
 
-}
-
-if (existsSync(filePath)) {
+} else if (existsSync(filePath)) { // If the file exists, don't override it
 
 	console.error('This file already exists.');
 	process.exit(1);

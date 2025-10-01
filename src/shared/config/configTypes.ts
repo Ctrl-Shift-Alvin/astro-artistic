@@ -1,8 +1,10 @@
 import { z } from 'zod';
-import { ZStatusArray } from '@/components/types';
 
 // #region Contact Config
 
+/**
+ * A single contact for a contact card component.
+ */
 export const ZContact = z.object({
 	description: z
 		.string()
@@ -19,16 +21,32 @@ export const ZContact = z.object({
 		),
 		z.e164()
 	),
+
+	/**
+	 * The default number code to prefix if it's omitted.
+	 */
 	defaultNumberCode: z
 		.string()
 		.max(2)
 });
+
+/**
+ * A single contact for a contact card component.
+ */
 export type TContact = z.infer<typeof ZContact>;
 
 export const ZContactConfig = z.object({
+
+	/**
+	 * For the admin page only: The initial entry count to be showed in the contact submission table.
+	 */
 	tableInitialEntryCount: z
 		.number()
 		.default(5),
+
+	/**
+	 * A record of contacts that a contact card can use. The key `default` is required.
+	 */
 	contacts: z
 		.record(
 			z.string(),
@@ -47,14 +65,20 @@ export type TContactConfig = z.infer<typeof ZContactConfig>;
 // #region Blog Config
 
 export const ZBlogConfig = z.object({
-	title: z.string(),
-	description: z.string(),
+
+	/**
+	 * The blog entry count per page. Recommended to use a multiple of 3, though it's not enforced.
+	 */
 	pageSize: z.number(),
-	recentBlogsCard: z.object({
-		title: z.string(),
-		gotoBlogButton: z.string(),
-		maxCardCount: z.number()
-	}),
+
+	/**
+	 * The maximum number of cards in the `Recent Blogs` component.
+	 */
+	maxRecentCardCount: z.number(),
+
+	/**
+	 * For the admin page only: The initial entry count to be showed in the blog entry table.
+	 */
 	tableInitialEntryCount: z
 		.number()
 		.default(5)
@@ -66,7 +90,15 @@ export type TBlogConfig = z.infer<typeof ZBlogConfig>;
 // #region Dialog Config
 
 export const ZDialogConfig = z.object({
+
+	/**
+	 * Close a dialog if the backdrop is clicked.
+	 */
 	closeOnBackdropClick: z.boolean(),
+
+	/**
+	 * Close a dialog by default if the 'Cancel' button is clicked.
+	 */
 	closeOnButtonClick: z.boolean()
 });
 export type TDialogConfig = z.infer<typeof ZDialogConfig>;
@@ -76,11 +108,31 @@ export type TDialogConfig = z.infer<typeof ZDialogConfig>;
 // #region Events Config
 
 export const ZEventsConfig = z.object({
+
+	/**
+	 * Create and show an href for event entries that have a page.
+	 */
 	showLinks: z.boolean(),
+
+	/**
+	 * The range of events shown from today's date.
+	 */
 	ageRangeShown: z.object({
+
+		/**
+		 * Can be `Number.MIN_SAFE_INTEGER` to show all past entries.
+		 */
 		minDays: z.number(),
+
+		/**
+		 * Can be `Number.MAX_SAFE_INTEGER` to show all future entries.
+		 */
 		maxDays: z.number()
 	}),
+
+	/**
+	 * The absolute path to the event pages. Must be inside `@/pages/`.
+	 */
 	pagesPath: z.string()
 });
 export type TEventsConfig = z.infer<typeof ZEventsConfig>;
@@ -89,16 +141,21 @@ export type TEventsConfig = z.infer<typeof ZEventsConfig>;
 
 // #region Hero Config
 
+/**
+ * The properties of a single social button on the Hero card.
+ */
 export const ZHeroSocialButton = z.object({
 	href: z.string(),
 	imageSource: z.string(),
 	imageAlt: z.string()
 });
+
+/**
+ * The properties of a single social button on the Hero card.
+ */
 export type THeroSocialButton = z.infer<typeof ZHeroSocialButton>;
 
 export const ZHeroConfig = z.object({
-	title: z.string(),
-	description: z.string(),
 	avatarImageSource: z.string(),
 	heroSocialButtons: ZHeroSocialButton.array()
 });
@@ -108,13 +165,20 @@ export type THeroConfig = z.infer<typeof ZHeroConfig>;
 
 // #region Navbar Config
 
+/**
+ * A single navbar button.
+ */
 export const ZNavbarItem = z.object({
 	name: z.string(),
 	href: z.string()
 });
+
+/**
+ * A single navbar button.
+ */
 export type TNavbarItem = z.infer<typeof ZNavbarItem>;
 
-export const ZNavbarConfig = ZNavbarItem.array();
+export const ZNavbarConfig = z.object({ items: ZNavbarItem.array() });
 export type TNavbarConfig = z.infer<typeof ZNavbarConfig>;
 
 // #endregion
@@ -122,12 +186,22 @@ export type TNavbarConfig = z.infer<typeof ZNavbarConfig>;
 // #region Errors Config
 
 export const ZErrorsConfig = z.object({
+
+	/**
+	 * Enable client sending JS errors to the errors API.
+	 */
 	enableJsLogging: z.boolean(),
-	enableResponseLogging: z.boolean(),
-	responseLoggingStatusCodes: ZStatusArray,
+
+	/**
+	 * For the admin page only: The initial entry count to be showed in the build table.
+	 */
 	tableInitialBuildCount: z
 		.number()
 		.default(5),
+
+	/**
+	 * For the admin page only: The initial entry count to be showed in the error table.
+	 */
 	tableInitialErrorCount: z
 		.number()
 		.default(5)

@@ -32,6 +32,8 @@ const outputPath = path.join(
 	process.cwd(),
 	'public/build.js'
 );
+
+// Overwrite /public/build.js script, that will be imported by the sw for build info
 fs.writeFileSync(
 	outputPath,
 	`self.__BUILD__ = ${JSON.stringify(build)};\n`

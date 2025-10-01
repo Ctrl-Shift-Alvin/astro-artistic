@@ -5,7 +5,7 @@ import { events_getEntry } from '@/backend/database/events';
 import { events_getEventContent } from '@/backend/events';
 import { marked } from 'marked';
 import Section from '@/components/astro-components/Section.astro';
-import { EventsPost } from '@/components/partials/EventsPost';
+import { EventPost } from '@/components/partials/EventPost';
 
 const { content: frontmatter } = Astro.props;
 
@@ -28,8 +28,8 @@ const title = `${eventEntry.title} - ${GlobalTranslation.siteName}`;
 
 <Base head={{ title, description: frontmatter.description }}>
 	<Section>
-		<EventsPost eventEntry={eventEntry}>
+		<EventPost eventEntry={eventEntry}>
 			<article set:html={parsedContent} />
-		</EventsPost>
+		</EventPost>
 	</Section>
 </Base>

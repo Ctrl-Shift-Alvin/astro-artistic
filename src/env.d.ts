@@ -1,7 +1,7 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
 
-import type { ITranslation } from '@/locales/global';
+import type { TTranslation } from '@/locales/global';
 import type { MonologEmitter } from '@/components/components/MonologProvider';
 import type { DialogEmitter } from './components/components/DialogProvider';
 import type { TBuild } from '@/components/types';
@@ -10,12 +10,12 @@ declare global {
 
 	declare namespace App {
 		interface Locals {
-			translation: ITranslation;
+			translation: TTranslation;
 		}
 	}
 
 	interface Window {
-		__TRANSLATION__: ITranslation;
+		__TRANSLATION__: TTranslation;
 		__BUILD__: TBuild;
 		monologEmitter: MonologEmitter | undefined;
 		dialogEmitter: DialogEmitter | undefined;

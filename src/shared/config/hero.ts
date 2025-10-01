@@ -1,10 +1,7 @@
 import { ZHeroConfig } from './configTypes';
-import { type ITranslation } from '@/locales/global';
 
-export const HeroConfig = (translation: ITranslation) => ZHeroConfig.parse({
+export const HeroConfig = ZHeroConfig.parse({
 
-	title: translation.heroAvatar.title,
-	description: translation.heroAvatar.description,
 	avatarImageSource: '/images/piano-hands.png',
 	heroSocialButtons: [
 		{

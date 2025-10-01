@@ -17,6 +17,9 @@ import {
 	enableUnloadConfirmation
 } from '@/frontend/windowTools';
 
+/**
+ * An editor for a blog file, that works through the protected admin API.
+ */
 export const AdminBlogEditor = ({ fileName }: { fileName: string }) => {
 
 	const [

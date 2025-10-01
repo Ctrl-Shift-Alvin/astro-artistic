@@ -11,6 +11,9 @@ import {
 } from '@/frontend/adminApi';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 
+/**
+ * An overview of a single contact form submission, that works through the protected admin API.
+ */
 export const AdminContactOverview = ({ submissionId }: { submissionId: number | string }) => {
 
 	const [

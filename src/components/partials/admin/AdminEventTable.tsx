@@ -16,6 +16,9 @@ import { cGetUserLanguage } from '@/shared/cookies';
 import { defaultLanguageCode } from '@/backend/i18n';
 import { TrashcanIcon } from '@/components/components/icons/TrashcanIcon';
 
+/**
+ * A table for an overview of all events, and a way to access each of them, that works through the protected admin API.
+ */
 export const AdminEventTable = () => {
 
 	const [

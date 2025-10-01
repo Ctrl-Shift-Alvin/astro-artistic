@@ -26,10 +26,13 @@ import { TrashcanIcon } from '@/components/components/icons/TrashcanIcon';
 import { defaultLanguageCode } from '@/backend/i18n';
 import { cGetUserLanguage } from '@/shared/cookies';
 
+/**
+ * A table for an overview of all blogs, and a way to access each of them, that works through the protected admin API.
+ */
 export const AdminBlogTable = () => {
 
 	const tableInitialEntryCount = useMemo(
-		() => BlogConfig(window.__TRANSLATION__).tableInitialEntryCount,
+		() => BlogConfig.tableInitialEntryCount,
 		[]
 	);
 

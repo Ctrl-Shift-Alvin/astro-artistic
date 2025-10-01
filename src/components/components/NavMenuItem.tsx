@@ -1,6 +1,9 @@
 import { type ReactNode } from 'react';
 import { A } from '../elements/A';
 
+/**
+ * A navmenu list element. Used in `Navbar.tsx`.
+ */
 export const NavMenuItem = ({
 	href,
 	children

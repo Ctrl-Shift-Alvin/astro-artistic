@@ -12,7 +12,7 @@ The large majority of styling is done with [Tailwind CSS](https://github.com/tai
 
 ### ESLint
 
-This project is also setup with [ESLint](https://github.com/eslint/eslint) for code delinting of Astro, React, Typescript, Javascript, JSON, JSONc and JSON5 files. It includes many useful plugins, and many rules custom set, for easy customization. It also includes some custom rules, which I created to suit my coding style... Though, I'm sure many of you won't like them - so just feel free to delete them and remove the from the config.
+This project is also setup with [ESLint](https://github.com/eslint/eslint) for code delinting of Astro, React, Typescript, Javascript, JSON, JSONc and JSON5 files. It includes many useful plugins, and all/many rules are custom set, for easy customization. It also includes some custom rules, which I created to suit my coding style... Though, I'm sure many of you won't like them - so just feel free to delete them and remove them from the config.
 
 ### Husky and commitlint
 
@@ -20,7 +20,7 @@ This project is also setup with [ESLint](https://github.com/eslint/eslint) for c
 
 ### Zod
 
-This project uses [zod](https://zod.dev/) for runtime type validation. It is a very useful tool for picking out small errors that might otherwise cause a headache to debug. All Zod values (schemas) are prefixed with a `Z`. So `ZBlogConfig` and `ZBlogConfig` are both Zod schemas that can be used to parse objects.
+This project uses [zod](https://zod.dev/) for runtime type validation. It is also a very useful tool for picking out small errors that might otherwise cause a headache to debug. All Zod values (schemas) are prefixed with a `Z`. So `ZBlogConfig` and `ZBlogConfig` are both Zod schemas that can be used to parse objects.
 
 ### HTTPS Dev Server
 
@@ -29,6 +29,10 @@ Certificates are automatically generated using [vite-plugin-mkcert](https://gith
 ### Screen Size Variety Support
 
 Small screen? No problem! This website is designed to look nice on all screen sizes. The navbar even tidies up into a collapsable menu on smaller vertical screens. When the screen becomes absurdly small, an ignorable warning appears.
+
+### Feature-Rich
+
+I've implemented various features including: Blog Page, Events Page, Contact Form + API, Build Tracking, JS/Response Error Logging + API, Admin Page for full control over dynamic data (e.g. blog posts, events, contact form submissions, errors, builds). Pretty much all of these can be disabled if not needed.
 
 ### RSS Support
 
@@ -46,6 +50,7 @@ Here's a high-level overview of the project structure:
 		- `/src/components/astro-components`: Astro components, which are rendered on the server. Prefer this over React hydration.
 		- `/src/components/components`: Smaller React components, usually used in larger blocks.
 		- `/src/components/partials`: Larger React blocks, that usually handle a specific job.
+		- `/src/components/elements`: Smaller React elements, that apply a specific style and/or additional functionality.
 	-	`/src/backend`: Backend logic for handling data, actions, and more.
 	-	`/src/shared`: Files accessible to both backend and frontend logic.
 	-	`/src/locales`: Translation files for internationalization (i18n).
@@ -84,6 +89,8 @@ Most of the website's content and behavior can be configured by editing the conf
 -	**`/src/shared/config/blog.ts`**: Configure blog settings, such as the number of posts per page.
 -	**`/src/shared/config/events.ts`**: Configure event settings.
 -	**`/src/shared/config/contact.ts`**: Configure contact form settings.
+-	**`/src/shared/config/dialog.ts`**: Configure dialog settings.
+-	**`/src/shared/config/errors.ts`**: Configure error logging settings.
 
 ## Workflow
 
@@ -93,7 +100,7 @@ Run the following command to create a `.env` file with a password for the admin 
 ```bash
 npm run createEnv <YOUR_ADMIN_PASSWORD>
 ```
-Omitting the .env file, or not providing the necessary values, disables the admin page cleanly.
+Omitting the .env values, or not providing the necessary values, disables the admin page cleanly.
 
 ### Creating Blog Posts
 
@@ -103,7 +110,7 @@ To create a new blog post, run the following command:
 npm run createPost "My New Post"
 ```
 
-This will create a new Markdown file in `/src/pages/blog`. You can then edit the file to add your content. The frontmatter of the Markdown file is used to set the title, description, and other metadata for the post.
+This will create a new Markdown file in your configured blog location. You can then edit the file to add your content. The frontmatter of the Markdown file is used to set the title, description, and other metadata for the post.
 
 ### Managing Events
 
@@ -111,14 +118,14 @@ Events are managed through the admin page. You can add, edit, and delete events 
 
 If you want to omit the admin page, you will need to manually edit the database in (default) `/data/events.db`. Check `/src/backend/database/events.ts` for the structure and workings of the events DB. You may also use a script that calls the functions from that file.
 
-For event entries that have `enablePage` set to `true`, the server expects a file named `{id}.md` inside the expected URL (set using the config file).
+For event entries that have `enablePage` set to `true`, the server expects a file named `{id}.md` inside the expected location (set using the config file).
 
 ### Internationalization (i18n)
 
 This template supports multiple languages. To add a new language, you need to:
 
 1.	Add the language to the `locales.config.ts` file in `/src/locales`.
-2.	Create a new translation file (e.g., `fr.ts`) in the `/src/locales` directory. This file should export a default object with the translated strings.
+2.	Create a new translation file (e.g., `fr-fr.ts`) in the `/src/locales` directory, named after a `BCP47` language code, using a `-` separator. 2- or 3-character codes are invalid. This file should export a default object with the translated strings.
 
 The website will remember the user's language choice using a cookie, while the server will read those and provide the according strings.
 
@@ -147,8 +154,15 @@ The admin page is available at `/admin/home/`. It allows you to:
 -	View contact form submissions.
 -	Add, remove and edit event entries and page content.
 -	Add, remove and edit blog posts.
+- View and remove builds.
+- View and remove errors.
+- View and remove errors corresponding to a specific build.
 
-You will need to log in with the password you set in the `.env` file.
+You will need to log in with the password you used to create your .env values.
+
+The Astro middleware (`@/middleware.ts`) redirects all admin pages to the login page (`/admin/login/`) if not authenticated, while it redirects to the admin homepage (`/admin/home/`) if authenticated.
+
+The components in the admin pages use the functions in `@/frontend/adminTools.ts` to communicate with the `/api/protected/` API, after authenticating to the `/api/auth/` API. Sending a POST request to the `/api/auth/` API with the correct password makes the server create a JWT and attach it as a cookie, while a DELETE request deletes the authentication token from the cookies. All requests to the protected API need to have the `credentials: 'include'` setting. The protected API has a bunch of request types specified as a URL query value, so it's probably better to go through all of them before changing anything there.
 
 ## Deployment
 

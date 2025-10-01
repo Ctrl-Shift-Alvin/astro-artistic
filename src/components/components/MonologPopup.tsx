@@ -12,6 +12,11 @@ export type TMonologProps = {
 	onClose?: ()=> void;
 };
 
+/**
+ * A monolog popup. Use is not recommended.
+ *
+ * @see MonologProvider
+ */
 export const MonologPopup = (props: TMonologProps) => {
 
 	const [

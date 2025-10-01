@@ -5,6 +5,7 @@ import BaseAdmin from '@/templates/BaseAdmin.astro';
 
 const { id = 'none' } = Astro.params;
 
+// Check if the 'id' is set to 'new', in which case we are creating a new entry
 let idOrNew: number | true =
 	id === 'new'
 		? true

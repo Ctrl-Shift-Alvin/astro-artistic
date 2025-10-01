@@ -3,14 +3,12 @@ import PaginationButtons from '@/components/astro-components/PaginationButtons.a
 import Section from '@/components/astro-components/Section.astro';
 import { BlogGallery } from '@/components/partials/BlogGallery';
 import { type TBlogMarkdownInstance } from '@/components/types';
-import { BlogConfig } from '@/shared/config/blog';
 import { GlobalTranslation } from '@/locales/global';
 import Base from '@/templates/Base.astro';
 import { getSortedBlogs } from '@/backend/blogs';
+import { BlogConfig } from '@/shared/config/blog';
 
 const translation = Astro.locals.translation;
-
-const config = BlogConfig(translation);
 
 const getPageUrl = (page: number) => {
 	const urlBase = '/blog/';
@@ -18,7 +16,7 @@ const getPageUrl = (page: number) => {
 };
 
 const { page = 1 } = Astro.params;
-const pageSize = config.pageSize;
+const pageSize = BlogConfig.pageSize;
 const startIndex = (Number(page) - 1) * pageSize;
 const endIndex = startIndex + pageSize;
 
@@ -36,12 +34,17 @@ const nextUrl: string | undefined =
 		getPageUrl(Number(page) + 1) // This as well
 	:	undefined;
 
-const title = `${config.title}${Number(page) > 1 ? ` ${translation.pagination.pageWord} ${page}` : ''} - ${GlobalTranslation.siteName}`;
-const description = config.description;
+const title = `${BlogConfig.title}${
+	Number(page) > 1
+		? ` ${translation.pagination.pageWord} ${page}`
+		: ''
+	} - ${GlobalTranslation.siteName
+}`;
+const description = BlogConfig.description;
 ---
 
 <Base head={{ title, description }}>
-	<Section title={config.title}>
+	<Section title={BlogConfig.title}>
 		<div class="w-full text-center mt-2">
 			{description}
 		</div>

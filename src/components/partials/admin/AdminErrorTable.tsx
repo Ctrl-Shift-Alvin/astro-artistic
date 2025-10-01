@@ -18,6 +18,10 @@ import { A } from '@/components/elements/A';
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 import { TrashcanIcon } from '@/components/components/icons/TrashcanIcon';
 
+/**
+ * A table for an overview of all error submissions,
+ * and a way to access each of them, that works through the protected admin API.
+ */
 export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 
 	const [

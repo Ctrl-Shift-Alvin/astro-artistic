@@ -1,11 +1,18 @@
-export type ILocale = {
+/**
+ * A locale with a name and a BCP47 code separated by a `-`.
+ */
+export interface ILocale {
 	name: string;
 	code: string;
-};
-export type ILocalesConfig = {
+}
+
+/**
+ * An array of `ILocale`s and a preferred BCP47 code that exists in the array.
+ */
+export interface ILocalesConfig {
 	languages: ILocale[];
 	preferredCode: string;
-};
+}
 
 export const LocalesConfig = {
 	languages: [

@@ -6,6 +6,9 @@ import {
 	formatDateOfBirth
 } from '@/shared/dataParse';
 
+/**
+ * The language code from the file name.
+ */
 const locale = import.meta.url.slice(
 	import.meta.url.lastIndexOf('/') + 1,
 	import.meta.url.lastIndexOf('/') + 6

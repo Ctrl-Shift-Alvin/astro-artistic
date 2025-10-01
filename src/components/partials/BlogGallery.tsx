@@ -7,6 +7,9 @@ import clsx from 'clsx/lite';
 import { BlogCard } from '../components/BlogCard';
 import { type TBlogMarkdownInstance } from '@/components/types';
 
+/**
+ * A blog post gallery that showcases all blog posts sorted by their descending publication date.
+ */
 export const BlogGallery = ({
 	blogFileList,
 	cutRemainder = true,

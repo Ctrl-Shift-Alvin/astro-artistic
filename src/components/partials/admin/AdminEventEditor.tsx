@@ -35,6 +35,9 @@ import { LabeledCheckbox } from '@/components/elements/LabeledCheckbox';
 // eslint-disable-next-line import-x/no-unassigned-import
 import 'react-datepicker/dist/react-datepicker.css';
 
+/**
+ * An overview and editor of a event, that works through the protected admin API.
+ */
 export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => {
 
 	const [

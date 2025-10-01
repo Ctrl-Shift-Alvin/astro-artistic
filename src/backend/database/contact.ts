@@ -18,15 +18,24 @@ const db = new Database(ContactConfig.dbPath);
 const CURRENT_VERSION = 0;
 const updateQueries: string[][] = []; // updateQueries[0] updates to 1, updateQueries[1] updates to 2, etc.
 
-// Returns true if the database was just created
+/**
+ * Create the database if it doesn't exist, and initialize it.
+ *
+ * When changing the structure make sure to update the version by 1,
+ * and add a new update query that yields the same exact structure
+ * as a now newly created DB. **There should be no difference between an *updated* and *new* DB!**
+ * @returns `true` if the database was just created. Otherwise `false`.
+ */
 const contact_createDbIfNotExists = (): boolean => {
 
+	// If file exists AND is not empty, do not proceed
 	if (fs.existsSync(ContactConfig.dbPath) && fs.statSync(ContactConfig.dbPath).size > 1) {
 
 		return false;
 
 	}
 
+	// Create directory if it doesn't exist
 	const dir = path.dirname(ContactConfig.dbPath);
 	if (!fs.existsSync(dir)) {
 
@@ -49,18 +58,11 @@ const contact_createDbIfNotExists = (): boolean => {
 				+ 'message TEXT NOT NULL,'
 				+ 'createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
 				+ ');';
-		const dbVersionQuery = 'user_version = 0;';
-
+		const dbVersionQuery = `user_version = ${CURRENT_VERSION};`;
 		db
 			.exec(dbSetupQuery)
 			.pragma(dbVersionQuery);
 
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		if (CURRENT_VERSION > 0) {
-
-			contact_updateDb();
-
-		}
 		return true;
 
 	} catch(err: any) {
@@ -74,6 +76,14 @@ const contact_createDbIfNotExists = (): boolean => {
 
 };
 
+/**
+ * Applies the update operations from `updateQueries` sequentially, based on the DB's version
+ * compared to `CURRENT_VERSION`.
+ *
+ * E.g. updating from version 5 to latest version 10 applies `updateQueries[5-9][...]` sequentially.
+ * @returns `true` if any update operations were applied successfully. Otherwise `false`.
+ * @throws if any update operations should be applied but fail. The transaction is reversed and the DB is unchanged.
+ */
 const contact_updateDb = () => {
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -88,7 +98,7 @@ const contact_updateDb = () => {
 
 	if (startDbVersion == CURRENT_VERSION) {
 
-		return;
+		return false;
 
 	}
 
@@ -121,6 +131,12 @@ const contact_updateDb = () => {
 
 };
 
+/**
+ * Run a query on the contact submissions database with params and return its result.
+ * @param query The query to run.
+ * @param params The params to provide to the query.
+ * @returns The result of the operation.
+ */
 export const contact_dbRun = (
 	query: string,
 	...params: unknown[]
@@ -153,6 +169,13 @@ export const contact_dbRun = (
 	}
 
 };
+
+/**
+ * Run a query on the contact submissions database with params, then parse and validate its *first* result.
+ * @param query The query to run.
+ * @param params The params to provide to the query.
+ * @returns The parsed and validated `TContactFormEntry` object. Otherwise, `undefined`.
+ */
 export const contact_dbGet = (
 	query: string,
 	...params: unknown[]
@@ -189,6 +212,13 @@ export const contact_dbGet = (
 	}
 
 };
+
+/**
+ * Run a query on the contact submissions database with params, then parse and validate all results.
+ * @param query The query to run.
+ * @param params The params to provide to the query.
+ * @returns The parsed and validated `TContactFormEntry` array. Otherwise, an empty array.
+ */
 export const contact_dbAll = (
 	query: string,
 	...params: unknown[]
@@ -226,6 +256,13 @@ export const contact_dbAll = (
 
 };
 
+/**
+ * Check if an existing entry with the same email and message is found in the contact submissions database.
+ *
+ * @param email The email to check against.
+ * @param message The message to check against.
+ * @returns `true` if an existing entry is found. Otherwise, `false`.
+ */
 export const contact_isDbDuplicateEntry = (
 	email: string,
 	message?: string
@@ -267,6 +304,11 @@ export const contact_isDbDuplicateEntry = (
 
 };
 
+/**
+ * Add a new entry to the contact submissions database.
+ *
+ * @returns The result of the DB operation.
+ */
 export const contact_addEntry = (form: TContactFormSubmission) => {
 
 	try {
@@ -290,6 +332,12 @@ export const contact_addEntry = (form: TContactFormSubmission) => {
 	}
 
 };
+
+/**
+ * Get an entry by its ID from the contact submissions database.
+ *
+ * @returns The first parsed and validated entry that was found. Otherwise, `undefined`.
+ */
 export const contact_getEntry = (id: number): TContactFormEntry | undefined => {
 
 	try {
@@ -309,6 +357,14 @@ export const contact_getEntry = (id: number): TContactFormEntry | undefined => {
 	}
 
 };
+
+/**
+ * Get all entries from the contact submissions database.
+ *
+ * **WARNING: Can be *very* slow, this gets *ALL* entries in the database and loads them into RAM.**
+ *
+ * @returns All entries found in the database. Otherwise, an empty array.
+ */
 export const contact_getAllEntries = (): TContactFormEntry[] => {
 
 	try {
@@ -325,6 +381,15 @@ export const contact_getAllEntries = (): TContactFormEntry[] => {
 	}
 
 };
+
+/**
+ * Get a certain number of entries, by an optional offset, from the contact submissions database.
+ *
+ * @param count The number of entries that should be retrieved.
+ * @param offset The offset at which to start counting the entries.
+ * @returns An array of length between `0` and `count`, depending on the available entries and `count`.
+ * 	Otherwise, an empty array.
+ */
 export const contact_getFewEntries = (
 	count: number,
 	offset: number = 0
@@ -349,6 +414,12 @@ export const contact_getFewEntries = (
 	}
 
 };
+
+/**
+ * Delete an entry by an ID from the contact submissions database.
+ *
+ * @returns The result of the DB operation.
+ */
 export const contact_deleteEntry = (id: number) => {
 
 	try {
@@ -368,6 +439,10 @@ export const contact_deleteEntry = (id: number) => {
 	}
 
 };
+
+/**
+ * Get the number of entries in the contact submissions database.
+ */
 export const contact_countEntries = (): number => {
 
 	try {

@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
+import path from 'node:path';
 import Database from 'better-sqlite3';
 import {
 	ZEventEntry,
@@ -17,14 +18,32 @@ const db = new Database(EventsConfig.dbPath);
 const updateQueries: string[][] = []; // updateQueries[0] updates to 1, updateQueries[1] updates to 2, etc.
 const CURRENT_VERSION = updateQueries.length;
 
+/**
+ * Create the database if it doesn't exist, and initialize it.
+ *
+ * When changing the structure make sure to update the version by 1,
+ * and add a new update query that yields the same exact structure
+ * as a now newly created DB. **There should be no difference between an *updated* and *new* DB!**
+ * @returns `true` if the database was just created. Otherwise `false`.
+ */
 const events_createDbIfNotExists = (): boolean => {
 
-	if (fs.existsSync(EventsConfig.dbPath) && fs.statSync(EventsConfig.dbPath).size > 1)
+	// If file exists AND is not empty, do not proceed
+
+	if (fs.existsSync(EventsConfig.dbPath) && fs.statSync(EventsConfig.dbPath).size > 1) {
+
 		return false;
 
-	if (!fs.existsSync('./data')) {
+	}
 
-		fs.mkdirSync('./data');
+	// Create directory if it doesn't exist
+	const dir = path.dirname(EventsConfig.dbPath);
+	if (!fs.existsSync(dir)) {
+
+		fs.mkdirSync(
+			dir,
+			{ recursive: true }
+		);
 
 	}
 
@@ -39,17 +58,11 @@ const events_createDbIfNotExists = (): boolean => {
 				+ 'enablePage BOOLEAN NOT NULL CHECK (enablePage IN (0, 1)),'
 				+ 'createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
 				+ ');';
-		const dbVersionQuery = 'user_version = 0;';
-
+		const dbVersionQuery = `user_version = ${CURRENT_VERSION};`;
 		db
 			.exec(dbSetupQuery)
 			.pragma(dbVersionQuery);
 
-		if (CURRENT_VERSION > 0) {
-
-			events_updateDb();
-
-		}
 		return true;
 
 	} catch(err: any) {
@@ -62,6 +75,15 @@ const events_createDbIfNotExists = (): boolean => {
 	}
 
 };
+
+/**
+ * Applies the update operations from `updateQueries` sequentially, based on the DB's version
+ * compared to `CURRENT_VERSION`.
+ *
+ * E.g. updating from version 5 to latest version 10 applies `updateQueries[5-9][...]` sequentially.
+ * @returns `true` if any update operations were applied successfully. Otherwise `false`.
+ * @throws if any update operations should be applied but fail. The transaction is reversed and the DB is unchanged.
+ */
 const events_updateDb = () => {
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -76,7 +98,7 @@ const events_updateDb = () => {
 
 	if (startDbVersion == CURRENT_VERSION) {
 
-		return;
+		return false;
 
 	}
 
@@ -108,6 +130,12 @@ const events_updateDb = () => {
 
 };
 
+/**
+ * Run a query on the events database with params and return its results.
+ * @param query The query to run.
+ * @param params The params to provide to the query.
+ * @returns The result of the operation.
+ */
 export const events_dbRun = (
 	query: string,
 	...params: unknown[]
@@ -141,6 +169,13 @@ export const events_dbRun = (
 	}
 
 };
+
+/**
+ * Run a query on the events database with params, then parse and validate its *first* result.
+ * @param query The query to run.
+ * @param params The params to provide to the query.
+ * @returns The parsed and validated `TEventsEntry` object. Otherwise, `undefined`.
+ */
 export const events_dbGet = (
 	query: string,
 	...params: unknown[]
@@ -177,6 +212,13 @@ export const events_dbGet = (
 	}
 
 };
+
+/**
+ * Run a query on the events database with params, then parse and validate all results.
+ * @param query The query to run.
+ * @param params The params to provide to the query.
+ * @returns The parsed and validated `TEventsEntry` array. Otherwise, an empty array.
+ */
 export const events_dbAll = (
 	query: string,
 	...params: unknown[]
@@ -214,6 +256,13 @@ export const events_dbAll = (
 
 };
 
+/**
+ * Get all entries from the events database.
+ *
+ * **WARNING: Can be *very* slow, this gets *ALL* entries in the database and loads them into RAM.**
+ *
+ * @returns All found entries in the database. Otherwise, an empty array.
+ */
 export const events_getAllEntries = (): TEventEntry[] => {
 
 	try {
@@ -231,6 +280,11 @@ export const events_getAllEntries = (): TEventEntry[] => {
 
 };
 
+/**
+ * Get all entries based on the `EventsConfig.ageRangeShown` config option.
+ *
+ * @returns The entries between `TODAY - ageRangeShown.minDays` and `TODAY + ageRangeShown.maxDays`.
+ */
 export const events_getAllRelevantEntries = (): TEventEntry[] => {
 
 	try {
@@ -280,6 +334,11 @@ export const events_getAllRelevantEntries = (): TEventEntry[] => {
 
 };
 
+/**
+ * Get an entry by its ID from the events database.
+ *
+ * @returns The first parsed and validated entry that was found. Otherwise, `undefined`.
+ */
 export const events_getEntry = (id: string | number): TEventEntry | undefined => {
 
 	try {
@@ -300,26 +359,42 @@ export const events_getEntry = (id: string | number): TEventEntry | undefined =>
 
 };
 
-export const events_createPage = async(id: number | bigint): Promise<boolean> => {
-
-	if (!fs.existsSync(EventsConfig.pagesPath))
-		fs.mkdirSync(EventsConfig.pagesPath);
-
-	const existingFiles = fs.readdirSync(
-		EventsConfig.pagesPath,
-		{ withFileTypes: true }
-	);
-
-	if (existingFiles
-		.map((e) => e.name)
-		.find((e) => e === `${id}.md`)
-	) {
-
-		return false;
-
-	}
+/**
+ * Create a new event page belonging to an existing event entry in the events database.
+ *
+ * @param id The event ID associated with the new page.
+ * @returns `true` if the event ID exists in the DB, and the page is successfully created. Otherwise, `false`.
+ */
+export const events_createPage = async(id: number): Promise<boolean> => {
 
 	try {
+
+		// Create the directory if it doesn't exist
+		if (!fs.existsSync(EventsConfig.pagesPath)) {
+
+			fs.mkdirSync(
+				EventsConfig.pagesPath,
+				{ recursive: true }
+			);
+
+		}
+
+		const existingFiles = fs.readdirSync(
+			EventsConfig.pagesPath,
+			{ withFileTypes: true }
+		);
+
+		// If the file already exists or the event ID does not exist in the DB, do not proceed
+		if (
+			existingFiles
+				.map((e) => e.name)
+				.find((e) => e === `${id}.md`)
+				|| events_getEntry(id) === undefined
+		) {
+
+			return false;
+
+		}
 
 		await new Promise((
 			resolve,
@@ -363,8 +438,12 @@ export const events_createPage = async(id: number | bigint): Promise<boolean> =>
 		});
 		return true;
 
-	} catch {
+	} catch(err: any) {
 
+		console.error(
+			'Failed to create a new event page with the ID ${id}:\n ',
+			err
+		);
 		return false;
 
 	}

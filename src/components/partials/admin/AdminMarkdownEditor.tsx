@@ -8,12 +8,19 @@ import ReactCodeMirror, { keymap } from '@uiw/react-codemirror';
 import { marked } from 'marked';
 import { useMemo } from 'react';
 
+/**
+ * A markdown editor for a string value.
+ *
+ * @param value The value that represents the editor contents.
+ * @param onSave Called when the save action (Ctrl+S) is triggered.
+ * @param onChange Called when the contents of the editor change. Make sure to manually update `value` here.
+ */
 export const AdminMarkdownEditor = ({
 	value = '',
 	onSave,
 	onChange
 }: {
-	value: string | undefined;
+	value?: string;
 	onSave: (newValue: string)=> void;
 	onChange: (newValue: string)=> void;
 }) => {

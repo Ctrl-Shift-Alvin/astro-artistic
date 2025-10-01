@@ -13,6 +13,9 @@ import {
 import { defaultFormatDateTimeString } from '@/shared/dataParse';
 import { A } from '@/components/elements/A';
 
+/**
+ * An overview of a single error submission, that works through the protected admin API.
+ */
 export const AdminErrorOverview = ({ submissionId }: { submissionId: number | string }) => {
 
 	const [

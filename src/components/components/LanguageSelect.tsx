@@ -1,6 +1,9 @@
 import clsx from 'clsx/lite';
 import { type ILocale } from '@/locales/locales.config';
 
+/**
+ * A select element for selecting a language from a dropdown.
+ */
 export const LanguageSelect = ({
 	availableLanguages,
 	selectedLanguageCode,

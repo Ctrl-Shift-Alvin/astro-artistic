@@ -6,10 +6,11 @@ import BaseAdmin from '@/templates/BaseAdmin.astro';
 
 const { fileName } = Astro.params;
 
+// Check if the filename is correct
 if (!fileName || getBlog(fileName) === null) {
 
-	Astro.response.status = 400;
-	Astro.response.statusText = 'bad-request';
+	Astro.response.status = 404;
+	Astro.response.statusText = 'not-found';
 
 }
 ---

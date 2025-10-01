@@ -5,6 +5,12 @@ import {
 import clsx from 'clsx/lite';
 import { smoothScroll } from '@/frontend/windowTools';
 
+/**
+ * A small fixed arrow-up button at the bottom-right of the screen,
+ * that allows the user to easily scroll up to the top of the page.
+ *
+ * @param scrollYThreshold The minimum Y-threashold at which to show the component.
+ */
 export const ScrollUp = ({ scrollYThreshold }: { scrollYThreshold: number }) => {
 
 	const [

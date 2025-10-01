@@ -1,8 +1,13 @@
 import {
-	useEffect, useMemo, useState, type Dispatch, type SetStateAction
+	useEffect,
+	useMemo,
+	useState,
+	type Dispatch,
+	type SetStateAction
 } from 'react';
 import {
-	Button, type TButtonProps
+	Button,
+	type TButtonProps
 } from '@/components/elements/Button';
 import { isWindowDefined } from '@/frontend/windowTools';
 
