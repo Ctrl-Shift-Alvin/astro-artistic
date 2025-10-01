@@ -38,7 +38,7 @@ I've implemented various features including: Blog Page, Events Page, Contact For
 
 Supports RSS, and makes it easy to configure. It passes [RSS Validator](https://www.rssboard.org/rss-validator/) perfectly!
 
-<a href="http://www.rssboard.org/rss-validator/check.cgi"><img src="public/images/valid-rss-rogers.png" alt="[Valid RSS]" title="Validate my RSS feed" /></a>
+<a href="http://www.rssboard.org/rss-validator/check.cgi"><img src="public/images/valid-rss.png" alt="[Valid RSS]" title="Validate my RSS feed" /></a>
 
 ## Project Structure
 
