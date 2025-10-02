@@ -74,7 +74,7 @@
 		"start": "node ./dist/server/entry.mjs",
 		"build": "npm run buildVersion && astro build",
 		"buildVersion": "tsx ./scripts/buildVersion.ts",
-		"bs": "astro build && npm run start"
+		"bs": "npm run build && npm run start"
 	},
 	"type": "module",
 	"version": "1.0.0",
