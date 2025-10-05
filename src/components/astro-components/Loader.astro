@@ -30,7 +30,7 @@
 			fill="currentColor"
 			d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
 	</svg>
-	<script> // Removes loader when react is hydrated
+	<script> // Removes loader when the page is loaded
 
 		import { getFadeInOffsetMs } from '@/frontend/windowTools';
 
@@ -39,10 +39,8 @@
 			throw new Error('Could not find \'loader\' element!');
 		}
 
+		window.loaderRemoved = false;
 		window.removeLoader = () => {
-
-			if (window.loaderRemoved)
-				return;
 
 			loader.classList.replace('opacity-100', 'opacity-0');
 			loader.classList.add('pointer-events-none');
@@ -51,27 +49,25 @@
 				getFadeInOffsetMs()
 			);
 
-			window.removeEventListener('react-hydrated', window.removeLoader!);
+			window.removeEventListener('load', window.removeLoader!);
 
 			window.loaderRemoved = true;
 			window.removeLoader = undefined;
 
 		};
 
-		window.addEventListener('react-hydrated', window.removeLoader);
+		window.addEventListener('load', window.removeLoader);
 
-	</script>
-
-	<script> // Removes loader if it times out
 		setTimeout(() => {
 
-			if (window.loaderRemoved == false) {
+			if (window.loaderRemoved === false) {
 
-				window.removeLoader?.();
 				console.error('Loader timed out after 2 seconds!');
+				window.removeLoader?.();
 
 			}
 
 		}, 2000); // Timeout after 2s
+
 	</script>
 </div>
