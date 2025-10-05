@@ -66,16 +66,12 @@ export const Translation = ZTranslation.parse({
 		feedback: {
 			noError:
 				'Message sent successfully! I will get back to you as soon as possible! :)',
-			resendError:
-				'You already sent a message. If you want to send another one, please press submit again to confirm!',
 			nameError:
 				'Error: Please enter a name! Thank you! :)',
 			emailError:
 				'Error: Please enter a valid email! Thank you! :)',
 			phoneNumberError:
 				'Error: Please enter a phone number! Thank you! :)',
-			messageError:
-				'Error: Please write a message! Thank you! :)',
 			sendingError:
 				'Oh no, something on my part went wrong sending the text. Please contact me via telephone or email!',
 			duplicateError:
@@ -176,5 +172,10 @@ export const Translation = ZTranslation.parse({
 		],
 		reloadInUnknown: 'Try reloading the website a few minutes later.',
 		shouldReload: 'Website reloading... If it\'s taking too long, feel free to reload manually.'
+	},
+	captcha: {
+		title: 'Captcha',
+		solveField: 'Solution',
+		errorFeedback: 'The captcha solution was incorrect! Please enter the correct characters into the solution field!'
 	}
 });

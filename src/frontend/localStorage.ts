@@ -76,3 +76,73 @@ export function lsGetAuthTokenExpiry(): number | null {
 	return null;
 
 }
+
+/**
+ * Set the `currentCaptcha` key in the local storage.
+ *
+ * @param captcha The value to set. Set to null to delete the key.
+ */
+export function lsSetCurrentCaptcha(captcha?: {
+	id: string;
+	expiry: number;
+	svgData: string;
+} | null) {
+
+	addLocalStorage(
+		'currentCaptcha',
+		captcha
+			? JSON.stringify(captcha)
+			: null
+	);
+
+}
+
+/**
+ * Get the `currentCaptcha` key from the local storage.
+ */
+export function lsGetCurrentCaptcha(): {
+	id: string;
+	expiry: number;
+	svgData: string;
+} | null {
+
+	const storedCaptcha = getLocalStorage('currentCaptcha');
+
+	return storedCaptcha
+		? JSON.parse(storedCaptcha) as {
+			id: string;
+			expiry: number;
+			svgData: string;
+		}
+		: null;
+
+}
+
+/**
+ * Set the `currentCaptchaAttempts` key in the local storage.
+ *
+ * @param value The value to set. Set to null to delete the key.
+ */
+export function lsSetCurrentCaptchaAttempts(value: number | null) {
+
+	addLocalStorage(
+		'currentCaptchaAttempts',
+		value?.toString() ?? null
+	);
+
+}
+
+/**
+ * Get the `currentCaptchaAttempts` key from the local storage.
+ */
+export function lsGetCurrentCaptchaAttempts(): number | null {
+
+	const value = getLocalStorage('currentCaptchaAttempts');
+	if (value) {
+
+		return Number(value);
+
+	}
+	return null;
+
+}

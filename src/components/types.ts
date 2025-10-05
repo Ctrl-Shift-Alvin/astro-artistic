@@ -222,7 +222,13 @@ export type TContactFormEntry = z.infer<typeof ZContactFormEntry>;
 /**
  * The body of a contact API request.
  */
-export const ZContactApiRequest = z.object({ data: ZContactFormSubmission });
+export const ZContactApiRequest = z.object({
+	data: ZContactFormSubmission,
+	captcha: z.object({
+		id: z.string(),
+		text: z.string()
+	})
+});
 
 /**
  * The body of a contact API request.

@@ -24,6 +24,7 @@
 		"react": "^18.2.0",
 		"react-datepicker": "^8.7.0",
 		"react-dom": "^18.2.0",
+		"svg-captcha": "^1.4.0",
 		"typescript": "^5.9.2",
 		"vite": "^6.2.0",
 		"vite-plugin-mkcert": "^1.17.8"

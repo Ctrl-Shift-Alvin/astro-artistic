@@ -208,3 +208,14 @@ export const ZErrorsConfig = z.object({
 });
 
 // #endregion
+
+// #region Captcha Config
+
+export const ZCaptchaConfig = z.object({
+	tokenExpiryMs: z.number(),
+	maxTokenCount: z.number(),
+	maxTriesPerToken: z.number(),
+	tokenCleanupIntervalMs: z.number()
+});
+
+// #endregion

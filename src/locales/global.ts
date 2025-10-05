@@ -55,11 +55,8 @@ export const ZTranslation = z.object({
 		submit: z.string(),
 		feedback: z.object({
 			noError: z.string(),
-			resendError: z.string(),
-			nameError: z.string(),
 			emailError: z.string(),
 			phoneNumberError: z.string(),
-			messageError: z.string(),
 			sendingError: z.string(),
 			duplicateError: z.string()
 		})
@@ -140,6 +137,11 @@ export const ZTranslation = z.object({
 		body: z.string(),
 		expandButton: z.string(),
 		homeButton: z.string()
+	}),
+	captcha: z.object({
+		title: z.string(),
+		solveField: z.string(),
+		errorFeedback: z.string()
 	})
 });
 

@@ -1,12 +1,18 @@
 import { useState } from 'react';
 import clsx from 'clsx';
 import { Monolog } from '../components/MonologProvider';
-import { ZContactFormSubmission } from '../types';
+import { ZContactApiRequest } from '../types';
 import { A } from '../elements/A';
 import { Button } from '../elements/Button';
 import { LabeledInput } from '../elements/LabeledInput';
 import { LabeledTextArea } from '../elements/LabeledTextArea';
+import { CaptchaSolver } from '../components/CaptchaSolver';
 import { type TContact } from '@/shared/config/configTypes';
+import {
+	addCaptchaAttempt,
+	fetchNewCaptcha,
+	getCaptcha
+} from '@/frontend/captchaApi';
 
 /**
  * A card that allows users to submit a contact form using the contact API.
@@ -32,37 +38,25 @@ export const ContactCard = ({
 		message: ''
 	});
 	const [
-		submitted,
-		setSubmitted
-	] = useState(false);
+		captchaData,
+		setCaptchaData
+	] = useState('');
 
 	const handleSubmit = async(e: React.FormEvent) => {
 
 		e.preventDefault();
 
-		if (submitted) {
-
-			setSubmitted(false);
-			Monolog.show({ text: window.__TRANSLATION__.contact.feedback.resendError });
-			return;
-
-		}
-
-		const requestBody = ZContactFormSubmission.safeParse(formData);
+		const requestBody = ZContactApiRequest.safeParse({
+			data: { ...formData },
+			captcha: {
+				id: (await getCaptcha())?.id,
+				text: captchaData
+			}
+		});
 		if (!requestBody.success) {
 
-			switch (requestBody.error.issues[0]?.path[0]) {
+			switch (requestBody.error.issues[0]?.path[1]) {
 
-				case 'firstName': {
-
-					Monolog.show({ text: window.__TRANSLATION__.contact.feedback.nameError });
-
-				} break;
-				case 'lastName': {
-
-					Monolog.show({ text: window.__TRANSLATION__.contact.feedback.nameError });
-
-				} break;
 				case 'email': {
 
 					Monolog.show({ text: window.__TRANSLATION__.contact.feedback.emailError });
@@ -71,11 +65,6 @@ export const ContactCard = ({
 				case 'phoneNumber': {
 
 					Monolog.show({ text: window.__TRANSLATION__.contact.feedback.phoneNumberError });
-
-				} break;
-				case 'message': {
-
-					Monolog.show({ text: window.__TRANSLATION__.contact.feedback.messageError });
 
 				} break;
 				default: {
@@ -97,13 +86,21 @@ export const ContactCard = ({
 				body: JSON.stringify(requestBody.data)
 			}
 		);
+
+		addCaptchaAttempt();
+
 		if (response.ok) {
 
-			setSubmitted(true);
+			void fetchNewCaptcha();
 			Monolog.show({ text: window.__TRANSLATION__.contact.feedback.noError });
+
+		} else if (response.status === 401) {
+
+			Monolog.show({ text: window.__TRANSLATION__.captcha.errorFeedback });
 
 		} else if (response.status === 409) {
 
+			void fetchNewCaptcha();
 			Monolog.show({ text: window.__TRANSLATION__.contact.feedback.duplicateError });
 
 		} else {
@@ -195,6 +192,7 @@ export const ContactCard = ({
 								<div className={'mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6'}>
 									<div className={'sm:col-span-3'}>
 										<LabeledInput
+											required
 											id={'first-name'}
 											name={'first-name'}
 											type={'text'}
@@ -217,6 +215,7 @@ export const ContactCard = ({
 
 									<div className={'sm:col-span-3'}>
 										<LabeledInput
+											required
 											id={'last-name'}
 											name={'last-name'}
 											type={'text'}
@@ -239,6 +238,7 @@ export const ContactCard = ({
 
 									<div className={'sm:col-span-3'}>
 										<LabeledInput
+											required
 											id={'email'}
 											name={'email'}
 											type={'text'}
@@ -261,6 +261,7 @@ export const ContactCard = ({
 
 									<div className={'sm:col-span-3'}>
 										<LabeledInput
+											required
 											id={'phone-number'}
 											name={'phone-number'}
 											type={'text'}
@@ -319,6 +320,13 @@ export const ContactCard = ({
 												{window.__TRANSLATION__.contact.message}
 											</LabeledTextArea>
 										</div>
+									</div>
+
+									<div className={'sm:col-span-3'}>
+										<CaptchaSolver
+											value={captchaData}
+											setValue={setCaptchaData}
+										/>
 									</div>
 								</div>
 							</div>
