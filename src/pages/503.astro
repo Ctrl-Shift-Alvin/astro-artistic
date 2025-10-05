@@ -1,0 +1,54 @@
+---
+import BaseLight from '@/templates/BaseLight.astro';
+import { DEFAULT_ANIMATION_DURATION_MS } from '@/frontend/windowTools';
+
+const translation = Astro.locals.translation;
+---
+<BaseLight head={{
+	title: translation.offline.title,
+	description: translation.offline.description
+}}>
+
+	<script is:inline define:vars={{ animDuration: DEFAULT_ANIMATION_DURATION_MS }}>
+
+		const tryRedirect = async () => {
+
+			try {
+
+				const result = await fetch('/home/', { cache: 'no-cache' }); // Smallest resource currently
+				if (result.status !== 503) {
+
+					// Transition
+					document.body.classList.replace('opacity-100', 'opacity-0');
+					await new Promise((res) => setTimeout(res, animDuration));
+					window.location.href = '/';
+					return true;
+
+				}
+
+			} finally {
+
+				return false;
+
+			}
+    };
+
+    (async () => {
+			if (!await tryRedirect()) {
+
+				setInterval(
+					() => void tryRedirect(),
+					5000
+				);
+
+			}
+    })();
+	</script>
+
+	<h1 class="mt-15 w-10/12 text-center text-4xl font-bold">
+		{translation.fiveOThree.title}
+	</h1>
+	<p class="newlines mt-3 w-10/12 text-center text-lg">
+		{translation.fiveOThree.body}
+	</p>
+</BaseLight>

@@ -173,6 +173,14 @@ export const Translation = ZTranslation.parse({
 		reloadInUnknown: 'Try reloading the website a few minutes later.',
 		shouldReload: 'Website reloading... If it\'s taking too long, feel free to reload manually.'
 	},
+	fiveOThree: {
+		title: 'Maintenance',
+		description: 'This website is currently under maintenance!',
+		body: 'The website is currently under maintenance, and nobody can access it! This is the only way to improve things!\n'
+			+ 'Meanwhile, here are my contact details should you have any questions:\n'
+			+ `Phone number: ${ContactConfig.contacts.default!.telNumber}\n`
+			+ `Email: ${ContactConfig.contacts.default!.email}`
+	},
 	captcha: {
 		title: 'Captcha',
 		solveField: 'Solution',

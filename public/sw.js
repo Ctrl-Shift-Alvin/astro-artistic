@@ -1,11 +1,19 @@
 /* eslint-disable import-x/unambiguous */
 
 // Assigns self.__BUILD__ to latest build information
-importScripts('build.js');
+try {
+
+	importScripts('build.js');
+
+} catch {
+
+	console.error('Failed to fetch build info from \'/build.js\'!');
+
+}
 
 if (!self.__BUILD__) {
 
-	console.error('Failed to fetch build info from \'/build.js\'!');
+	console.error('Fetching build info from \'/build.js\' didn\'t work as expected!');
 
 }
 
@@ -13,11 +21,13 @@ if (!self.__BUILD__) {
 const CACHE_NAME = `cache-${self.__BUILD__.buildNumber}` || 'cache-0';
 const OFFLINE_URL = '/offline/';
 const FOURTWENTYNINE_URL = '/429/';
+const FIVEOTHREE_URL = '/503/';
 
 /** URLs pointing to any page. */
 const NAV_URLS = [
 	OFFLINE_URL,
-	FOURTWENTYNINE_URL
+	FOURTWENTYNINE_URL,
+	FIVEOTHREE_URL
 ];
 
 /** URLs pointing to any static asset. */
@@ -82,7 +92,7 @@ self.addEventListener(
 							return await caches.match(OFFLINE_URL) || networkResponse;
 
 						case 503:
-							return await caches.match(OFFLINE_URL) || networkResponse; // Change later to server maintenance page
+							return await caches.match(FIVEOTHREE_URL) || networkResponse;
 
 						case 504:
 							return await caches.match(OFFLINE_URL) || networkResponse;

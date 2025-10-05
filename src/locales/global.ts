@@ -138,6 +138,11 @@ export const ZTranslation = z.object({
 		expandButton: z.string(),
 		homeButton: z.string()
 	}),
+	fiveOThree: z.object({
+		title: z.string(),
+		description: z.string(),
+		body: z.string()
+	}),
 	captcha: z.object({
 		title: z.string(),
 		solveField: z.string(),

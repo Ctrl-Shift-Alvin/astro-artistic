@@ -175,6 +175,14 @@ export const Translation = ZTranslation.parse({
 		reloadInUnknown: 'Rufen Sie die Webseite in ein paar Minuten neu auf.',
 		shouldReload: 'Website lädt neu... Falls es zu lange dauern soll, können Sie es gerne auch manuell probieren.'
 	},
+	fiveOThree: {
+		title: 'Wartung',
+		description: 'Diese Webseite wird momentan gewartet.',
+		body: 'Diese Webseite wird momentan gewartet, und niemand kann auf sie zugreifen. Dies ist der einzige Weg, Sachen zu verbessern!\n'
+			+ 'Hier finden Sie meine Kontaktdaten, falls Sie daweil Fragen haben:\n'
+			+ `Telefonnummer: ${ContactConfig.contacts.default!.telNumber}\n`
+			+ `Email: ${ContactConfig.contacts.default!.email}`
+	},
 	captcha: {
 		title: 'Captcha',
 		solveField: 'Lösung',
