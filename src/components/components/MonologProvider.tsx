@@ -125,32 +125,37 @@ export const MonologProvider = () => {
 
 			const listener = (options: TMonologOptions) => {
 
-				if (monologs.length > 3) {
-
-					setMonologs((prev) => {
-
-						return prev.slice(-2);
-
-					});
-
-				}
-
 				const id = crypto.randomUUID();
-				const onClose = () => {
+				const newElement = {
+					...options,
+					id,
+					onClose: () => {
 
-					removeMonolog(id);
-					options.onClose?.();
+						removeMonolog(id);
+						options.onClose?.();
 
+					}
 				};
 
-				setMonologs((prevMonologs) => [
-					...prevMonologs,
-					{
-						...options,
-						id,
-						onClose
-					}
-				]);
+				/*
+				 * If the max length is reached,
+				 * keep the last 2 elements and append the new one
+				 */
+				if (monologs.length >= 3) {
+
+					setMonologs((prev) => [
+						...prev.slice(-2),
+						newElement
+					]);
+
+				} else {
+
+					setMonologs((prev) => [
+						...prev,
+						newElement
+					]);
+
+				}
 
 			};
 
