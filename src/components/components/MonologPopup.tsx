@@ -3,21 +3,14 @@ import {
 	useEffect
 } from 'react';
 import clsx from 'clsx';
-
-export type TMonologProps = {
-	text: string;
-	durationMs: number;
-	fadeDurationMs: number;
-	className?: string;
-	onClose?: ()=> void;
-};
+import { type TMonologOptions } from './MonologProvider';
 
 /**
  * A monolog popup. Use is not recommended.
  *
  * @see MonologProvider
  */
-export const MonologPopup = (props: TMonologProps) => {
+export const MonologPopup = (props: TMonologOptions) => {
 
 	const [
 		visible,

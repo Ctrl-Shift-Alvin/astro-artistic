@@ -4,6 +4,7 @@ import React, {
 	useEffect,
 	useState
 } from 'react';
+import { Emitter } from '../types';
 import {
 	DialogPopup,
 	type DialogButton
@@ -11,51 +12,25 @@ import {
 import { DialogConfig } from '@/shared/config/dialog';
 import { isWindowDefined } from '@/frontend/windowTools';
 
-type DialogOptions = {
+type TDialogOptions = {
 	title: ReactNode;
 	body: ReactNode;
 	buttons: DialogButton[];
 	onBackdropClick?: ()=> void;
 };
 
-/**
- * A subscribe/listener emitter for a DialogProvider. You probably shouldn't use this.
- */
-export class DialogEmitter {
-
-	private listener: ((options: DialogOptions)=> void) | null = null;
-
-	subscribe(l: (options: DialogOptions)=> void) {
-
-		this.listener = l;
-
-	}
-
-	unsubscribe() {
-
-		this.listener = null;
-
-	}
-
-	emit(options: DialogOptions) {
-
-		this.listener?.(options);
-
-	}
-
-}
 const dialogEmitter = isWindowDefined()
 	? (() => {
 
 		if (!window.dialogEmitter) {
 
-			window.dialogEmitter = new DialogEmitter();
+			window.dialogEmitter = new Emitter<TDialogOptions>();
 
 		}
 		return window.dialogEmitter;
 
 	})()
-	: new DialogEmitter();
+	: new Emitter<TDialogOptions>();
 
 /**
  * Class with static helper functions for creating dialogs. The DOM must have the DialogProvider component.
@@ -67,7 +42,7 @@ export class Dialog {
 	 * If the other helper methods do not suit your needs, use this to create a custom dialog.
 	 * @param options The custom options used to create the dialog
 	 */
-	static show(options: DialogOptions): void {
+	static show(options: TDialogOptions): void {
 
 		dialogEmitter.emit(options);
 
@@ -285,7 +260,7 @@ export const DialogProvider: React.FC = () => {
 	const [
 		options,
 		setOptions
-	] = useState<DialogOptions | null>(null);
+	] = useState<TDialogOptions | null>(null);
 
 	const hideDialogCallback = useCallback(
 		() => {
@@ -299,7 +274,7 @@ export const DialogProvider: React.FC = () => {
 	useEffect(
 		() => {
 
-			const listener = (opts: DialogOptions) => {
+			const listener = (opts: TDialogOptions) => {
 
 				setOptions({
 					...opts,

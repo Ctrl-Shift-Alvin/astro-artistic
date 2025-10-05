@@ -2,9 +2,9 @@
 /// <reference types="astro/client" />
 
 import type { TTranslation } from '@/locales/global';
-import type { MonologEmitter } from '@/components/components/MonologProvider';
-import type { DialogEmitter } from './components/components/DialogProvider';
-import type { TBuild } from '@/components/types';
+import type { MonologEmitter, TMonologOptions } from '@/components/components/MonologProvider';
+import type { DialogEmitter, TDialogOptions } from './components/components/DialogProvider';
+import type { Emitter, TBuild } from '@/components/types';
 
 declare global {
 
@@ -17,8 +17,8 @@ declare global {
 	interface Window {
 		__TRANSLATION__: TTranslation;
 		__BUILD__: TBuild;
-		monologEmitter: MonologEmitter | undefined;
-		dialogEmitter: DialogEmitter | undefined;
+		monologEmitter: Emitter<TMonologOptions> | undefined;
+		dialogEmitter: Emitter<TDialogOptions> | undefined;
 
 		removeLoader?: ()=> void;
 		loaderRemoved?: boolean;

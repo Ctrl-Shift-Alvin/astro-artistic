@@ -599,3 +599,100 @@ export const ZAuthDeleteApiResponse = ZApiResponse;
 export type TAuthDeleteApiResponse = z.infer<typeof ZAuthDeleteApiResponse>;
 
 // #endregion
+
+// #region Captcha API
+
+export const ZCaptchaResponse = z.object({
+	id: z
+		.string()
+		.nonempty(),
+	svgData: z
+		.string()
+		.nonempty()
+});
+
+// #endregion
+
+/**
+ * A subscription emitter.
+ */
+export class Emitter<T> {
+
+	private listener: ((value: T)=> void) | null = null;
+
+	subscribe(l: (value: T)=> void) {
+
+		this.listener = l;
+
+	}
+
+	unsubscribe() {
+
+		this.listener = null;
+
+	}
+
+	emit(value: T) {
+
+		this.listener?.(value);
+
+	}
+
+}
+
+/**
+ * A subscription emitter that allows multiple listeners.
+ */
+export class MultiEmitter<T> {
+
+	private nextId = 0;
+
+	private listeners: ({
+		callback: (value: T)=> void;
+		id: number;
+	})[] = [];
+
+	/**
+	 * Add a new subscriber to the emitter instance.
+	 * @param l The listener callback.
+	 * @returns The unique listener ID number. Use it to unsubscribe.
+	 */
+	subscribe(l: (value: T)=> void): number {
+
+		const id = this.nextId++;
+		this.listeners.push({
+			callback: l,
+			id
+		});
+		return id;
+
+	}
+
+	/**
+	 * Unsubscribe a existing subscriber with an ID.
+	 *
+	 * @param id The ID number returned by the earlier `subscribe()` call.
+	 */
+	unsubscribe(id: number) {
+
+		this.listeners = this.listeners.filter((l) => l.id !== id);
+
+	}
+
+	/**
+	 * Emit a value to all current subscribers.
+	 */
+	emit(value: T) {
+
+		// Iterate over a copy in case a listener unsubscribes itself during the emit.
+		this.listeners
+			.slice()
+			.forEach((l) => {
+
+				l.callback(value);
+
+			});
+
+	}
+
+}

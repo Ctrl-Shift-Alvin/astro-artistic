@@ -3,55 +3,33 @@ import {
 	useEffect,
 	useCallback
 } from 'react';
-import {
-	MonologPopup,
-	type TMonologProps
-} from './MonologPopup';
+import { Emitter } from '../types';
+import { MonologPopup } from './MonologPopup';
 import {
 	DEFAULT_ANIMATION_DURATION_MS,
 	isWindowDefined
 } from '@/frontend/windowTools';
 
-/**
- * A subscribe/listener emitter for a MonologProvider. You probably shouldn't use this.
- */
-export class MonologEmitter {
+export type TMonologOptions = {
+	text: string;
+	durationMs: number;
+	fadeDurationMs: number;
+	className?: string;
+	onClose?: ()=> void;
+};
 
-	nextId: number = 0;
-
-	private listener: ((options: TMonologProps)=> void) | null = null;
-
-	subscribe(l: (options: TMonologProps)=> void) {
-
-		this.listener = l;
-
-	}
-
-	unsubscribe() {
-
-		this.listener = null;
-
-	}
-
-	emit(options: TMonologProps) {
-
-		this.listener?.(options);
-
-	}
-
-}
 const monologEmitter = isWindowDefined()
 	? (() => {
 
 		if (!window.monologEmitter) {
 
-			window.monologEmitter = new MonologEmitter();
+			window.monologEmitter = new Emitter<TMonologOptions>();
 
 		}
 		return window.monologEmitter;
 
 	})()
-	: new MonologEmitter();
+	: new Emitter<TMonologOptions>();
 
 /**
  * Class with static helper functions for creating monologs. The DOM must have the MonologProvider component.
@@ -131,10 +109,10 @@ export const MonologProvider = () => {
 	const [
 		monologs,
 		setMonologs
-	] = useState<(TMonologProps & { id: number })[]>([]);
+	] = useState<(TMonologOptions & { id: string })[]>([]);
 
 	const removeMonolog = useCallback(
-		(id: number) => {
+		(id: string) => {
 
 			setMonologs((prevMonologs) => prevMonologs.filter((m) => m.id !== id));
 
@@ -145,9 +123,9 @@ export const MonologProvider = () => {
 	useEffect(
 		() => {
 
-			const listener = (options: TMonologProps) => {
+			const listener = (options: TMonologOptions) => {
 
-				if (monologs.length >= 3) {
+				if (monologs.length > 3) {
 
 					setMonologs((prev) => {
 
@@ -157,7 +135,7 @@ export const MonologProvider = () => {
 
 				}
 
-				const id = monologEmitter.nextId++;
+				const id = crypto.randomUUID();
 				const onClose = () => {
 
 					removeMonolog(id);
