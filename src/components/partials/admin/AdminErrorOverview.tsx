@@ -10,7 +10,7 @@ import {
 	deleteError,
 	fetchError
 } from '@/frontend/adminApi';
-import { defaultFormatDateTimeString } from '@/shared/dataParse';
+import { defaultFormatDateTimeString } from '@/shared/time';
 import { A } from '@/components/elements/A';
 
 /**

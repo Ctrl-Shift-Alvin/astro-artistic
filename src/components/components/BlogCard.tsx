@@ -1,6 +1,6 @@
 import { type TBlogMarkdownInstance } from '../types';
 import { A } from '../elements/A';
-import { defaultFormatDateString } from '@/shared/dataParse';
+import { defaultFormatDateString } from '@/shared/time';
 
 /**
  * A blog card that summarizes a blog post.

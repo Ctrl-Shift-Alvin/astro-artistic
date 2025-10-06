@@ -3,7 +3,7 @@ import { type TTranslation } from '@/locales/global';
 import { events_getAllRelevantEntries } from '@/backend/database/events';
 import { A } from '../elements/A';
 import { EventsConfig } from '@/backend/config/events';
-import { defaultFormatDateTimeString } from '@/shared/dataParse';
+import { defaultFormatDateTimeString } from '@/shared/time';
 
 export interface Props {
 	translation: TTranslation;
@@ -11,9 +11,11 @@ export interface Props {
 const { translation } = Astro.props;
 
 const eventEntries = events_getAllRelevantEntries().map((item) => {
+
 	const date = new Date(item.dateTime);
 	const datePassed = date.getTime() - Date.now() < 0;
 	return { data: item, date, datePassed };
+
 });
 
 const eventPagesUrl = EventsConfig.pagesPath

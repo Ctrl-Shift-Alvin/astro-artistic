@@ -10,7 +10,7 @@ import {
 	fetchBuild
 } from '@/frontend/adminApi';
 import { A } from '@/components/elements/A';
-import { defaultFormatDateTimeString } from '@/shared/dataParse';
+import { defaultFormatDateTimeString } from '@/shared/time';
 
 /**
  * An overview of a single build including its corresponding errors,

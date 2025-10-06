@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { type TBlogFrontmatter } from '@/components/types';
 import { GlobalTranslation } from '@/locales/global';
-import { defaultFormatDateString } from '@/shared/dataParse';
+import { defaultFormatDateString } from '@/shared/time';
 
 /**
  * Renders a blog post and its header info. Pass the blog post contents as children.

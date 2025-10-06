@@ -13,7 +13,7 @@ import {
 } from '@/frontend/adminApi';
 import { ErrorsConfig } from '@/shared/config/errors';
 import { A } from '@/components/elements/A';
-import { defaultFormatDateTimeString } from '@/shared/dataParse';
+import { defaultFormatDateTimeString } from '@/shared/time';
 import { TrashcanIcon } from '@/components/components/icons/TrashcanIcon';
 
 /**

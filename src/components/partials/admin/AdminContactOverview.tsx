@@ -9,7 +9,7 @@ import {
 	deleteContactEntry,
 	fetchContactEntry
 } from '@/frontend/adminApi';
-import { defaultFormatDateTimeString } from '@/shared/dataParse';
+import { defaultFormatDateTimeString } from '@/shared/time';
 
 /**
  * An overview of a single contact form submission, that works through the protected admin API.

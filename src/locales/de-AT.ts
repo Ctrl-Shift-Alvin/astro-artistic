@@ -4,7 +4,7 @@ import { ContactConfig } from '@/shared/config/contact';
 import {
 	formatAge,
 	formatDateOfBirth
-} from '@/shared/dataParse';
+} from '@/shared/time';
 
 /**
  * The language code from the file name.

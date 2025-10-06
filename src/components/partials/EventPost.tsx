@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { defaultFormatDateTimeString } from '@/shared/dataParse';
+import { defaultFormatDateTimeString } from '@/shared/time';
 import { type TEventEntry } from '@/components/types';
 
 /**
