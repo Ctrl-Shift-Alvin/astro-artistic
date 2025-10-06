@@ -120,12 +120,12 @@ export const ZEventsConfig = z.object({
 	ageRangeShown: z.object({
 
 		/**
-		 * Can be `Number.MIN_SAFE_INTEGER` to show all past entries.
+		 * Can be `Number.MIN_SAFE_INTEGER` to show all past entries. Should be negative, but it's not enforced.
 		 */
 		minDays: z.number(),
 
 		/**
-		 * Can be `Number.MAX_SAFE_INTEGER` to show all future entries.
+		 * Can be `Number.MAX_SAFE_INTEGER` to show all future entries. Should be positive, but it's not enforced.
 		 */
 		maxDays: z.number()
 	})
@@ -212,6 +212,25 @@ export const ZCaptchaConfig = z.object({
 	maxTokenCount: z.number(),
 	maxTriesPerToken: z.number(),
 	tokenCleanupIntervalMs: z.number()
+});
+
+// #endregion
+
+// #region Time Config
+
+export const ZTimeZone = z
+	.string()
+	.refine(
+		(val) => Intl
+			.supportedValuesOf('timeZone')
+			.includes(val),
+		{ message: 'Invalid timezone' }
+	);
+
+export const ZTimeConfig = z.object({
+	defaultTimezone: ZTimeZone
+		.optional()
+		.default('UTC')
 });
 
 // #endregion

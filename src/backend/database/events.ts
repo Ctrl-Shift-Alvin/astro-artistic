@@ -4,7 +4,8 @@ import path from 'node:path';
 import Database from 'better-sqlite3';
 import {
 	ZEventEntry,
-	type TEventEntry
+	type TEventEntry,
+	type TNewEventEntry
 } from '@/components/types';
 import { EventsConfig } from '@/backend/config/events';
 import { EventsConfig as SharedEventsConfig } from '@/shared/config/events';
@@ -300,6 +301,12 @@ export const events_getAllRelevantEntries = (): TEventEntry[] => {
 
 			const minDate = new Date();
 			minDate.setDate(minDate.getDate() + timeRange.minDays);
+			minDate.setHours(
+				0,
+				0,
+				0,
+				0
+			);
 			minDateString = minDate.toISOString();
 
 		}
@@ -313,15 +320,25 @@ export const events_getAllRelevantEntries = (): TEventEntry[] => {
 
 			const maxDate = new Date();
 			maxDate.setDate(maxDate.getDate() + timeRange.maxDays);
+			maxDate.setHours(
+				23,
+				59,
+				59,
+				999
+			);
 			maxDateString = maxDate.toISOString();
 
 		}
 
-		return events_dbAll(
-			'SELECT * FROM events WHERE datetime(dateTime) BETWEEN ? AND ?',
+		const result = events_dbAll(
+			'SELECT * FROM events WHERE dateTime BETWEEN ? AND ?',
 			minDateString,
 			maxDateString
 		);
+
+		console.log(result);
+
+		return result;
 
 	} catch(err: any) {
 
@@ -339,7 +356,7 @@ export const events_getAllRelevantEntries = (): TEventEntry[] => {
  *
  * @returns The first parsed and validated entry that was found. Otherwise, `undefined`.
  */
-export const events_getEntry = (id: string | number): TEventEntry | undefined => {
+export const events_getEntry = (id: string | number | bigint): TEventEntry | undefined => {
 
 	try {
 
@@ -360,12 +377,42 @@ export const events_getEntry = (id: string | number): TEventEntry | undefined =>
 };
 
 /**
+ * Add a new entry to the events database.
+ *
+ * @returns
+ */
+export const events_createEntry = (entry: TNewEventEntry): Database.RunResult => {
+
+	try {
+
+		return events_dbRun(
+			'INSERT INTO events (title, dateTime, location, enablePage) VALUES (?, ?, ?, ?)',
+			entry.title,
+			entry.dateTime,
+			entry.location,
+			entry.enablePage
+				? 1
+				: 0
+		);
+
+	} catch(err: any) {
+
+		throw new Error(
+			`Failed to add a new event entry: ${err}`,
+			{ cause: err }
+		);
+
+	}
+
+};
+
+/**
  * Create a new event page belonging to an existing event entry in the events database.
  *
  * @param id The event ID associated with the new page.
  * @returns `true` if the event ID exists in the DB, and the page is successfully created. Otherwise, `false`.
  */
-export const events_createPage = async(id: number): Promise<boolean> => {
+export const events_createPage = async(id: number | bigint): Promise<boolean> => {
 
 	try {
 

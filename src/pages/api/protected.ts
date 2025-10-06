@@ -22,6 +22,7 @@ import {
 	contact_getFewEntries
 } from '@/backend/database/contact';
 import {
+	events_createEntry,
 	events_createPage,
 	events_dbRun,
 	events_getAllEntries,
@@ -322,15 +323,7 @@ export async function POST(context: APIContext) {
 				}
 
 				const newEntry = parsedBody.data.data;
-				const { lastInsertRowid: id } = events_dbRun(
-					'INSERT INTO events (title, dateTime, location, enablePage) VALUES (?, ?, ?, ?)',
-					newEntry.title,
-					newEntry.dateTime,
-					newEntry.location,
-					newEntry.enablePage
-						? 1
-						: 0
-				);
+				const { lastInsertRowid: id } = events_createEntry(newEntry);
 
 				if (newEntry.enablePage) {
 

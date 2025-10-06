@@ -111,13 +111,16 @@ const translation = Astro.locals.translation;
 
 				import '@/string.extensions.ts';
 
-				import { initWindowAnimations } from '@/frontend/windowTools';
 				import { setupJsErrorHandler } from '@/frontend/errorService';
-
 				setupJsErrorHandler();
-
-				// Initializes window animations
+				
+				import { initWindowAnimations } from '@/frontend/windowTools';
 				initWindowAnimations(800, 200);
+
+
+				import { setDefaultLocale } from 'react-datepicker';
+				import { defaultLanguageCode } from '@/backend/i18n';
+				setDefaultLocale(defaultLanguageCode);
 
 			</script>
 		</div>

@@ -6,7 +6,6 @@ import {
 	useState
 } from 'react';
 import clsx from 'clsx/lite';
-import { DatePicker } from 'react-datepicker';
 import { AdminMarkdownEditor } from './AdminMarkdownEditor';
 import { addAdminButton } from './AdminButtonContainer';
 import { Monolog } from '@/components/components/MonologProvider';
@@ -29,8 +28,8 @@ import {
 	goto
 } from '@/frontend/windowTools';
 import { LabeledInput } from '@/components/elements/LabeledInput';
-import { Label } from '@/components/elements/Label';
 import { LabeledCheckbox } from '@/components/elements/LabeledCheckbox';
+import { LabeledDateTimePicker } from '@/components/elements/LabeledDateTimePicker';
 
 // eslint-disable-next-line import-x/no-unassigned-import
 import 'react-datepicker/dist/react-datepicker.css';
@@ -389,25 +388,17 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 					<div
 						className={divClassName}
 					>
-						<Label htmlFor={'datetime'}>
-							{'Date/Time'}
-						</Label>
-
-						<DatePicker
-							toggleCalendarOnIconClick
-							showTimeInput
-							className={'w-full'}
+						<LabeledDateTimePicker
 							id={'datetime'}
-							dateFormat={'dd/MM/yyyy HH:mm'}
-							timeIntervals={15}
 							selected={new Date(eventEntry.dateTime)}
 							onChange={
 								(d) => {
 
-									setEventEntry({
-										...eventEntry,
-										dateTime: d?.toISOString() || eventEntry.dateTime
-									});
+									if (d)
+										setEventEntry({
+											...eventEntry,
+											dateTime: d.toISOString() // Returns Zulu time (UTC Time)
+										});
 
 								}
 							}
