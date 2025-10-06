@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+export NO_COLOR=1
+npx lint-staged
