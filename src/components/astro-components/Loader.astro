@@ -58,16 +58,19 @@
 
 		window.addEventListener('load', window.removeLoader);
 
+		// Timeout loader in case of bug or whatever
+
+		const LOADER_TIMEOUT_MS = 5000;
 		setTimeout(() => {
 
 			if (window.loaderRemoved === false) {
 
-				console.error('Loader timed out after 2 seconds!');
+				console.error(`Loader timed out after ${LOADER_TIMEOUT_MS} seconds!`);
 				window.removeLoader?.();
 
 			}
 
-		}, 2000); // Timeout after 2s
+		}, LOADER_TIMEOUT_MS);
 
 	</script>
 </div>
