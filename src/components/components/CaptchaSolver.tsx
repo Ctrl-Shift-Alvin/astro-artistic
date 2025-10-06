@@ -39,6 +39,7 @@ export const CaptchaSolver = ({
 
 				setCaptchaSvg(captcha.svgData);
 				setCaptchaId(captcha.id);
+				setValue('');
 
 			}
 
