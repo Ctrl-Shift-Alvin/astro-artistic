@@ -26,7 +26,7 @@ export const ZEventsConfig = z.object({
 		.string()
 		.nonempty(),
 
-	/** The absolute path to the events pages directory. */
+	/** The absolute path to the events pages directory. Must be somewhere inside `@/pages/`! */
 	pagesPath: z
 		.string()
 		.nonempty()

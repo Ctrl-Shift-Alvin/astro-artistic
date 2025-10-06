@@ -5,6 +5,5 @@ export const EventsConfig = ZEventsConfig.parse({
 	ageRangeShown: {
 		minDays: 14,
 		maxDays: Number.MAX_SAFE_INTEGER
-	},
-	pagesPath: 'src/pages/events'
+	}
 });

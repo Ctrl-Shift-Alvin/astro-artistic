@@ -128,12 +128,8 @@ export const ZEventsConfig = z.object({
 		 * Can be `Number.MAX_SAFE_INTEGER` to show all future entries.
 		 */
 		maxDays: z.number()
-	}),
+	})
 
-	/**
-	 * The absolute path to the event pages. Must be inside `@/pages/`.
-	 */
-	pagesPath: z.string()
 });
 export type TEventsConfig = z.infer<typeof ZEventsConfig>;
 
