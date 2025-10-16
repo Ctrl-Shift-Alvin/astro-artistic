@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 
 import { windowRefresh } from '@/frontend/windowTools';
 import { cSetIgnoreSizeError } from '@/shared/cookies';
@@ -92,8 +92,12 @@ export type TAsyncActionPayload = {
 /**
  * A discriminated union for all actions (sync and async) and their arguments.
  */
-// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+
 export type TActionPayload = TSyncActionPayload | TAsyncActionPayload;
+
+export const syncActionKeys = new Set<string>(
+	Object.keys(actions).filter((key) => actions[key as TActionType].constructor.name !== 'AsyncFunction')
+);
 
 /**
  * Type guard to check if the payload is for a synchronous action
@@ -118,7 +122,7 @@ export const executeAction = (payload: TSyncActionPayload) => {
 	 * We cast to a generic function type to satisfy TypeScript's inference limitations.
 	 */
 	// @ts-ignore When TAsyncActionPayload is 'never', 'payload.action' is an error.
-	(func as (...args: any[])=> void)(...payload.args || []);
+	(func as (...args: any[])=> void)(...payload.args ?? []);
 
 };
 
@@ -141,6 +145,3 @@ export const executeAsyncAction = (payload: TAsyncActionPayload) => {
 
 };
 
-export const syncActionKeys = new Set<string>(Object
-	.keys(actions)
-	.filter((key) => actions[key as TActionType].constructor.name !== 'AsyncFunction'));

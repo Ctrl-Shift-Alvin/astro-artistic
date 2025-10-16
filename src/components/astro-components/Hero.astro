@@ -1,11 +1,9 @@
 ---
-import { HeroConfig } from '@/shared/config/hero';
 import { A } from '../elements/A';
+import { HeroConfig } from '@/shared/config/hero';
 import { type TTranslation } from '@/locales/global';
 
-export interface Props {
-	translation: TTranslation;
-}
+export interface Props { translation: TTranslation }
 const { translation } = Astro.props;
 ---
 
@@ -18,16 +16,22 @@ const { translation } = Astro.props;
 
 	<div class="mt-3 flex w-full justify-center gap-1 lg:justify-start">
 		{
-			HeroConfig.heroSocialButtons.map((item) => (
-				<A href={item.href} target="_blank" client:only="react">
-					<img
-						class="mx-4 size-12 hover:size-11"
-						src={item.imageSource}
-						alt={item.imageAlt}
-						loading="lazy"
-					/>
-				</A>
-			))
+			HeroConfig.heroSocialButtons.map(
+				(item) => (
+					<A
+						href={item.href}
+						target="_blank"
+						client:only="react"
+					>
+						<img
+							class="mx-4 size-12 hover:size-11"
+							src={item.imageSource}
+							alt={item.imageAlt}
+							loading="lazy"
+						/>
+					</A>
+				)
+			)
 		}
 	</div>
 </div>

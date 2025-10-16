@@ -6,9 +6,7 @@ import { z } from 'zod';
  * A single contact for a contact card component.
  */
 export const ZContact = z.object({
-	description: z
-		.string()
-		.optional(),
+	description: z.string().optional(),
 	email: z.email(),
 	telNumber: z.preprocess(
 		(val) => (
@@ -25,9 +23,7 @@ export const ZContact = z.object({
 	/**
 	 * The default number code to prefix if it's omitted.
 	 */
-	defaultNumberCode: z
-		.string()
-		.max(2)
+	defaultNumberCode: z.string().max(2)
 });
 
 /**
@@ -40,22 +36,18 @@ export const ZContactConfig = z.object({
 	/**
 	 * For the admin page only: The initial entry count to be showed in the contact submission table.
 	 */
-	tableInitialEntryCount: z
-		.number()
-		.default(5),
+	tableInitialEntryCount: z.number().default(5),
 
 	/**
 	 * A record of contacts that a contact card can use. The key `default` is required.
 	 */
-	contacts: z
-		.record(
-			z.string(),
-			ZContact
-		)
-		.refine(
-			(val) => 'default' in val,
-			{ message: 'Key \'default\' is required in contacts' }
-		)
+	contacts: z.record(
+		z.string(),
+		ZContact
+	).refine(
+		(val) => 'default' in val,
+		{ message: 'Key \'default\' is required in contacts' }
+	)
 
 });
 export type TContactConfig = z.infer<typeof ZContactConfig>;
@@ -79,9 +71,7 @@ export const ZBlogConfig = z.object({
 	/**
 	 * For the admin page only: The initial entry count to be showed in the blog entry table.
 	 */
-	tableInitialEntryCount: z
-		.number()
-		.default(5)
+	tableInitialEntryCount: z.number().default(5)
 });
 export type TBlogConfig = z.infer<typeof ZBlogConfig>;
 
@@ -191,16 +181,12 @@ export const ZErrorsConfig = z.object({
 	/**
 	 * For the admin page only: The initial entry count to be showed in the build table.
 	 */
-	tableInitialBuildCount: z
-		.number()
-		.default(5),
+	tableInitialBuildCount: z.number().default(5),
 
 	/**
 	 * For the admin page only: The initial entry count to be showed in the error table.
 	 */
-	tableInitialErrorCount: z
-		.number()
-		.default(5)
+	tableInitialErrorCount: z.number().default(5)
 });
 
 // #endregion
@@ -218,19 +204,11 @@ export const ZCaptchaConfig = z.object({
 
 // #region Time Config
 
-export const ZTimeZone = z
-	.string()
-	.refine(
-		(val) => Intl
-			.supportedValuesOf('timeZone')
-			.includes(val),
-		{ message: 'Invalid timezone' }
-	);
+export const ZTimeZone = z.string().refine(
+	(val) => Intl.supportedValuesOf('timeZone').includes(val),
+	{ message: 'Invalid timezone' }
+);
 
-export const ZTimeConfig = z.object({
-	defaultTimezone: ZTimeZone
-		.optional()
-		.default('UTC')
-});
+export const ZTimeConfig = z.object({ defaultTimezone: ZTimeZone.optional().default('UTC') });
 
 // #endregion

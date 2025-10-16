@@ -10,6 +10,7 @@ import { type APIContext } from 'astro';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import {
 	ZApiResponse,
+	ZApiResponseError,
 	ZProtectedGetApiResponse,
 	ZProtectedPostApiRequestMap,
 	ZProtectedPostApiResponseMap
@@ -48,6 +49,7 @@ import {
 	getSortedBlogsSliced
 } from '@/backend/blogs';
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
 const SECRET_KEY = import.meta.env.JWT_KEY as string;
 
 export function GET(context: APIContext) {
@@ -79,6 +81,7 @@ export function GET(context: APIContext) {
 	// Verify token
 	try {
 
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
 		decodedTokenPayload = jwt.verify(
 			token,
 			SECRET_KEY,
@@ -171,7 +174,8 @@ export async function POST(context: APIContext) {
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-	const body = await context.request
+	const body = await context
+		.request
 		.json()
 		.catch(() => undefined);
 
@@ -464,7 +468,8 @@ export async function POST(context: APIContext) {
 				}
 
 				const {
-					id, data: fileContent
+					id,
+					data: fileContent
 				} = parsedBody.data;
 
 				const filePath = path.join(
@@ -776,9 +781,8 @@ export async function POST(context: APIContext) {
 					}
 				);
 
-				if (!files
-					.map((e) => e.name)
-					.find((e) => e === fileName)
+				if (
+					!files.map((e) => e.name).find((e) => e === fileName)
 				) {
 
 					const errorBody = ZProtectedPostApiResponseMap[requestType].parse({ error: 'bad-filename' });
@@ -1077,7 +1081,6 @@ export async function POST(context: APIContext) {
 				}
 
 				errors_deleteError(parsedBody.data.id);
-				console.log('Deleted');
 
 				const responseBody = ZProtectedPostApiResponseMap[requestType].parse({ message: 'success' });
 				return new Response(
@@ -1101,10 +1104,7 @@ export async function POST(context: APIContext) {
 
 	} catch {
 
-		const errorBody = ZProtectedPostApiResponseMap[
-			requestType as keyof typeof ZProtectedPostApiResponseMap
-		].parse({ error: 'server-error' });
-
+		const errorBody = ZApiResponseError.parse({ error: 'server-error' });
 		return new Response(
 			JSON.stringify(errorBody),
 			{ status: 500 }

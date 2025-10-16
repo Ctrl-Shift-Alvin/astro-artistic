@@ -13,7 +13,9 @@ import { isAdminSetup } from '@/backend/admin';
 if (!isAdminSetup)
 	throw new Error('Admin page is not setup but accessed!');
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
 const ADMIN_PASSWORD_HASH = import.meta.env.ADMIN_PASSWORD_HASH as string;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
 const JWT_KEY = import.meta.env.JWT_KEY as string;
 const JWT_LENGTH = Number(import.meta.env.JWT_LENGTH);
 

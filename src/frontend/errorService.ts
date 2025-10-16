@@ -66,18 +66,15 @@ export function setupJsErrorHandler() {
 
 	window.addEventListener(
 		'error',
-		(event) => {
+		(ev) => {
 
 			void submitError({
 				buildNumber: window.__BUILD__.buildNumber,
 				url: location.href,
 				isClient: true,
-				errorMessage: event.message,
+				errorMessage: ev.message,
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-				errorStack: event.error && event.error.stack
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-					? event.error.stack
-					: undefined
+				errorStack: ev.error?.stack ?? undefined
 			});
 
 		}
@@ -85,17 +82,17 @@ export function setupJsErrorHandler() {
 
 	window.addEventListener(
 		'unhandledrejection',
-		(event) => {
+		(ev) => {
 
-			if (event.reason instanceof Error) {
+			if (ev.reason instanceof Error) {
 
 				void submitError({
 					buildNumber: window.__BUILD__.buildNumber,
 					isClient: true,
 					url: location.href,
-					errorMessage: event.reason.message,
-					errorCause: String(event.reason.cause),
-					errorStack: event.reason.stack
+					errorMessage: ev.reason.message,
+					errorCause: String(ev.reason.cause),
+					errorStack: ev.reason.stack
 				});
 
 			} else {
@@ -104,7 +101,7 @@ export function setupJsErrorHandler() {
 					buildNumber: window.__BUILD__.buildNumber,
 					isClient: true,
 					url: location.href,
-					errorMessage: String(event.reason)
+					errorMessage: String(ev.reason)
 				});
 
 			}

@@ -4,7 +4,7 @@ import { spawn } from 'node:child_process';
 import matter from 'gray-matter';
 import {
 	type TBlogMarkdownInstance,
-	type TBlogFrontmatter
+	ZBlogFrontmatter
 } from '@/components/types';
 import { BlogConfig } from '@/backend/config/blog';
 
@@ -16,9 +16,9 @@ export function getBlogUrlPathname(): string {
 
 	try {
 
-		return BlogConfig.pagesPath
-			.split(/src[/\\]pages/)[1]!
-		// eslint-disable-next-line custom/newline-per-chained-call
+		return BlogConfig
+			.pagesPath
+			.split(/src[/\\]pages/)[0]!
 			.replace(
 				/\\/g,
 				'/'
@@ -61,13 +61,20 @@ export function getAllBlogs(): TBlogMarkdownInstance[] {
 				content
 			} = matter(raw);
 
+			const parsedFrontmatter = ZBlogFrontmatter.safeParse(frontmatter);
+			if (!parsedFrontmatter.success) {
+
+				throw new Error(`Failed to parse frontmatter of '${file}'!`);
+
+			}
+
 			posts.push({
 				url: `${getBlogUrlPathname()}${file.replace(
 					/\.md$/,
 					''
 				)}/`,
 				fileName: file,
-				frontmatter: frontmatter as TBlogFrontmatter,
+				frontmatter: parsedFrontmatter.data,
 				content
 			});
 
@@ -108,13 +115,20 @@ export function getBlog(fileName: string): TBlogMarkdownInstance | null {
 			const raw = fs.readFileSync(fullPath);
 			const parsed = matter(raw);
 
+			const parsedFrontmatter = ZBlogFrontmatter.safeParse(parsed.data);
+			if (!parsedFrontmatter.success) {
+
+				throw new Error(`Failed to parse frontmatter of '${file}'!`);
+
+			}
+
 			return {
 				url: `${getBlogUrlPathname()}${file.replace(
 					/\.md$/,
 					''
 				)}/`,
 				fileName: file,
-				frontmatter: parsed.data as TBlogFrontmatter,
+				frontmatter: parsedFrontmatter.data,
 				content: parsed.content
 			};
 
@@ -139,11 +153,13 @@ export function getBlog(fileName: string): TBlogMarkdownInstance | null {
 export function getSortedBlogs() {
 
 	const posts = getAllBlogs();
-	posts.sort((
-		a,
-		b
-	) => new Date(b.frontmatter.pubDate).valueOf()
-		- new Date(a.frontmatter.pubDate).valueOf());
+	posts.sort(
+		(
+			a,
+			b
+		) => new Date(b.frontmatter.pubDate).valueOf()
+			- new Date(a.frontmatter.pubDate).valueOf()
+	);
 	return posts;
 
 }
@@ -188,55 +204,55 @@ export const blog_createPage = async(fileName: string): Promise<boolean> => {
 			{ withFileTypes: true }
 		);
 
-		if (existingFiles
-			.map((e) => e.name)
-			.find((e) => e === `${fileName}.md`)
+		if (existingFiles.map((e) => e.name).find((e) => e === `${fileName}.md`)
 		) {
 
 			return false;
 
 		}
 
-		await new Promise((
-			resolve,
-			reject
-		) => {
+		await new Promise(
+			(
+				resolve,
+				reject
+			) => {
 
-			try {
+				try {
 
-				const child = spawn(
-					'npm',
-					[
-						'run',
-						'createPost',
-						'--',
-						fileName
-					],
-					{ shell: true }
-				);
+					const child = spawn(
+						'npm',
+						[
+							'run',
+							'createPost',
+							'--',
+							fileName
+						],
+						{ shell: true }
+					);
 
-				child.on(
-					'error',
-					reject
-				);
+					child.on(
+						'error',
+						reject
+					);
 
-				child.on(
-					'close',
-					(code) => {
+					child.on(
+						'close',
+						(code) => {
 
-						resolve(code === 0);
+							resolve(code === 0);
 
-					}
-				);
+						}
+					);
 
-			} catch(err: any) {
+				} catch(err: any) {
 
-				// eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
-				reject(err);
+					// eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+					reject(err);
+
+				}
 
 			}
-
-		});
+		);
 		return true;
 
 	} catch {
@@ -255,13 +271,16 @@ export const blog_countEntries = (): number => {
 	try {
 
 		return fs.existsSync(BlogConfig.pagesPath)
-			? fs.readdirSync(
-				BlogConfig.pagesPath,
-				{
-					recursive: false,
-					withFileTypes: true
-				}
-			).filter((e) => e.isFile() && e.name.endsWith('.md')).length
+			? fs
+				.readdirSync(
+					BlogConfig.pagesPath,
+					{
+						recursive: false,
+						withFileTypes: true
+					}
+				)
+				.filter((e) => e.isFile() && e.name.endsWith('.md'))
+				.length
 			: 0;
 
 	} catch(err: any) {

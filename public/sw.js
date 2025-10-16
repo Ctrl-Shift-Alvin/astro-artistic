@@ -18,7 +18,7 @@ if (!self.__BUILD__) {
 }
 
 // #region CONFIGURATION
-const CACHE_NAME = `cache-${self.__BUILD__.buildNumber}` || 'cache-0';
+const CACHE_NAME = `cache-${self.__BUILD__.buildNumber ?? 0}`;
 const OFFLINE_URL = '/offline/';
 const FOURTWENTYNINE_URL = '/429/';
 const FIVEOTHREE_URL = '/503/';
@@ -45,30 +45,37 @@ const STATIC_ASSETS = [
 
 self.oninstall = (event) => {
 
-	event.waitUntil((async() => {
+	event.waitUntil(
+		(async() => {
 
-		await self.skipWaiting();
+			await self.skipWaiting();
 
-	})());
+		})()
+	);
 
 };
 
 self.onactivate = (event) => {
 
-	event.waitUntil((async() => {
+	event.waitUntil(
+		(async() => {
 
-		await self.clients.claim();
+			await self.clients.claim();
 
-		// Delete outdated caches
-		await Promise.all((await caches.keys())
-			.filter((k) => k !== CACHE_NAME)
-			.map((k) => caches.delete(k)));
+			// Delete outdated caches
+			await Promise.all(
+				await caches
+					.keys()
+					.filter((k) => k !== CACHE_NAME)
+					.map((k) => caches.delete(k))
+			);
 
-		// Refetch and recache pages
-		await cacheNavUrls();
-		await cacheStaticAssets();
+			// Refetch and recache pages
+			await cacheNavUrls();
+			await cacheStaticAssets();
 
-	})());
+		})()
+	);
 
 };
 
@@ -79,71 +86,81 @@ self.addEventListener(
 		// Handle navigation requests
 		if (event.request.mode === 'navigate') {
 
-			return event.respondWith((async() => {
+			return event.respondWith(
+				(async() => {
 
-				return fetchResponse(event.request).then(async(networkResponse) => {
+					return fetchResponse(event.request).then(
+						async(networkResponse) => {
 
-					switch (networkResponse.status) {
+							switch (networkResponse.status) {
 
-						case 429:
-							return handle429Response(networkResponse);
+								case 429:
+									return handle429Response(networkResponse);
 
-						case 502:
-							return await caches.match(OFFLINE_URL) || networkResponse;
+								case 502:
+									return await caches.match(OFFLINE_URL) || networkResponse;
 
-						case 503:
-							return await caches.match(FIVEOTHREE_URL) || networkResponse;
+								case 503:
+									return await caches.match(FIVEOTHREE_URL) || networkResponse;
 
-						case 504:
-							return await caches.match(OFFLINE_URL) || networkResponse;
+								case 504:
+									return await caches.match(OFFLINE_URL) || networkResponse;
 
-						case 599: // Response failed
-							return await caches.match(OFFLINE_URL) || networkResponse;
+								case 599: // Response failed
+									return await caches.match(OFFLINE_URL) || networkResponse;
 
-						default:
-							return networkResponse;
+								default:
+									return networkResponse;
 
-					}
+							}
 
-				});
+						}
+					);
 
-			})());
+				})()
+			);
 
 		}
 
 		const url = new URL(event.request.url);
 
 		// Handle listed static assets
-		if (STATIC_ASSETS.includes(url.pathname) || url.pathname.endsWith('.css')) {
+		if (
+			STATIC_ASSETS.includes(url.pathname) || url.pathname.endsWith('.css')
+		) {
 
-			event.respondWith((async() => {
+			event.respondWith(
+				(async() => {
 
-				const cachedResponse = await caches.match(event.request);
+					const cachedResponse = await caches.match(event.request);
 
-				// Fetch request and cache successful responses
-				const fetchPromise = fetchResponse(event.request).then(async(initialNetworkResponse) => {
+					// Fetch request and cache successful responses
+					const fetchPromise = fetchResponse(event.request).then(
+						async(initialNetworkResponse) => {
 
-					if (initialNetworkResponse.status == 200 || !cachedResponse) {
+							if (initialNetworkResponse.status == 200 || !cachedResponse) {
 
-						await caches
-							.open(CACHE_NAME)
-							.then((cache) => cache.put(
-								event.request,
-								initialNetworkResponse.clone()
-							));
+								await caches.open(CACHE_NAME).then(
+									(cache) => cache.put(
+										event.request,
+										initialNetworkResponse.clone()
+									)
+								);
 
-					}
+							}
 
-					return initialNetworkResponse;
+							return initialNetworkResponse;
 
-				});
+						}
+					);
 
-				event.waitUntil(fetchPromise);
+					event.waitUntil(fetchPromise);
 
-				// Return cached response if available, otherwise the network response
-				return cachedResponse || fetchPromise;
+					// Return cached response if available, otherwise the network response
+					return cachedResponse || fetchPromise;
 
-			})());
+				})()
+			);
 
 		}
 
@@ -166,16 +183,16 @@ const offlineResponse = () => new Response(
 /**
  * Refetches and caches all assets from `STATIC_ASSETS`.
  */
-const cacheStaticAssets = () => caches
-	.open(CACHE_NAME)
-	.then(async(cache) => {
+const cacheStaticAssets = () => caches.open(CACHE_NAME).then(
+	async(cache) => {
 
 		return cacheAddAllBypass(
 			cache,
 			STATIC_ASSETS
 		);
 
-	});
+	}
+);
 
 /**
  * Refetches and caches all pages from `NAV_URLS`.
@@ -183,18 +200,19 @@ const cacheStaticAssets = () => caches
  */
 const cacheNavUrls = async() => {
 
-	return caches
-		.open(CACHE_NAME)
-		.then(async(cache) => {
+	return caches.open(CACHE_NAME).then(
+		async(cache) => {
 
 			let cssUrls = new Set();
 			for (const navUrl of NAV_URLS) {
 
 				// Fetch page
-				const response = await fetchResponse(new Request(
-					navUrl,
-					{ cache: 'no-store' }
-				));
+				const response = await fetchResponse(
+					new Request(
+						navUrl,
+						{ cache: 'no-store' }
+					)
+				);
 				if (!response.ok || response.status == 599) {
 
 					throw new Error(`Failed to fetch ${response.url}: ${response.status}, '${response.statusText}'`);
@@ -210,12 +228,12 @@ const cacheNavUrls = async() => {
 				 * Tip: Depending on Astro's settings, a page's style might be inlined as a module, or made external,
 				 * through a <link rel="stylesheet" href="..." /> element. In case the latter happens, also fetch the styles.
 				 */
-				const text = await response
-					.clone()
-					.text();
-				[ ...text.matchAll(/<link[^>]+rel=["']stylesheet["'][^>]+href=["']([^"']+)["']/gi) ]
-					.map((match) => match[1])
-					.forEach((e) => cssUrls.add(e));
+				const text = await response.clone().text();
+				[
+					...text
+					// eslint-disable-next-line custom/max-chain-per-line
+						.matchAll(/<link[^>]+rel=["']stylesheet["'][^>]+href=["']([^"']+)["']/gi)
+				].map((match) => match[1]).forEach((e) => cssUrls.add(e));
 
 			}
 
@@ -238,7 +256,8 @@ const cacheNavUrls = async() => {
 
 			}
 
-		});
+		}
+	);
 
 };
 
@@ -266,10 +285,12 @@ async function cacheAddAllBypass(
 
 	for (const url of urls) {
 
-		const response = await fetchResponse(new Request(
-			url,
-			{ cache: 'no-store' }
-		));
+		const response = await fetchResponse(
+			new Request(
+				url,
+				{ cache: 'no-store' }
+			)
+		);
 		if (!response.ok) {
 
 			throw new Error(`Failed to fetch ${url}: ${response.status}, '${response.statusText}'`);
@@ -285,23 +306,26 @@ async function cacheAddAllBypass(
 }
 
 /** Calculates a hash using the djb2 algorithm. (1-7 characters) */
-function calculateHash(buffer) {
-
-	const view = new Uint8Array(buffer);
-
-	// djb2 algorithm
-	let hash = 5381;
-	for (let i = 0; i < view.length; i++) {
-
-		// hash * 33 + current byte -> truncate
-		hash = (((hash << 5) + hash) + view[i]) | 0; /* eslint-disable-line @stylistic/no-extra-parens */
-
-	}
-
-	// Unsigned int
-	return (hash >>> 0).toString(36);
-
-}
+/*
+ *function calculateHash(buffer) {
+ *
+ *	const view = new Uint8Array(buffer);
+ *
+ *	// djb2 algorithm
+ *	let hash = 5381;
+ *	for (let i = 0; i < view.length; i++) {
+ *
+ *		// hash * 33 + current byte -> truncate
+ *		hash = (((hash << 5) + hash) + view[i]) | 0; // eslint-disable-line @stylistic/no-extra-parens
+ *
+ *	}
+ *
+ *	// Unsigned int
+ *	return (hash >>> 0).toString(36);
+ *
+ *}
+ *
+ */
 
 /**
  * Handles a response with the status code 429 (too many requests).

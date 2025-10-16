@@ -9,13 +9,12 @@ import {
 } from '@/components/types';
 import { ContactConfig } from '@/backend/config/contact';
 
+const db = new Database(ContactConfig.dbPath);
+const CURRENT_VERSION = 0;
 process.on(
 	'exit',
 	() => db.close()
 );
-
-const db = new Database(ContactConfig.dbPath);
-const CURRENT_VERSION = 0;
 const updateQueries: string[][] = []; // updateQueries[0] updates to 1, updateQueries[1] updates to 2, etc.
 
 /**
@@ -59,9 +58,7 @@ const contact_createDbIfNotExists = (): boolean => {
 				+ 'createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
 				+ ');';
 		const dbVersionQuery = `user_version = ${CURRENT_VERSION};`;
-		db
-			.exec(dbSetupQuery)
-			.pragma(dbVersionQuery);
+		db.exec(dbSetupQuery).pragma(dbVersionQuery);
 
 		return true;
 
@@ -80,25 +77,29 @@ const contact_createDbIfNotExists = (): boolean => {
  * Applies the update operations from `updateQueries` sequentially, based on the DB's version
  * compared to `CURRENT_VERSION`.
  *
- * E.g. updating from version 5 to latest version 10 applies `updateQueries[5-9][...]` sequentially.
+ * E.g. Updating from version 5 to latest version 10 applies `updateQueries[5-9][...]` sequentially.
  * @returns `true` if any update operations were applied successfully. Otherwise `false`.
  * @throws if any update operations should be applied but fail. The transaction is reversed and the DB is unchanged.
  */
 const contact_updateDb = () => {
 
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	const result = db.pragma('user_version') as [{ user_version: number }];
+	// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unsafe-type-assertion
+	const result = db.pragma('user_version') as [{ user_version: number }] | undefined;
+	if (!result) {
+
+		throw new Error('Could not read pragma \'user_version\'.');
+
+	}
 	const startDbVersion = result[0].user_version;
 
+	if (startDbVersion === CURRENT_VERSION) {
+
+		return false;
+
+	}
 	if (startDbVersion > CURRENT_VERSION) {
 
 		throw new Error('Contact submissions database version is larger than the CURRENT_VERSION.');
-
-	}
-
-	if (startDbVersion == CURRENT_VERSION) {
-
-		return false;
 
 	}
 
@@ -106,17 +107,19 @@ const contact_updateDb = () => {
 
 	try {
 
-		db.transaction(() => {
+		db.transaction(
+			() => {
 
-			for (let i = startDbVersion; i < CURRENT_VERSION; i++) {
+				for (let i = startDbVersion; i < CURRENT_VERSION; i++) {
 
-				updateQueries[i]?.forEach((q) => db.exec(q));
-				db.pragma(`user_version = ${i + 1}`);
+					updateQueries[i]?.forEach((q) => db.exec(q));
+					db.pragma(`user_version = ${i + 1}`);
+
+				}
+				return true;
 
 			}
-			return true;
-
-		});
+		);
 
 		return true;
 
@@ -144,9 +147,7 @@ export const contact_dbRun = (
 
 	try {
 
-		return db
-			.prepare(query)
-			.run(params);
+		return db.prepare(query).run(params);
 
 	} catch(err: any) {
 
@@ -183,12 +184,8 @@ export const contact_dbGet = (
 
 	try {
 
-		const result = db
-			.prepare(query)
-			.get(params);
-		const parsed = ZContactFormEntry
-			.optional()
-			.parse(result);
+		const result = db.prepare(query).get(params);
+		const parsed = ZContactFormEntry.optional().parse(result);
 		return parsed;
 
 	} catch(err: any) {
@@ -226,12 +223,8 @@ export const contact_dbAll = (
 
 	try {
 
-		const result = db
-			.prepare(query)
-			.all(params);
-		const parsed = ZContactFormEntry
-			.array()
-			.parse(result);
+		const result = db.prepare(query).all(params);
+		const parsed = ZContactFormEntry.array().parse(result);
 		return parsed;
 
 	} catch(err: any) {
@@ -270,15 +263,11 @@ export const contact_isDbDuplicateEntry = (
 
 	try {
 
-		const result = db
-			.prepare('SELECT COUNT(*) AS count FROM submissions WHERE email = ? AND message = ?')
-			.get(
-				email,
-				message ?? null
-			);
-		const parsed = z
-			.object({ count: z.coerce.number() })
-			.parse(result);
+		const result = db.prepare('SELECT COUNT(*) AS count FROM submissions WHERE email = ? AND message = ?').get(
+			email,
+			message ?? null
+		);
+		const parsed = z.object({ count: z.coerce.number() }).parse(result);
 
 		return parsed.count > 0;
 
@@ -447,17 +436,14 @@ export const contact_countEntries = (): number => {
 
 	try {
 
-		const result = db
-			.prepare('SELECT COUNT(*) AS count FROM submissions')
-			.get();
+		const result = db.prepare('SELECT COUNT(*) AS count FROM submissions').get();
 
-		const parsedResult = z
-			.object({
-				count: z.coerce
-					.number()
-					.default(0)
-			})
-			.parse(result);
+		const parsedResult = z.object({
+			count: z
+				.coerce
+				.number()
+				.default(0)
+		}).parse(result);
 
 		return parsedResult.count;
 

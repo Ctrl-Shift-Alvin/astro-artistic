@@ -16,6 +16,9 @@ const translation = Astro.locals.translation;
 	}}
 >
 	<Section title={translation.contact.title}>
-		<ContactCard contactData={ContactConfig.contacts.default!} client:only="react" />
+		<ContactCard
+			contactData={ContactConfig.contacts.default!}
+			client:only="react"
+		/>
 	</Section>
 </Base>

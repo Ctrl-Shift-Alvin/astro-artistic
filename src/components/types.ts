@@ -17,9 +17,7 @@ export type TApiResponseSuccess = z.infer<typeof ZApiResponseSuccess>;
  */
 export const ZApiResponseError = z.object({
 	error: z.string(),
-	message: z
-		.string()
-		.optional()
+	message: z.string().optional()
 });
 
 /**
@@ -76,9 +74,7 @@ export const ZBlogFrontmatter = z.object({
 	pubDate: z.coerce.date(),
 	imgSrc: z.string(),
 	imgAlt: z.string(),
-	draft: z
-		.boolean()
-		.default(false)
+	draft: z.boolean().default(false)
 });
 
 /**
@@ -110,13 +106,9 @@ export type TBlogMarkdownInstance = z.infer<typeof ZBlogMarkdownInstance>;
  */
 export const ZEventEntry = z.object({
 	id: z.coerce.number(),
-	title: z
-		.string()
-		.nonempty(),
+	title: z.string().nonempty(),
 	dateTime: z.iso.datetime(),
-	location: z
-		.string()
-		.nonempty(),
+	location: z.string().nonempty(),
 	enablePage: z.coerce.boolean(),
 	createdAt: z.string()
 });
@@ -130,13 +122,9 @@ export type TEventEntry = z.infer<typeof ZEventEntry>;
  * A to-be-added event entry. (represents the data needed, to add a new row to the events DB)
  */
 export const ZNewEventEntry = z.object({
-	title: z
-		.string()
-		.nonempty(),
+	title: z.string().nonempty(),
 	dateTime: z.iso.datetime(),
-	location: z
-		.string()
-		.nonempty(),
+	location: z.string().nonempty(),
 	enablePage: z.boolean()
 });
 
@@ -148,16 +136,12 @@ export type TNewEventEntry = z.infer<typeof ZNewEventEntry>;
 /**
  * The frontmatter of an event page.
  */
-export interface IEventFrontmatter { id: number }
+export const ZEventFrontmatter = z.object({ id: z.number() });
 
 /**
- * An instace of an event page, including its frontmatter and content.
+ * The frontmatter of an event page.
  */
-export interface IEventMarkdownInstance<T extends Record<string, any>> {
-	url: string;
-	frontmatter: IEventFrontmatter & T;
-	content: string;
-}
+export type TEventFrontmatter = z.infer<typeof ZEventFrontmatter>;
 
 // #endregion
 
@@ -177,12 +161,11 @@ export const ZContactFormSubmission = z.object({
 					' ',
 					''
 				)
-				: val),
+				: val
+		),
 		z.e164()
 	),
-	message: z
-		.string()
-		.nullish()
+	message: z.string().nullish()
 });
 
 /**
@@ -206,12 +189,11 @@ export const ZContactFormEntry = z.object({
 					' ',
 					''
 				)
-				: val),
+				: val
+		),
 		z.e164()
 	),
-	message: z
-		.string()
-		.optional()
+	message: z.string().optional()
 });
 
 /**
@@ -253,12 +235,13 @@ export type TContactApiResponse = z.infer<typeof ZContactApiResponse>;
  * A build entry. (represents a row in the builds DB)
  */
 export const ZBuild = z.object({
-	buildNumber: z.coerce.number(),
+	buildNumber: z.union([
+		z.number(),
+		z.bigint()
+	]),
 	createdAt: z.string(),
 	gitBranch: z.string(),
-	gitCommit: z
-		.string()
-		.min(40),
+	gitCommit: z.string().min(40),
 	isGitDirty: z.coerce.boolean()
 });
 
@@ -275,22 +258,12 @@ export const ZError = z.object({
 	createdAt: z.string(),
 	buildNumber: z.coerce.number(),
 	isClient: z.coerce.boolean(),
-	url: z
-		.string()
-		.nonempty(),
+	url: z.string().nonempty(),
 	status: ZStatusCode.nullish(),
-	statusText: z
-		.string()
-		.nullish(),
-	errorMessage: z
-		.string()
-		.nullish(),
-	errorCause: z
-		.string()
-		.nullish(),
-	errorStack: z
-		.string()
-		.nullish()
+	statusText: z.string().nullish(),
+	errorMessage: z.string().nullish(),
+	errorCause: z.string().nullish(),
+	errorStack: z.string().nullish()
 });
 
 /**
@@ -302,24 +275,17 @@ export type TError = z.infer<typeof ZError>;
  * An error submission. (represents a row to be added to the errors DB)
  */
 export const ZErrorSubmission = z.object({
-	buildNumber: z.coerce.number(),
+	buildNumber: z.union([
+		z.number(),
+		z.bigint()
+	]),
 	isClient: z.coerce.boolean(),
-	url: z
-		.string()
-		.nonempty(),
+	url: z.string().nonempty(),
 	status: ZStatusCode.nullish(),
-	statusText: z
-		.string()
-		.nullish(),
-	errorMessage: z
-		.string()
-		.nullish(),
-	errorCause: z
-		.string()
-		.nullish(),
-	errorStack: z
-		.string()
-		.nullish()
+	statusText: z.string().nullish(),
+	errorMessage: z.string().nullish(),
+	errorCause: z.string().nullish(),
+	errorStack: z.string().nullish()
 });
 
 /**
@@ -370,7 +336,8 @@ export type TProtectedGetApiResponse = z.infer<typeof ZProtectedGetApiResponse>;
 export const ZProtectedPostApiRequestMap = {
 	'contact/index': z.object({
 		count: z.coerce.number(),
-		offset: z.coerce
+		offset: z
+			.coerce
 			.number()
 			.optional()
 	}),
@@ -396,25 +363,29 @@ export const ZProtectedPostApiRequestMap = {
 			.positive()
 	}),
 	'events/get': z.object({
-		id: z.coerce
+		id: z
+			.coerce
 			.number()
 			.positive()
 	}),
 	'events/save': z.object({
-		id: z.coerce
+		id: z
+			.coerce
 			.number()
 			.positive(),
 		data: z.string()
 	}),
 	'events/edit': z.object({
-		id: z.coerce
+		id: z
+			.coerce
 			.number()
 			.positive(),
 		data: ZNewEventEntry
 	}),
 	'blog/index': z.object({
 		count: z.coerce.number(),
-		offset: z.coerce
+		offset: z
+			.coerce
 			.number()
 			.optional()
 	}),
@@ -423,11 +394,13 @@ export const ZProtectedPostApiRequestMap = {
 		fileName: z
 			.string()
 			.nonempty()
-			.transform((val) => (
-				val.endsWith('.md')
-					? val
-					: `${val}.md`
-			))
+			.transform(
+				(val) => (
+					val.endsWith('.md')
+						? val
+						: `${val}.md`
+				)
+			)
 	}),
 	'blog/save': z.object({
 		fileName: z
@@ -441,11 +414,13 @@ export const ZProtectedPostApiRequestMap = {
 			.string()
 			.nonempty()
 			.regex(/^[a-zA-Z0-9_-]+(\.md)?$/)
-			.transform((val) => (
-				val.endsWith('.md')
-					? val
-					: `${val}.md`
-			))
+			.transform(
+				(val) => (
+					val.endsWith('.md')
+						? val
+						: `${val}.md`
+				)
+			)
 	}),
 	'blog/remove': z.object({
 		fileName: z
@@ -455,7 +430,8 @@ export const ZProtectedPostApiRequestMap = {
 	}),
 	'builds/index': z.object({
 		count: z.coerce.number(),
-		offset: z.coerce
+		offset: z
+			.coerce
 			.number()
 			.optional()
 	}),
@@ -464,7 +440,8 @@ export const ZProtectedPostApiRequestMap = {
 	'builds/delete': z.object({ buildNumber: z.coerce.number() }),
 	'errors/index': z.object({
 		count: z.coerce.number(),
-		offset: z.coerce
+		offset: z
+			.coerce
 			.number()
 			.optional()
 	}),
@@ -472,7 +449,8 @@ export const ZProtectedPostApiRequestMap = {
 	'errors/indexBuild': z.object({
 		buildNumber: z.coerce.number(),
 		count: z.coerce.number(),
-		offset: z.coerce
+		offset: z
+			.coerce
 			.number()
 			.optional()
 	}),
@@ -507,9 +485,7 @@ export const ZProtectedPostApiResponseMap = {
 	'events/get': z.union([
 		ZApiResponseSuccess.extend({
 			data: ZEventEntry,
-			file: z
-				.string()
-				.optional()
+			file: z.string().optional()
 		}),
 		ZApiResponseError
 	]),
@@ -573,11 +549,7 @@ export const ZProtectedPostApiResponseMap = {
 /**
  * The body of an auth API POST request.
  */
-export const ZAuthPostApiRequest = z.object({
-	password: z
-		.string()
-		.optional()
-});
+export const ZAuthPostApiRequest = z.object({ password: z.string().optional() });
 
 /**
  * The body of an auth API POST request.
@@ -609,12 +581,8 @@ export type TAuthDeleteApiResponse = z.infer<typeof ZAuthDeleteApiResponse>;
 // #region Captcha API
 
 export const ZCaptchaResponse = z.object({
-	id: z
-		.string()
-		.nonempty(),
-	svgData: z
-		.string()
-		.nonempty()
+	id: z.string().nonempty(),
+	svgData: z.string().nonempty()
 });
 
 // #endregion
@@ -629,6 +597,12 @@ export class Emitter<T> {
 	subscribe(l: (value: T)=> void) {
 
 		this.listener = l;
+
+	}
+
+	hasListener(): boolean {
+
+		return this.listener !== null;
 
 	}
 
@@ -691,13 +665,16 @@ export class MultiEmitter<T> {
 	emit(value: T) {
 
 		// Iterate over a copy in case a listener unsubscribes itself during the emit.
-		this.listeners
+		this
+			.listeners
 			.slice()
-			.forEach((l) => {
+			.forEach(
+				(l) => {
 
-				l.callback(value);
+					l.callback(value);
 
-			});
+				}
+			);
 
 	}
 

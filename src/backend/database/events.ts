@@ -10,14 +10,13 @@ import {
 import { EventsConfig } from '@/backend/config/events';
 import { EventsConfig as SharedEventsConfig } from '@/shared/config/events';
 
+const db = new Database(EventsConfig.dbPath);
+const updateQueries: string[][] = []; // updateQueries[0] updates to 1, updateQueries[1] updates to 2, etc.
+const CURRENT_VERSION = updateQueries.length;
 process.on(
 	'exit',
 	() => db.close()
 );
-
-const db = new Database(EventsConfig.dbPath);
-const updateQueries: string[][] = []; // updateQueries[0] updates to 1, updateQueries[1] updates to 2, etc.
-const CURRENT_VERSION = updateQueries.length;
 
 /**
  * Create the database if it doesn't exist, and initialize it.
@@ -60,9 +59,7 @@ const events_createDbIfNotExists = (): boolean => {
 				+ 'createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
 				+ ');';
 		const dbVersionQuery = `user_version = ${CURRENT_VERSION};`;
-		db
-			.exec(dbSetupQuery)
-			.pragma(dbVersionQuery);
+		db.exec(dbSetupQuery).pragma(dbVersionQuery);
 
 		return true;
 
@@ -81,25 +78,28 @@ const events_createDbIfNotExists = (): boolean => {
  * Applies the update operations from `updateQueries` sequentially, based on the DB's version
  * compared to `CURRENT_VERSION`.
  *
- * E.g. updating from version 5 to latest version 10 applies `updateQueries[5-9][...]` sequentially.
+ * E.g. Updating from version 5 to latest version 10 applies `updateQueries[5-9][...]` sequentially.
  * @returns `true` if any update operations were applied successfully. Otherwise `false`.
  * @throws if any update operations should be applied but fail. The transaction is reversed and the DB is unchanged.
  */
 const events_updateDb = () => {
 
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	const result = db.pragma('user_version') as [{ user_version: number }];
-	const startDbVersion = result[0].user_version;
+	// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unsafe-type-assertion
+	const result = db.pragma('user_version') as [{ user_version: number }] | undefined;
+	if (!result) {
 
-	if (startDbVersion > CURRENT_VERSION) {
-
-		throw new Error('events.db version is larger than the CURRENT_VERSION.');
+		throw new Error('Could not read pragma \'user_version\' of events database.');
 
 	}
-
-	if (startDbVersion == CURRENT_VERSION) {
+	const startDbVersion = result[0].user_version;
+	if (startDbVersion === CURRENT_VERSION) {
 
 		return false;
+
+	}
+	if (startDbVersion > CURRENT_VERSION) {
+
+		throw new Error('Events database version is larger than the CURRENT_VERSION.');
 
 	}
 
@@ -107,17 +107,19 @@ const events_updateDb = () => {
 
 	try {
 
-		db.transaction(() => {
+		db.transaction(
+			() => {
 
-			for (let i = startDbVersion; i < CURRENT_VERSION; i++) {
+				for (let i = startDbVersion; i < CURRENT_VERSION; i++) {
 
-				updateQueries[i]?.forEach((q) => db.exec(q));
-				db.pragma(`user_version = ${i + 1}`);
+					updateQueries[i]?.forEach((q) => db.exec(q));
+					db.pragma(`user_version = ${i + 1}`);
+
+				}
+				return true;
 
 			}
-			return true;
-
-		});
+		);
 		return true;
 
 	} catch(err: any) {
@@ -144,9 +146,7 @@ export const events_dbRun = (
 
 	try {
 
-		const result = db
-			.prepare(query)
-			.run(params);
+		const result = db.prepare(query).run(params);
 		return result;
 
 	} catch(err: any) {
@@ -184,12 +184,8 @@ export const events_dbGet = (
 
 	try {
 
-		const result = db
-			.prepare(query)
-			.get(params);
-		const parsed = ZEventEntry
-			.optional()
-			.parse(result);
+		const result = db.prepare(query).get(params);
+		const parsed = ZEventEntry.optional().parse(result);
 		return parsed;
 
 	} catch(err: any) {
@@ -227,12 +223,8 @@ export const events_dbAll = (
 
 	try {
 
-		const result = db
-			.prepare(query)
-			.all(params);
-		const parsed = ZEventEntry
-			.array()
-			.parse(result);
+		const result = db.prepare(query).all(params);
+		const parsed = ZEventEntry.array().parse(result);
 		return parsed;
 
 	} catch(err: any) {
@@ -336,8 +328,6 @@ export const events_getAllRelevantEntries = (): TEventEntry[] => {
 			maxDateString
 		);
 
-		console.log(result);
-
 		return result;
 
 	} catch(err: any) {
@@ -433,56 +423,56 @@ export const events_createPage = async(id: number | bigint): Promise<boolean> =>
 
 		// If the file already exists or the event ID does not exist in the DB, do not proceed
 		if (
-			existingFiles
-				.map((e) => e.name)
-				.find((e) => e === `${id}.md`)
-				|| events_getEntry(id) === undefined
+			existingFiles.map((e) => e.name).find((e) => e === `${id}.md`)
+			|| events_getEntry(id) === undefined
 		) {
 
 			return false;
 
 		}
 
-		await new Promise((
-			resolve,
-			reject
-		) => {
+		await new Promise(
+			(
+				resolve,
+				reject
+			) => {
 
-			try {
+				try {
 
-				const child = spawn(
-					'npm',
-					[
-						'run',
-						'createEvent',
-						'--',
-						id.toString()
-					],
-					{ shell: true }
-				);
+					const child = spawn(
+						'npm',
+						[
+							'run',
+							'createEvent',
+							'--',
+							id.toString()
+						],
+						{ shell: true }
+					);
 
-				child.on(
-					'error',
-					reject
-				);
+					child.on(
+						'error',
+						reject
+					);
 
-				child.on(
-					'close',
-					(code) => {
+					child.on(
+						'close',
+						(code) => {
 
-						resolve(code === 0);
+							resolve(code === 0);
 
-					}
-				);
+						}
+					);
 
-			} catch(err: any) {
+				} catch(err: any) {
 
-				// eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
-				reject(err);
+					// eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+					reject(err);
+
+				}
 
 			}
-
-		});
+		);
 		return true;
 
 	} catch(err: any) {

@@ -27,7 +27,13 @@ try {
 		description: 'Seeing submission ' + submissionId
 	}}
 >
-	<Section center title={`Contact Submission ID '${submissionId}'`}>
-		<AdminContactOverview submissionId={submissionId} client:only="react" />
+	<Section
+		center
+		title={`Contact Submission ID '${submissionId}'`}
+	>
+		<AdminContactOverview
+			submissionId={submissionId}
+			client:only="react"
+		/>
 	</Section>
 </BaseAdmin>

@@ -21,11 +21,7 @@ export type TMonologOptions = {
 const monologEmitter = isWindowDefined()
 	? (() => {
 
-		if (!window.monologEmitter) {
-
-			window.monologEmitter = new Emitter<TMonologOptions>();
-
-		}
+		window.monologEmitter ??= new Emitter<TMonologOptions>();
 		return window.monologEmitter;
 
 	})()
@@ -85,17 +81,19 @@ export class Monolog {
 		className?: string;
 	}): Promise<void> {
 
-		return new Promise((resolve) => {
+		return new Promise(
+			(resolve) => {
 
-			monologEmitter.emit({
-				text,
-				durationMs,
-				fadeDurationMs,
-				className,
-				onClose: resolve
-			});
+				monologEmitter.emit({
+					text,
+					durationMs,
+					fadeDurationMs,
+					className,
+					onClose: resolve
+				});
 
-		});
+			}
+		);
 
 	}
 
@@ -143,17 +141,21 @@ export const MonologProvider = () => {
 				 */
 				if (monologs.length >= 3) {
 
-					setMonologs((prev) => [
-						...prev.slice(-2),
-						newElement
-					]);
+					setMonologs(
+						(prev) => [
+							...prev.slice(-2),
+							newElement
+						]
+					);
 
 				} else {
 
-					setMonologs((prev) => [
-						...prev,
-						newElement
-					]);
+					setMonologs(
+						(prev) => [
+							...prev,
+							newElement
+						]
+					);
 
 				}
 
@@ -180,16 +182,18 @@ export const MonologProvider = () => {
 			className={'fixed w-2/3 left-1/2 -translate-x-1/2 bottom-0 flex flex-col items-center justify-end my-2 gap-y-4'}
 		>
 			{
-				monologs.map((m) => (
-					<MonologPopup
-						key={m.id}
-						text={m.text}
-						durationMs={m.durationMs}
-						fadeDurationMs={m.fadeDurationMs}
-						className={m.className}
-						onClose={m.onClose}
-					/>
-				))
+				monologs.map(
+					(m) => (
+						<MonologPopup
+							key={m.id}
+							text={m.text}
+							durationMs={m.durationMs}
+							fadeDurationMs={m.fadeDurationMs}
+							className={m.className}
+							onClose={m.onClose}
+						/>
+					)
+				)
 			}
 		</div>
 	);

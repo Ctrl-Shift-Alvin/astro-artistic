@@ -4,41 +4,66 @@ import { Button } from '@/components/elements/Button';
 import Base from '@/templates/Base.astro';
 import { A } from '@/components/elements/A';
 
-interface Props {
-	error: unknown;
-}
+interface Props { error: unknown }
 const { error } = Astro.props;
 
 let errorString = '';
 try { // Cannot let 500 page fail, so just to be sure, use try block
+
 	const scrubStackPath = (str?: string) => {
 
 		if (!str)
 			return str;
 
-		const cwd = process.cwd().replaceAll('\\', '/');
+		const cwd = process.cwd().replaceAll(
+			'\\',
+			'/'
+		);
 		return str
-			.replaceAll('\\', '/') // Normalize slashes
-			.replaceAll(cwd, '...') // Remove cwd
-			.replace(/(\/[A-Za-z0-9._-]+)+/g, (match) => // Other long paths
-				match.startsWith('...') ? match : `/.../${match.split('/').pop()}`
+			.replaceAll(
+				'\\',
+				'/'
+			) // Normalize slashes
+			.replaceAll(
+				cwd,
+				'...'
+			) // Remove cwd
+			.replace(
+				/(\/[A-Za-z0-9._-]+)+/g,
+				(match) => { // Other long paths
+
+					return match.startsWith('...')
+						? match
+						: `/.../${match.split('/').pop()}`;
+
+				}
 			);
-	}
+
+	};
 
 	if (error instanceof Error) {
 
-		errorString += 'Error:\n\n' + (error.message.length > 0 ? error.message : '*No Error Message*');
+		errorString += 'Error:\n\n' + (
+			error.message.length > 0
+				? error.message
+				: '*No Error Message*'
+		);
 		if (error.cause) {
-			errorString += '\n\nCause:\n\n' + error.cause
+
+			errorString += '\n\nCause:\n\n' + error.cause;
+
 		}
-		errorString += '\n\nStacktrace:\n\n' + scrubStackPath(error.stack)
+		errorString += '\n\nStacktrace:\n\n' + scrubStackPath(error.stack);
 
 	} else {
-		errorString = 'Unknown Error\n\n: ' + error
+
+		errorString = 'Unknown Error\n\n: ' + error;
+
 	}
+
 } catch {
 
-	errorString = '500 Page Error 500'
+	errorString = '500 Page Error 500';
 
 }
 
@@ -52,13 +77,31 @@ const translation = Astro.locals.translation;
 		description: translation.fiveHundreed.description
 	}}
 >
-	<Section center={true} title={translation.fiveHundreed.title}>
+	<Section
+		center={true}
+		title={translation.fiveHundreed.title}
+	>
 
 		<p class="newlines text-center">{translation.fiveHundreed.body}</p>
-		<Button href="/" className="mt-20" client:only="react">{translation.fiveHundreed.homeButton}</Button>
 
-		<A className="my-10 text-md italic" actionPayload={{ action: "toggleExpand500ErrorDiv" }} client:only="react">{translation.fiveHundreed.expandButton}</A>
-		<div id="errorDiv" class="w-full text-center text-lg transition-opacity duration-750 opacity-0 newlines">
+		<Button
+			href="/"
+			className="mt-20"
+			client:only="react"
+		>{translation.fiveHundreed.homeButton}
+		</Button>
+
+		<A
+			className="my-10 text-md italic"
+			actionPayload={{ action: 'toggleExpand500ErrorDiv' }}
+			client:only="react"
+		>{translation.fiveHundreed.expandButton}
+		</A>
+
+		<div
+			id="errorDiv"
+			class="w-full text-center text-lg transition-opacity duration-750 opacity-0 newlines"
+		>
 			{errorString}
 		</div>
 

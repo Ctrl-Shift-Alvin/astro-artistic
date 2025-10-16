@@ -1,12 +1,10 @@
 ---
+import { DialogProvider } from '@/components/components/DialogProvider';
 import {
 	availableLanguages,
 	defaultLanguageCode
 } from '@/backend/i18n';
 import { GlobalTranslation } from '@/locales/global';
-import '@/styles/global.css';
-import '@/string.extensions.ts';
-import { DialogProvider } from '@/components/components/DialogProvider';
 import Loader from '@/components/astro-components/Loader.astro';
 import Footer from '@/components/astro-components/Footer.astro';
 import Section from '@/components/astro-components/Section.astro';
@@ -14,45 +12,92 @@ import SizeError from '@/components/astro-components/SizeError.astro';
 import { ScrollUp } from '@/components/components/ScrollUp';
 import { Navbar } from '@/components/partials/Navbar';
 import { MonologProvider } from '@/components/components/MonologProvider';
+import '@/styles/global.css';
+// eslint-disable-next-line import-x/no-unassigned-import
+import '@/string.extensions.ts';
 
 export interface Props {
 	head: {
 		title: string;
-		description: string
+		description: string;
 	};
 	noTopPadding?: boolean;
 }
-const { head, noTopPadding } = Astro.props as Props;
+const {
+	head,
+	noTopPadding
+} = Astro.props;
 const translation = Astro.locals.translation;
 ---
 
 <html class="bg-gradient-to-b from-black via-black to-gray-900 text-gray-100">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
+
 		<title>{head.title}</title>
-		<meta name="description" content={head.description} />
-		<meta name="author" content={GlobalTranslation.author} />
-		<meta name="theme-color" content="#000000" />
 
-		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<meta
+			name="description"
+			content={head.description}
+		/>
+
+		<meta
+			name="author"
+			content={GlobalTranslation.author}
+		/>
+
+		<meta
+			name="theme-color"
+			content="#000000"
+		/>
+
+		<link
+			rel="icon"
+			type="image/x-icon"
+			href="/favicon.ico"
+		/>
 
 		<link
 			rel="alternate"
 			type="application/rss+xml"
 			title={GlobalTranslation.siteName}
-			href={new URL("rss/blog.xml", Astro.site)}
+			href={
+				new URL(
+					'rss/blog.xml',
+					Astro.site
+				)
+			}
 		/>
+
 		<link
 			rel="alternate"
 			type="application/rss+xml"
 			title={GlobalTranslation.siteName}
-			href={new URL("rss/events.xml", Astro.site)}
+			href={
+				new URL(
+					'rss/events.xml',
+					Astro.site
+				)
+			}
 		/>
-		<script is:inline define:vars={{ translation }}>
+
+		<script
+			is:inline
+			define:vars={{ translation }}
+		>
 			window.__TRANSLATION__ = translation;
 		</script>
-		<script src="/build.js" is:inline/>
+
+		<script
+			is:inline
+			src="/build.js"
+		/>
+
 		<script>
 
 			if ('serviceWorker' in navigator) {
@@ -76,9 +121,10 @@ const translation = Astro.locals.translation;
 				});
 
 			}
-			
+
 		</script>
 	</head>
+
 	<body
 		class="bg-gradient-to-b from-black via-black to-gray-900 text-gray-100 alvins-class"
 	>
@@ -95,28 +141,42 @@ const translation = Astro.locals.translation;
 				client:only="react"
 			/>
 
-			<div class:list={[`grow pb-5`, {"pt-26 sm:pt-36 lg:pt-26": !noTopPadding}]}>
+			<div
+				class:list={[
+					'grow pb-5',
+					{ 'pt-26 sm:pt-36 lg:pt-26': !noTopPadding }
+				]}
+			>
 				<slot />
 			</div>
-			<ScrollUp scrollYThreshold={0} client:only="react" />
+
+			<ScrollUp
+				scrollYThreshold={0}
+				client:only="react"
+			/>
 
 			<Footer translation={translation} />
 
-			<Section id="size-error-div" center className="h-screen justify-center">
+			<Section
+				center
+				id="size-error-div"
+				className="h-screen justify-center"
+			>
 				<SizeError translation={translation} />
 			</Section>
+
 			<MonologProvider client:only="react" />
 			<DialogProvider client:only="react" />
+
 			<script> /* Start script */
 
 				import '@/string.extensions.ts';
 
 				import { setupJsErrorHandler } from '@/frontend/errorService';
 				setupJsErrorHandler();
-				
+
 				import { initWindowAnimations } from '@/frontend/windowTools';
 				initWindowAnimations(800, 200);
-
 
 				import { setDefaultLocale } from 'react-datepicker';
 				import { defaultLanguageCode } from '@/backend/i18n';

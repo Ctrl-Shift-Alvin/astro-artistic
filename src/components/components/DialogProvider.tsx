@@ -22,11 +22,7 @@ type TDialogOptions = {
 const dialogEmitter = isWindowDefined()
 	? (() => {
 
-		if (!window.dialogEmitter) {
-
-			window.dialogEmitter = new Emitter<TDialogOptions>();
-
-		}
+		window.dialogEmitter ??= new Emitter<TDialogOptions>();
 		return window.dialogEmitter;
 
 	})()
@@ -62,27 +58,29 @@ export class Dialog {
 		body: ReactNode
 	): Promise<void> {
 
-		return new Promise((resolve) => {
+		return new Promise(
+			(resolve) => {
 
-			this.show({
-				title,
-				body,
-				buttons: [
-					{
-						text: 'OK',
-						onClick: () => {
+				this.show({
+					title,
+					body,
+					buttons: [
+						{
+							text: 'OK',
+							onClick: () => {
 
-							if (DialogConfig.closeOnButtonClick)
-								this.close();
+								if (DialogConfig.closeOnButtonClick)
+									this.close();
 
-							resolve();
+								resolve();
 
+							}
 						}
-					}
-				]
-			});
+					]
+				});
 
-		});
+			}
+		);
 
 	}
 
@@ -100,36 +98,38 @@ export class Dialog {
 		} = {}
 	): Promise<boolean> {
 
-		return new Promise((resolve) => {
+		return new Promise(
+			(resolve) => {
 
-			this.show({
-				title,
-				body,
-				buttons: [
-					{
-						text: opts.noText || 'No',
-						onClick: () => {
+				this.show({
+					title,
+					body,
+					buttons: [
+						{
+							text: opts.noText ?? 'No',
+							onClick: () => {
 
-							if (DialogConfig.closeOnButtonClick)
-								this.close();
-							resolve(false);
+								if (DialogConfig.closeOnButtonClick)
+									this.close();
+								resolve(false);
 
+							}
+						},
+						{
+							text: opts.yesText ?? 'Yes',
+							onClick: () => {
+
+								if (DialogConfig.closeOnButtonClick)
+									this.close();
+								resolve(true);
+
+							}
 						}
-					},
-					{
-						text: opts.yesText || 'Yes',
-						onClick: () => {
+					]
+				});
 
-							if (DialogConfig.closeOnButtonClick)
-								this.close();
-							resolve(true);
-
-						}
-					}
-				]
-			});
-
-		});
+			}
+		);
 
 	}
 
@@ -150,8 +150,8 @@ export class Dialog {
 			body: (
 				formValues: T,
 				setFormValues: (newValues: T)=> void,
-				onSubmit: (event: React.SyntheticEvent)=> void,
-				onCancel: (event: React.SyntheticEvent)=> void
+				onSubmit: (ev: React.SyntheticEvent)=> void,
+				onCancel: (ev: React.SyntheticEvent)=> void
 			)=> ReactNode;
 			onSubmit: (formValues: T)=> boolean;
 			initialValue: T;
@@ -162,91 +162,93 @@ export class Dialog {
 		} = {}
 	): Promise<T | null> {
 
-		return new Promise((resolve) => {
+		return new Promise(
+			(resolve) => {
 
-			let latestFormValues: T = form.initialValue;
-			const handleStateChange = (newState: T) => {
+				let latestFormValues: T = form.initialValue;
+				const handleStateChange = (newState: T) => {
 
-				latestFormValues = newState;
+					latestFormValues = newState;
 
-			};
+				};
 
-			// The callback for submitting the form
-			const submitCallback = (event: React.SyntheticEvent) => {
+				// The callback for submitting the form
+				const submitCallback = (ev: React.SyntheticEvent) => {
 
-				event.preventDefault();
+					ev.preventDefault();
 
-				// If the onSubmit callback returns true, resolve the promise
-				const result = form.onSubmit(latestFormValues);
-				if (result) {
+					// If the onSubmit callback returns true, resolve the promise
+					const result = form.onSubmit(latestFormValues);
+					if (result) {
+
+						if (DialogConfig.closeOnButtonClick)
+							this.close();
+
+						resolve(latestFormValues);
+
+					}
+
+					// Otherwise, the dialog remains open, so no resolve() here
+
+				};
+
+				// The callback for cancelling the form
+				const cancelCallback = (ev: React.SyntheticEvent) => {
+
+					ev.preventDefault();
 
 					if (DialogConfig.closeOnButtonClick)
 						this.close();
 
-					resolve(latestFormValues);
+					resolve(null);
 
-				}
+				};
 
-				// Otherwise, the dialog remains open, so no resolve() here
+				const FormBody = () => {
 
-			};
+					const [
+						formValues,
+						setFormValues
+					] = useState(form.initialValue);
 
-			// The callback for cancelling the form
-			const cancelCallback = (event: React.SyntheticEvent) => {
+					useEffect(
+						() => {
 
-				event.preventDefault();
+							handleStateChange(formValues);
 
-				if (DialogConfig.closeOnButtonClick)
-					this.close();
+						},
+						[ formValues ]
+					);
 
-				resolve(null);
+					return form.body(
+						formValues,
+						setFormValues,
+						submitCallback,
+						cancelCallback
+					);
 
-			};
+				};
 
-			const FormBody = () => {
-
-				const [
-					formValues,
-					setFormValues
-				] = useState(form.initialValue);
-
-				useEffect(
-					() => {
-
-						handleStateChange(formValues);
-
+				const dialogButtons = [
+					{
+						text: opts.cancelText ?? 'Cancel',
+						onClick: cancelCallback
 					},
-					[ formValues ]
-				);
+					{
+						text: opts.submitText ?? 'Submit',
+						onClick: submitCallback,
+						type: 'submit'
+					}
+				] as DialogButton[];
 
-				return form.body(
-					formValues,
-					setFormValues,
-					submitCallback,
-					cancelCallback
-				);
+				this.show({
+					title,
+					body: <FormBody />,
+					buttons: dialogButtons
+				});
 
-			};
-
-			const dialogButtons = [
-				{
-					text: opts.cancelText || 'Cancel',
-					onClick: cancelCallback
-				},
-				{
-					text: opts.submitText || 'Submit',
-					onClick: submitCallback,
-					type: 'submit'
-				}
-			] as DialogButton[];
-
-			this.show({
-				title,
-				body: <FormBody />,
-				buttons: dialogButtons
-			});
-
-		});
+			}
+		);
 
 	}
 
@@ -306,7 +308,7 @@ export const DialogProvider: React.FC = () => {
 		<DialogPopup
 			isOpen={!!options}
 			title={options?.title}
-			buttons={options?.buttons || []}
+			buttons={options?.buttons ?? []}
 			onBackdropClick={options?.onBackdropClick}
 		>
 			{options?.body}

@@ -20,11 +20,13 @@ export const MonologPopup = (props: TMonologOptions) => {
 	useEffect(
 		() => {
 
-			requestAnimationFrame(() => {
+			requestAnimationFrame(
+				() => {
 
-				setVisible(true);
+					setVisible(true);
 
-			});
+				}
+			);
 
 			const fadeOutTimer = setTimeout(
 				() => {
@@ -60,7 +62,7 @@ export const MonologPopup = (props: TMonologOptions) => {
 			className={
 				clsx(
 					'z-50 border-2 border-white bg-gray-900 p-4',
-					props.fadeDurationMs && `transition-opacity duration-${props.fadeDurationMs}`,
+					props.fadeDurationMs !== 0 && `transition-opacity duration-${props.fadeDurationMs}`,
 					visible
 						? 'opacity-100'
 						: 'opacity-0',

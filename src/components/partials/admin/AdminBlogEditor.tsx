@@ -38,16 +38,18 @@ export const AdminBlogEditor = ({ fileName }: { fileName: string }) => {
 	const setFileContent = useCallback(
 		(value: typeof fileContent) => {
 
-			_setFileContent((prev) => {
+			_setFileContent(
+				(prev) => {
 
-				if (prev) {
+					if (prev) {
 
-					setFileContentChanged(true);
+						setFileContentChanged(true);
+
+					}
+					return value;
 
 				}
-				return value;
-
-			});
+			);
 
 		},
 		[]
@@ -64,26 +66,6 @@ export const AdminBlogEditor = ({ fileName }: { fileName: string }) => {
 		[ fileContentChanged ]
 	);
 
-	const get = useCallback(
-		async() => {
-
-			const result = await fetchBlogFile(
-				fileName,
-				true
-			);
-			if (!result)
-				return;
-
-			setFileContent(result);
-			setFileContentChanged(false);
-			setShowEditor(true);
-
-		},
-		[
-			fileName,
-			setFileContent
-		]
-	);
 	const save = useCallback(
 		async() => {
 
@@ -127,10 +109,25 @@ export const AdminBlogEditor = ({ fileName }: { fileName: string }) => {
 	useLayoutEffect(
 		() => {
 
+			const get = async() => {
+
+				const result = await fetchBlogFile(
+					fileName,
+					true
+				);
+				if (!result)
+					return;
+
+				_setFileContent(result);
+				setFileContentChanged(false);
+				setShowEditor(true);
+
+			};
+
 			void get();
 
 		},
-		[ get ]
+		[ fileName ]
 	);
 
 	useLayoutEffect(

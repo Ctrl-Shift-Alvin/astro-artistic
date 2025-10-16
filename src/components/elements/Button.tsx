@@ -1,5 +1,6 @@
 import {
-	useCallback, type ReactNode
+	useCallback,
+	type ReactNode
 } from 'react';
 import clsx from 'clsx/lite';
 import {
@@ -20,7 +21,7 @@ export type TButtonProps = {
 	type?: 'button' | 'reset' | 'submit';
 	form?: string;
 	href?: string;
-	onClick?: (event: React.MouseEvent<HTMLButtonElement>)=> void;
+	onClick?: (ev: React.MouseEvent<HTMLButtonElement>)=> void;
 	actionPayload?: TActionPayload;
 };
 
@@ -32,9 +33,9 @@ export type TButtonProps = {
 export const Button = (props: TButtonProps) => {
 
 	const click = useCallback(
-		(event: React.MouseEvent<HTMLButtonElement>) => {
+		(ev: React.MouseEvent<HTMLButtonElement>) => {
 
-			props.onClick?.(event);
+			props.onClick?.(ev);
 
 			if (props.actionPayload) {
 
@@ -52,17 +53,19 @@ export const Button = (props: TButtonProps) => {
 
 			if (props.href) {
 
-				void windowFadeOut()
-					.then(() => {
+				void windowFadeOut().then(
+					() => {
 
-						window.location.href = props.href || '';
+						window.location.href = props.href ?? '';
 
-					})
-					.then(() => {
+					}
+				).then(
+					() => {
 
 						windowFadeIn();
 
-					});
+					}
+				);
 
 			}
 
@@ -74,7 +77,7 @@ export const Button = (props: TButtonProps) => {
 		<button
 			className={
 				clsx(
-					props.small
+					props.small ?? false
 						? 'h-10 w-18 text-lg'
 						: 'h-20 w-40 text-2xl',
 					'shrink-0 cursor-pointer rounded-md border-2 border-solid border-white',

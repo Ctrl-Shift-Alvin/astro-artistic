@@ -8,6 +8,10 @@ export function isWindowDefined(): boolean {
 
 }
 
+let animatedObjects: NodeListOf<Element> | undefined;
+let animationDurationMs: number;
+let fadeInOffsetMs: number;
+
 /**
  * Scroll to a target Y value using a step function.
  * @param targetY The Y target to scroll to. (0 is top)
@@ -22,11 +26,10 @@ export const smoothScroll = (
 	const distance = targetY - startY;
 	let startTime: number | null = null;
 
-	const step = (currentTime: number) => {
+	const step = (time: number) => {
 
-		if (!startTime)
-			startTime = currentTime;
-		const elapsed = currentTime - startTime;
+		startTime ??= time;
+		const elapsed = time - startTime;
 
 		const progress = Math.min(
 			elapsed / durationMs,
@@ -36,7 +39,7 @@ export const smoothScroll = (
 
 		window.scrollTo(
 			0,
-			startY + distance * easeOutQuad
+			startY + (distance * easeOutQuad)
 		);
 
 		if (elapsed < durationMs) {
@@ -68,10 +71,6 @@ export const enableUnloadConfirmation = () => _isUnloadConfirmation = true;
  *
  */
 export const disableUnloadConfirmation = () => _isUnloadConfirmation = false;
-
-let animatedObjects: NodeListOf<Element> | undefined;
-let animationDurationMs: number;
-let fadeInOffsetMs: number;
 
 /**
  * Get the windowTools' current `animationDurationMs` value.
@@ -132,14 +131,16 @@ export const windowFadeIn = () => {
 
 	if (animatedObjects === undefined || animatedObjects.length < 1)
 		return;
-	animatedObjects.forEach((e: Element) => {
+	animatedObjects.forEach(
+		(e: Element) => {
 
-		e.classList.replace(
-			'opacity-0',
-			'opacity-100'
-		);
+			e.classList.replace(
+				'opacity-0',
+				'opacity-100'
+			);
 
-	});
+		}
+	);
 
 };
 
@@ -150,18 +151,22 @@ export const windowFadeOut = async() => {
 
 	if (animatedObjects === undefined || animatedObjects.length < 1)
 		return;
-	animatedObjects.forEach((e: Element) => {
+	animatedObjects.forEach(
+		(e: Element) => {
 
-		e.classList.replace(
-			'opacity-100',
-			'opacity-0'
-		);
+			e.classList.replace(
+				'opacity-100',
+				'opacity-0'
+			);
 
-	});
-	return new Promise((resolve) => setTimeout(
-		resolve,
-		animationDurationMs
-	));
+		}
+	);
+	return await new Promise(
+		(resolve) => setTimeout(
+			resolve,
+			animationDurationMs
+		)
+	);
 
 };
 
@@ -172,11 +177,13 @@ export const windowRefresh = () => {
 
 	if (animatedObjects) {
 
-		void windowFadeOut().then(() => {
+		void windowFadeOut().then(
+			() => {
 
-			window.location.reload();
+				window.location.reload();
 
-		});
+			}
+		);
 
 	} else {
 
@@ -211,14 +218,16 @@ export function initWindowAnimations(
 	// Start opacity transition
 	const elements = document.querySelectorAll('.windowtools-transition');
 	animatedObjects = elements; // Pass query result to tools, for future references
-	setAnimationDurationMs(_animationDurationMs || DEFAULT_ANIMATION_DURATION_MS);
-	setFadeInOffsetMs(_fadeInOffsetMs || DEFAULT_FADE_IN_OFFSET_MS);
+	setAnimationDurationMs(_animationDurationMs ?? DEFAULT_ANIMATION_DURATION_MS);
+	setFadeInOffsetMs(_fadeInOffsetMs ?? DEFAULT_FADE_IN_OFFSET_MS);
 
-	animatedObjects.forEach((e: Element) => {
+	animatedObjects.forEach(
+		(e: Element) => {
 
-		e.classList.add(`duration-${animationDurationMs}`);
+			e.classList.add(`duration-${animationDurationMs}`);
 
-	});
+		}
+	);
 
 	setTimeout(
 		() => {
@@ -235,12 +244,14 @@ export function initWindowAnimations(
 		if (_isUnloadConfirmation)
 			e.preventDefault();
 
-		void windowFadeOut().then(() => {
+		void windowFadeOut().then(
+			() => {
 
-			// Fade back in, in case the user navigates back to the cached state (without reloading)
-			windowFadeIn();
+				// Fade back in, in case the user navigates back to the cached state (without reloading)
+				windowFadeIn();
 
-		});
+			}
+		);
 
 	};
 
@@ -255,24 +266,24 @@ export function initWindowAnimations(
  */
 export function fakeReload(callback: ()=> any) {
 
-	void windowFadeOut().then(() => {
+	void windowFadeOut().then(
+		() => {
 
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-		const result = callback();
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			const result = callback();
 
-		if (result instanceof Promise) {
+			if (result instanceof Promise) {
 
-			result
-				.then(windowFadeIn)
-				.catch(windowFadeIn);
+				result.then(windowFadeIn).catch(windowFadeIn);
 
-		} else {
+			} else {
 
-			windowFadeIn();
+				windowFadeIn();
+
+			}
 
 		}
-
-	});
+	);
 
 }
 
@@ -281,10 +292,12 @@ export function fakeReload(callback: ()=> any) {
  */
 export function goto(href: string) {
 
-	void windowFadeOut().then(() => {
+	void windowFadeOut().then(
+		() => {
 
-		location.href = href;
+			location.href = href;
 
-	});
+		}
+	);
 
 }

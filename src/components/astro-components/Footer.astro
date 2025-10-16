@@ -6,9 +6,7 @@ import {
 import { A } from '@/components/elements/A';
 import { isAdminSetup } from '@/backend/admin';
 
-export interface Props {
-	translation: TTranslation;
-}
+export interface Props { translation: TTranslation }
 
 const { translation } = Astro.props;
 ---
@@ -19,14 +17,24 @@ const { translation } = Astro.props;
 	<div class="w-fit text-sm text-gray-200">
 		© Copyright {new Date().getFullYear()}. {GlobalTranslation.siteName}.
 	</div>
+
 	<div class="flex gap-x-5">
-		<div class:list={{ "hidden": !isAdminSetup }}>
-			<A href="/admin/home/" className="text-sm" client:only="react">
+		<div class:list={{ hidden: !isAdminSetup }}>
+			<A
+				href="/admin/home/"
+				className="text-sm"
+				client:only="react"
+			>
 				{translation.footer.admin}
 			</A>
 		</div>
+
 		<div>
-			<A href="/websiteinfo/" className="text-sm" client:only="react">
+			<A
+				href="/websiteinfo/"
+				className="text-sm"
+				client:only="react"
+			>
 				{translation.footer.siteInfo}
 			</A>
 		</div>

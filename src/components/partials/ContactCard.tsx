@@ -55,21 +55,44 @@ export const ContactCard = ({
 		});
 		if (!requestBody.success) {
 
-			switch (requestBody.error.issues[0]?.path[1]) {
+			switch (
+				requestBody
+					.error
+					.issues[0]
+					?.path[1]
+			) {
 
 				case 'email': {
 
-					Monolog.show({ text: window.__TRANSLATION__.contact.feedback.emailError });
+					Monolog.show({
+						text: window
+							.__TRANSLATION__
+							.contact
+							.feedback
+							.emailError
+					});
 
 				} break;
 				case 'phoneNumber': {
 
-					Monolog.show({ text: window.__TRANSLATION__.contact.feedback.phoneNumberError });
+					Monolog.show({
+						text: window
+							.__TRANSLATION__
+							.contact
+							.feedback
+							.phoneNumberError
+					});
 
 				} break;
-				default: {
+				case undefined: {
 
-					Monolog.show({ text: window.__TRANSLATION__.contact.feedback.sendingError });
+					Monolog.show({
+						text: window
+							.__TRANSLATION__
+							.contact
+							.feedback
+							.sendingError
+					});
 
 				} break;
 
@@ -92,20 +115,43 @@ export const ContactCard = ({
 		if (response.ok) {
 
 			void fetchNewCaptcha();
-			Monolog.show({ text: window.__TRANSLATION__.contact.feedback.noError });
+			Monolog.show({
+				text: window
+					.__TRANSLATION__
+					.contact
+					.feedback
+					.noError
+			});
 
 		} else if (response.status === 401) {
 
-			Monolog.show({ text: window.__TRANSLATION__.captcha.errorFeedback });
+			Monolog.show({
+				text: window
+					.__TRANSLATION__
+					.captcha
+					.errorFeedback
+			});
 
 		} else if (response.status === 409) {
 
 			void fetchNewCaptcha();
-			Monolog.show({ text: window.__TRANSLATION__.contact.feedback.duplicateError });
+			Monolog.show({
+				text: window
+					.__TRANSLATION__
+					.contact
+					.feedback
+					.duplicateError
+			});
 
 		} else {
 
-			Monolog.show({ text: window.__TRANSLATION__.contact.feedback.sendingError });
+			Monolog.show({
+				text: window
+					.__TRANSLATION__
+					.contact
+					.feedback
+					.sendingError
+			});
 
 		}
 
@@ -117,7 +163,7 @@ export const ContactCard = ({
 				className={
 					clsx(
 						'flex flex-col items-center sm:justify-between md:gap-x-24',
-						alternate
+						alternate ?? false
 							? 'lg:flex-row-reverse'
 							: 'lg:flex-row'
 					)
@@ -128,7 +174,7 @@ export const ContactCard = ({
 						className={
 							clsx(
 								'text-center newlines text-xl leading-9',
-								alternate
+								alternate ?? false
 									? 'lg:text-right'
 									: 'lg:text-left'
 							)
@@ -141,13 +187,17 @@ export const ContactCard = ({
 						className={
 							clsx(
 								'text-center text-xl leading-9',
-								alternate
+								alternate ?? false
 									? 'lg:text-right'
 									: 'lg:text-left'
 							)
 						}
 					>
-						{window.__TRANSLATION__.contact.email}
+						{window
+							.__TRANSLATION__
+							.contact
+							.email}
+
 						{':'}
 						{' '}
 
@@ -163,13 +213,17 @@ export const ContactCard = ({
 						className={
 							clsx(
 								'mb-4 text-center text-xl leading-9',
-								alternate
+								alternate ?? false
 									? 'lg:text-right'
 									: 'lg:text-left'
 							)
 						}
 					>
-						{window.__TRANSLATION__.contact.phoneNumber}
+						{window
+							.__TRANSLATION__
+							.contact
+							.phoneNumber}
+
 						{':'}
 						{' '}
 
@@ -209,7 +263,10 @@ export const ContactCard = ({
 												}
 											}
 										>
-											{window.__TRANSLATION__.contact.firstName}
+											{window
+												.__TRANSLATION__
+												.contact
+												.firstName}
 										</LabeledInput>
 									</div>
 
@@ -232,7 +289,10 @@ export const ContactCard = ({
 												}
 											}
 										>
-											{window.__TRANSLATION__.contact.lastName}
+											{window
+												.__TRANSLATION__
+												.contact
+												.lastName}
 										</LabeledInput>
 									</div>
 
@@ -255,7 +315,10 @@ export const ContactCard = ({
 												}
 											}
 										>
-											{window.__TRANSLATION__.contact.email}
+											{window
+												.__TRANSLATION__
+												.contact
+												.email}
 										</LabeledInput>
 									</div>
 
@@ -272,30 +335,46 @@ export const ContactCard = ({
 
 													setFormData({
 														...formData,
-														phoneNumber: e.target.value.startsWith('00') // Replace 00 with +
-															? `+${e.target.value
+														phoneNumber: e
+															.target
+															.value
+															.startsWith('00') // Replace 00 with +
+															? `+${e
+																.target
+																.value
 																.slice(2)
 																.replace(
 																	/\s/g,
 																	''
 																)}`
-															: e.target.value.startsWith('0') // Replace first 0 with default code
-																? `+43${e.target.value
+															: e
+																.target
+																.value
+																.startsWith('0') // Replace first 0 with default code
+																? `+43${e
+																	.target
+																	.value
 																	.slice(1)
 																	.replace(
 																		/\s/g,
 																		''
 																	)}`
-																: e.target.value.replace(
-																	/\s/g,
-																	''
-																)
+																: e
+																	.target
+																	.value
+																	.replace(
+																		/\s/g,
+																		''
+																	)
 													});
 
 												}
 											}
 										>
-											{window.__TRANSLATION__.contact.phoneNumber}
+											{window
+												.__TRANSLATION__
+												.contact
+												.phoneNumber}
 										</LabeledInput>
 									</div>
 
@@ -317,7 +396,10 @@ export const ContactCard = ({
 													}
 												}
 											>
-												{window.__TRANSLATION__.contact.message}
+												{window
+													.__TRANSLATION__
+													.contact
+													.message}
 											</LabeledTextArea>
 										</div>
 									</div>
@@ -334,7 +416,10 @@ export const ContactCard = ({
 
 						<div className={'mt-6 flex justify-center gap-x-6 sm:justify-end'}>
 							<Button type={'submit'}>
-								{window.__TRANSLATION__.contact.submit}
+								{window
+									.__TRANSLATION__
+									.contact
+									.submit}
 							</Button>
 						</div>
 					</form>

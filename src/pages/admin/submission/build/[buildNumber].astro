@@ -27,10 +27,23 @@ try {
 		description: 'Seeing submission ' + buildNumber
 	}}
 >
-	<Section center title={`Build ID '${buildNumber}' Overview`}>
-		<AdminBuildOverview buildNumber={buildNumber} client:only="react" />
+	<Section
+		center
+		title={`Build ID '${buildNumber}' Overview`}
+	>
+		<AdminBuildOverview
+			buildNumber={buildNumber}
+			client:only="react"
+		/>
 	</Section>
-	<Section center title={`Errors`}>
-		<AdminErrorTable buildNumber={buildNumberInt} client:only="react" />
+
+	<Section
+		center
+		title={'Errors'}
+	>
+		<AdminErrorTable
+			buildNumber={buildNumberInt}
+			client:only="react"
+		/>
 	</Section>
 </BaseAdmin>

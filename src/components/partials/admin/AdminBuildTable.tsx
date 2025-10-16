@@ -39,10 +39,12 @@ export const AdminBuildTable = () => {
 	const [
 		expandedRows,
 		setExpandedRows
-	] = useState<Record<number, boolean>>({});
+	] = useState<Record<string, boolean>>({});
 
 	const index = useCallback(
 		async(count: number) => {
+
+			const currentLength = buildsIndex.length;
 
 			/*
 			 * Because of semi-circular deps, when 'Show more...' is clicked, this is called twice.
@@ -52,36 +54,40 @@ export const AdminBuildTable = () => {
 				return;
 
 			// If count decreased, just slice the builds index
-			if (buildsIndex.length >= count) {
+			if (currentLength >= count) {
 
-				setBuildsIndex((prev) => prev.slice(
-					0,
-					count
-				));
+				setBuildsIndex(
+					(prev) => prev.slice(
+						0,
+						count
+					)
+				);
 				return;
 
 			}
 
 			// Otherwise, fetch only missing rows
 			const result = await fetchBuildIndex(
-				count - buildsIndex.length,
-				buildsIndex.length
+				count - currentLength,
+				currentLength
 			);
 			if (result === null)
 				return;
 
-			setBuildsIndex((prev) => [
-				...prev,
-				...result
-			].slice(
-				0,
-				buildsCount
-			));
+			setBuildsIndex(
+				(prev) => [
+					...prev,
+					...result
+				].slice(
+					0,
+					buildsCount
+				)
+			);
 
 		},
 		[
-			buildsCount,
-			buildsIndex.length
+			buildsIndex.length,
+			buildsCount
 		]
 	);
 
@@ -89,24 +95,12 @@ export const AdminBuildTable = () => {
 		async(buildNumber: number | string) => {
 
 			await deleteBuild(buildNumber);
-			void index(buildsCount);
 
-		},
-		[
-			buildsCount,
-			index
-		]
-	);
-
-	const count = useCallback(
-		async() => {
-
-			const result = await fetchBuildCount();
-			if (result) {
-
-				setFullIndexCount(result);
-
-			}
+			/*
+			 * After deleting, we need to refetch.
+			 * Resetting the index and letting the effect handle it is a clean way to do this.
+			 */
+			setBuildsIndex([]);
 
 		},
 		[]
@@ -133,13 +127,26 @@ export const AdminBuildTable = () => {
 	useLayoutEffect(
 		() => {
 
-			void count();
-			void index(buildsCount);
+			const loadData = async() => {
+
+				// Fetch the total count
+				const totalCount = await fetchBuildCount();
+				if (totalCount) {
+
+					setFullIndexCount(totalCount);
+
+				}
+
+				// Fetch the builds for the current view
+				await index(buildsCount);
+
+			};
+
+			void loadData();
 
 		},
 		[
 			buildsCount,
-			count,
 			index
 		]
 	);
@@ -175,120 +182,125 @@ export const AdminBuildTable = () => {
 
 				<tbody>
 					{
-						buildsIndex.map((entry) => {
+						buildsIndex.map(
+							(entry) => {
 
-							const isGitCommitExpanded = expandedRows[entry.buildNumber] ?? false;
+								const buildNumberStr = entry.buildNumber.toString();
+								const isGitCommitExpanded = expandedRows[buildNumberStr] ?? false;
 
-							const toggleIsCommitExpanded = () => {
+								const toggleIsCommitExpanded = () => {
 
-								setExpandedRows((previous) => ({
-									...previous,
-									[entry.buildNumber]: !isGitCommitExpanded
-								}));
+									setExpandedRows(
+										(previous) => ({
+											...previous,
+											[buildNumberStr]: !isGitCommitExpanded
+										})
+									);
 
-							};
+								};
 
-							const tdClassName = clsx('border p-2');
-							return (
-								<tr key={entry.buildNumber}>
+								const tdClassName = clsx('border p-2');
+								return (
+									<tr key={buildNumberStr}>
 
-									<td
-										className={
-											clsx(
-												tdClassName,
-												entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-r-1'
-											)
-										}
-									>
-										<A
-											className={'text-center underline'}
-											href={`/admin/submission/build/${entry.buildNumber}/${getPrevUrlQuery()}`}
-										>
-											{entry.buildNumber}
-										</A>
-									</td>
-
-									<td
-										className={
-											clsx(
-												tdClassName,
-												entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-x-1'
-											)
-										}
-									>
-										{defaultFormatDateTimeString(new Date(entry.createdAt))}
-									</td>
-
-									<td
-										className={
-											clsx(
-												tdClassName,
-												entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-x-1'
-											)
-										}
-									>
-										{entry.gitBranch}
-									</td>
-
-									<td
-										className={
-											clsx(
-												tdClassName,
-												entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-x-1'
-											)
-										}
-									>
-										{
-											isGitCommitExpanded
-												? entry.gitCommit
-												: entry.gitCommit.slice(
-													0,
-													12
+										<td
+											className={
+												clsx(
+													tdClassName,
+													entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-r-1'
 												)
-										}
+											}
+										>
+											<A
+												className={'text-center underline'}
+												href={`/admin/submission/build/${entry.buildNumber}/${getPrevUrlQuery()}`}
+											>
+												{entry.buildNumber}
+											</A>
+										</td>
 
-										<A
-											className={'font-bold'}
-											onClick={toggleIsCommitExpanded}
+										<td
+											className={
+												clsx(
+													tdClassName,
+													entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-x-1'
+												)
+											}
+										>
+											{defaultFormatDateTimeString(new Date(entry.createdAt))}
+										</td>
+
+										<td
+											className={
+												clsx(
+													tdClassName,
+													entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-x-1'
+												)
+											}
+										>
+											{entry.gitBranch}
+										</td>
+
+										<td
+											className={
+												clsx(
+													tdClassName,
+													entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-x-1'
+												)
+											}
 										>
 											{
 												isGitCommitExpanded
-													? '  <-'
-													: '  ...'
+													? entry.gitCommit
+													: entry.gitCommit.slice(
+														0,
+														12
+													)
 											}
-										</A>
-									</td>
 
-									<td
-										className={
-											clsx(
-												tdClassName,
-												entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-x-1'
-											)
-										}
-									>
-										{
-											entry.isGitDirty
-												? 'Yes'
-												: 'No'
-										}
-									</td>
+											<A
+												className={'font-bold'}
+												onClick={toggleIsCommitExpanded}
+											>
+												{
+													isGitCommitExpanded
+														? '  <-'
+														: '  ...'
+												}
+											</A>
+										</td>
 
-									<td
-										className={
-											clsx(
-												tdClassName,
-												'w-px',
-												entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-l-1'
-											)
-										}
-									>
-										<TrashcanIcon onClick={() => void remove(entry.buildNumber)} />
-									</td>
-								</tr>
-							);
+										<td
+											className={
+												clsx(
+													tdClassName,
+													entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-x-1'
+												)
+											}
+										>
+											{
+												entry.isGitDirty
+													? 'Yes'
+													: 'No'
+											}
+										</td>
 
-						})
+										<td
+											className={
+												clsx(
+													tdClassName,
+													'w-px',
+													entry.buildNumber == window.__BUILD__.buildNumber && 'border-4 border-l-1'
+												)
+											}
+										>
+											<TrashcanIcon onClick={() => void remove(entry.buildNumber.toString())} />
+										</td>
+									</tr>
+								);
+
+							}
+						)
 					}
 				</tbody>
 			</table>

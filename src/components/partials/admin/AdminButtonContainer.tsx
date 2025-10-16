@@ -1,48 +1,46 @@
 import {
 	useEffect,
-	useMemo,
-	useState,
-	type Dispatch,
-	type SetStateAction
+	useState
 } from 'react';
 import {
 	Button,
 	type TButtonProps
 } from '@/components/elements/Button';
+import { Emitter } from '@/components/types';
 import { isWindowDefined } from '@/frontend/windowTools';
 
 const ADMIN_BUTTON_CONTAINER_ID = 'adminButtonContainer';
 
-interface AdminButtonState {
-	setter: Dispatch<SetStateAction<TButtonProps[]>> | null;
-	buttons: TButtonProps[];
-}
+type ButtonUpdater = (buttons: TButtonProps[])=> TButtonProps[];
 
 declare global {
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	interface Window { __adminButtonState?: AdminButtonState }
+
+	interface Window {
+		// eslint-disable-next-line @typescript-eslint/naming-convention
+		__adminButtonState?: {
+			emitter: Emitter<ButtonUpdater>;
+			queued: TButtonProps[];
+		};
+	}
 }
 
 /**
  * We attach the state to the global `window` object to ensure a true singleton
  * across all module instances, which can be a problem with some bundlers and
  * framework integrations (like Astro islands).
+ * This now uses a simple event emitter pattern.
  */
-function getButtonState(): AdminButtonState {
+function getButtonState() {
 
 	if (!isWindowDefined()) {
 
 		throw new Error('This function can only be called on the client!');
 
 	}
-	if (!window.__adminButtonState) {
-
-		window.__adminButtonState = {
-			setter: null,
-			buttons: []
-		};
-
-	}
+	window.__adminButtonState ??= {
+		emitter: new Emitter<ButtonUpdater>(),
+		queued: []
+	};
 	return window.__adminButtonState;
 
 }
@@ -85,13 +83,13 @@ export const addAdminButton = (...newButtons: TButtonProps[]) => {
 
 	};
 
-	if (state.setter) {
+	if (state.emitter.hasListener()) {
 
-		state.setter(updater);
+		state.emitter.emit(updater);
 
 	} else {
 
-		state.buttons = updater(state.buttons);
+		state.queued = updater(state.queued);
 
 	}
 
@@ -112,67 +110,59 @@ export const AdminButtonContainer = ({ buttons: initialButtons = [] }: { buttons
 
 	const state = getButtonState();
 	const [
-		clientButtons,
-		setClientButtons
-	] = useState<TButtonProps[]>(state.buttons);
+		buttons,
+		setButtons
+	] = useState<TButtonProps[]>(
+		() => {
+
+			// Merge initial server-side buttons with any client-side buttons that were queued before mount.
+			const clientButtonIds = new Set(state.queued.map(getButtonId));
+			const uniqueInitialButtons = initialButtons.filter((btn) => !clientButtonIds.has(getButtonId(btn)));
+			return [
+				...uniqueInitialButtons,
+				...state.queued
+			];
+
+		}
+	);
 
 	useEffect(
 		() => {
 
-			state.setter = setClientButtons;
+			// Subscribe to the emitter, applying any updates to the component's state.
+			state.emitter.subscribe(setButtons);
 
-			// In case buttons were added before this component mounted
-			setClientButtons(state.buttons);
-
-			// Clear setters, leave buttons untouched
+			// Unsubscribe on unmount.
 			return () => {
 
-				state.setter = null;
+				state.emitter.unsubscribe();
 
 			};
 
 		},
-		[ state ]
-	);
-
-	const allButtons = useMemo(
-		() => {
-
-			const clientButtonIds = new Set(clientButtons.map(getButtonId));
-
-			// Filter out initialButtons that are already present in clientButtons
-			const uniqueInitialButtons = initialButtons.filter((btn) => !clientButtonIds.has(getButtonId(btn)));
-
-			return [
-				...uniqueInitialButtons,
-				...clientButtons
-			];
-
-		},
-		[
-			initialButtons,
-			clientButtons
-		]
+		[ state.emitter ] // Dependency on the emitter object itself.
 	);
 
 	return (
-		allButtons.length > 0
+		buttons.length > 0
 		&& (
 			<div
 				id={ADMIN_BUTTON_CONTAINER_ID}
 				className={'sticky bottom-0 left-0 right-0 p-4 flex flex-row justify-start gap-x-5 bg-gray/20'}
 			>
 				{
-					allButtons.map((btn) => (
-						<Button
-							key={getButtonId(btn)}
-							small={btn.small ?? true}
-							href={btn.href}
-							onClick={btn.onClick}
-						>
-							{btn.children}
-						</Button>
-					))
+					buttons.map(
+						(btn) => (
+							<Button
+								key={getButtonId(btn)}
+								small={btn.small ?? true}
+								href={btn.href}
+								onClick={btn.onClick}
+							>
+								{btn.children}
+							</Button>
+						)
+					)
 				}
 			</div>
 		)

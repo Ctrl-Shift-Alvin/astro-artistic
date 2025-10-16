@@ -14,7 +14,11 @@ export const RecentBlogs = ({ recentBlogFiles }: { recentBlogFiles: TBlogMarkdow
 					href={'/blog/'}
 					className={'text-lg'}
 				>
-					{window.__TRANSLATION__.blog.gotoBlogButton}
+					{window
+						.__TRANSLATION__
+						.blog
+						.gotoBlogButton}
+
 					{' '}
 					{'→'}
 				</A>

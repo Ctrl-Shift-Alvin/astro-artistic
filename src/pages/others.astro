@@ -15,42 +15,80 @@ const translation = Astro.locals.translation;
 		description: translation.others.description
 	}}
 >
-	<Section title={translation.others.title} center={true} />
+	<Section
+		title={translation.others.title}
+		center={true}
+	/>
+
 	<Section>
 		<Card
-			title={translation.others.card1.title}
-			description={translation.others.card1.description}
+			title={translation
+				.others
+				.card1
+				.title}
+			description={translation
+				.others
+				.card1
+				.description}
 			imageSource="/images/piano-hands.png"
 		/>
 	</Section>
+
 	<Section>
 		<Card
-			title={translation.others.card2.title}
-			description={translation.others.card2.description}
+			title={translation
+				.others
+				.card2
+				.title}
+			description={translation
+				.others
+				.card2
+				.description}
 			alternate={true}
 			imageSource="/images/piano-hands.png"
 		/>
 	</Section>
+
 	<Section>
 		<Card
-			title={translation.others.card3.title}
-			description={translation.others.card3.description}
+			title={translation
+				.others
+				.card3
+				.title}
+			description={translation
+				.others
+				.card3
+				.description}
 			imageSource="/images/piano-hands.png"
 		/>
 	</Section>
+
 	<Section>
-		<Card title={translation.others.card4.title} />
+		<Card
+			title={translation
+				.others
+				.card4
+				.title}
+		/>
+
 		<div class="mt-5 flex justify-center">
 			<ol class="max-w-2/3 min-w-1/3 list-disc">
 				{
-					(translation.others.card4.points as string[]).map((str) => (
-						<li class="my-2 text-center text-xl">{str}</li>
-					))
+					(translation
+						.others
+						.card4
+						.points as string[]).map(
+						(str) => <li class="my-2 text-center text-xl">{str}</li>
+					)
 				}
 			</ol>
 		</div>
 	</Section>
+
 	<Section title={translation.contact.title}>
-		<ContactCard contactData={ContactConfig.contacts.default!} client:only="react" />
+		<ContactCard
+			contactData={ContactConfig.contacts.default!}
+			client:only="react"
+		/>
 	</Section>
 </Base>

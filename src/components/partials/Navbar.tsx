@@ -30,9 +30,9 @@ export const Navbar = ({
 	const selectedLanguageCode = cGetUserLanguage();
 
 	const handleLanguageChange = useCallback(
-		(event: React.ChangeEvent<HTMLSelectElement>) => {
+		(ev: React.ChangeEvent<HTMLSelectElement>) => {
 
-			const langCode: string = event.target.value;
+			const langCode: string = ev.target.value;
 			cSetUserLanguage(langCode);
 
 			windowRefresh();
@@ -159,16 +159,18 @@ export const Navbar = ({
 				}
 			>
 				{
-					NavbarConfig(window.__TRANSLATION__).items.map((item) => (
-						<ol
-							key={item.name}
-							className={'flex flex-col justify-start text-center text-2xl'}
-						>
-							<NavMenuItem href={item.href}>
-								{item.name}
-							</NavMenuItem>
-						</ol>
-					))
+					NavbarConfig(window.__TRANSLATION__).items.map(
+						(item) => (
+							<ol
+								key={item.name}
+								className={'flex flex-col justify-start text-center text-2xl'}
+							>
+								<NavMenuItem href={item.href}>
+									{item.name}
+								</NavMenuItem>
+							</ol>
+						)
+					)
 				}
 
 				<LanguageSelect
@@ -200,16 +202,18 @@ export const Navbar = ({
 				className={'absolute z-50 hidden w-full justify-center pt-8 pb-18 sm:flex'}
 			>
 				{
-					NavbarConfig(window.__TRANSLATION__).items.map((item) => (
-						<ol
-							key={item.name}
-							className={'mx-5 font-medium text-gray-200'}
-						>
-							<NavMenuItem href={item.href}>
-								{item.name}
-							</NavMenuItem>
-						</ol>
-					))
+					NavbarConfig(window.__TRANSLATION__).items.map(
+						(item) => (
+							<ol
+								key={item.name}
+								className={'mx-5 font-medium text-gray-200'}
+							>
+								<NavMenuItem href={item.href}>
+									{item.name}
+								</NavMenuItem>
+							</ol>
+						)
+					)
 				}
 
 				<LanguageSelect

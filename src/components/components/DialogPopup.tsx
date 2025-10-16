@@ -3,7 +3,7 @@ import { Button } from '../elements/Button';
 
 export interface DialogButton {
 	text: ReactNode;
-	onClick?: (event: React.MouseEvent<HTMLButtonElement>)=> void;
+	onClick?: (ev: React.MouseEvent<HTMLButtonElement>)=> void;
 	className?: string;
 	type?: 'button' | 'reset' | 'submit';
 }
@@ -65,20 +65,22 @@ export const DialogPopup: React.FC<DialogPopupProps> = ({
 					{/* Dialog Buttons */}
 					<div className={'mt-5 flex w-full justify-end gap-4'}>
 						{
-							buttons.map((
-								btn,
-								index
-							) => (
-								<Button
-									key={index}
-									small
-									className={btn.className}
-									type={btn.type}
-									onClick={btn.onClick}
-								>
-									{btn.text}
-								</Button>
-							))
+							buttons.map(
+								(
+									btn,
+									index
+								) => (
+									<Button
+										key={index}
+										small
+										className={btn.className}
+										type={btn.type}
+										onClick={btn.onClick}
+									>
+										{btn.text}
+									</Button>
+								)
+							)
 						}
 					</div>
 				</div>

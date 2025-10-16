@@ -1,6 +1,5 @@
 ---
 import { AdminButtonContainer } from '@/components/partials/admin/AdminButtonContainer';
-import { logout } from '@/frontend/adminApi';
 import { GlobalTranslation } from '@/locales/global';
 import Base from '@/templates/Base.astro';
 
@@ -8,7 +7,7 @@ interface Props {
 	head: {
 		title: string;
 		description: string;
-	}
+	};
 	noLogoutComponent?: boolean;
 }
 
@@ -17,34 +16,48 @@ const { head } = Astro.props;
 const title = `${GlobalTranslation.siteName} - Admin - ${head.title}`;
 const description = `${GlobalTranslation.siteName} - Admin - ${head.description}`;
 
-const pathname = Astro.url.pathname;
-const prevUrl = decodeURIComponent(Astro.url.searchParams.get('prevUrl') ?? '');
-
-const adminButtons = pathname !== '/admin/home/'
-	? [
-		{
-			children: 'Back',
-			href: prevUrl || '/admin/home/'
-		}
-	]
-	: undefined;
 ---
 
-<Base head={{ title, description }}>
+<Base
+	head={{
+		title,
+		description
+	}}
+>
 
 	<slot />
-	<AdminButtonContainer buttons={adminButtons} client:only="react">
-		{
-			{
-				children: 'Logout',
-				onClick: () => void logout()
-			}
-		}
-	</AdminButtonContainer>
+	<AdminButtonContainer client:only="react" />
+
 	<script>
 
-		import { setLogoutTimeout } from '@/frontend/adminApi';
+		import { addAdminButton } from '@/components/partials/admin/AdminButtonContainer';
+		import {
+			gotoPrevOrHome,
+			logout,
+			setLogoutTimeout
+		} from '@/frontend/adminApi';
+
 		setLogoutTimeout();
+
+		if (location.pathname !== '/admin/home/') {
+			addAdminButton({
+				children: 'Back',
+				onClick: () => {
+
+					gotoPrevOrHome();
+
+				}
+			});
+		}
+
+		addAdminButton({
+			children: 'Logout',
+			onClick: () => {
+
+				logout();
+
+			}
+		});
 
 	</script>
 </Base>

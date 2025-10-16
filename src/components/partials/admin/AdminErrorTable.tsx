@@ -57,10 +57,12 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 			// If count decreased, just slice the errors index
 			if (errorsIndex.length >= count) {
 
-				setErrorsIndex((prev) => prev.slice(
-					0,
-					count
-				));
+				setErrorsIndex(
+					(prev) => prev.slice(
+						0,
+						count
+					)
+				);
 				return;
 
 			}
@@ -80,13 +82,15 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 			if (result == null)
 				return;
 
-			setErrorsIndex((prev) => [
-				...prev,
-				...result
-			].slice(
-				0,
-				errorsCount
-			));
+			setErrorsIndex(
+				(prev) => [
+					...prev,
+					...result
+				].slice(
+					0,
+					errorsCount
+				)
+			);
 
 		},
 		[
@@ -96,33 +100,16 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 		]
 	);
 
-	const count = useCallback(
-		async() => {
-
-			const result = buildNumber
-				? await fetchErrorCountByBuild(buildNumber)
-				: await fetchErrorCount();
-			if (result === null)
-				return;
-
-			setFullIndexCount(result);
-
-		},
-		[ buildNumber ]
-	);
-
 	const del = useCallback(
 		async(id: number | string) => {
 
 			await deleteError(id);
-			setErrorsIndex([]); // Refetch all errors, but keep the shown count
-			void index(errorsCount);
+
+			// Refetch all errors by clearing the index, which will trigger the layout effect.
+			setErrorsIndex([]);
 
 		},
-		[
-			errorsCount,
-			index
-		]
+		[]
 	);
 
 	const increaseCount = useCallback(
@@ -146,14 +133,35 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 	useLayoutEffect(
 		() => {
 
-			void count();
-			void index(errorsCount);
+			const loadData = async() => {
+
+				const result = buildNumber
+					? await fetchErrorCountByBuild(buildNumber)
+					: await fetchErrorCount();
+
+				if (result !== null) {
+
+					setFullIndexCount(result);
+
+				}
+
+				// Only fetch if the index is empty (initial load or after a delete)
+				if (errorsIndex.length === 0) {
+
+					await index(errorsCount);
+
+				}
+
+			};
+
+			void loadData();
 
 		},
 		[
+			buildNumber,
 			errorsCount,
-			index,
-			count
+			errorsIndex.length,
+			index
 		]
 	);
 
@@ -205,125 +213,129 @@ export const AdminErrorTable = ({ buildNumber }: { buildNumber?: number }) => {
 
 				<tbody>
 					{
-						errorsIndex.map((entry) => {
+						errorsIndex.map(
+							(entry) => {
 
-							const isErrorExapanded = expandedRows[entry.id] ?? false;
+								const isErrorExapanded = expandedRows[entry.id] ?? false;
 
-							const toggleIsErrorExpanded = () => {
+								const toggleIsErrorExpanded = () => {
 
-								setExpandedRows((previous) => ({
-									...previous,
-									[entry.id]: !isErrorExapanded
-								}));
+									setExpandedRows(
+										(previous) => ({
+											...previous,
+											[entry.id]: !isErrorExapanded
+										})
+									);
 
-							};
+								};
 
-							const tdClassName = 'border p-2';
-							return (
-								<React.Fragment key={entry.id}>
-									<tr>
+								const tdClassName = 'border p-2';
+								return (
+									<React.Fragment key={entry.id}>
+										<tr>
 
-										<td className={tdClassName}>
-											<A
-												className={'text-center underline'}
-												href={`/admin/submission/error/${entry.id}/${getPrevUrlQuery()}`}
+											<td className={tdClassName}>
+												<A
+													className={'text-center underline'}
+													href={`/admin/submission/error/${entry.id}/${getPrevUrlQuery()}`}
+												>
+													{entry.id}
+												</A>
+
+											</td>
+
+											<td className={tdClassName}>
+												{defaultFormatDateTimeString(new Date(entry.createdAt))}
+											</td>
+
+											<td className={tdClassName}>
+												<A
+													className={'underline'}
+													href={`/admin/submission/build/${entry.buildNumber}/${getPrevUrlQuery()}}`}
+												>
+													{entry.buildNumber}
+												</A>
+											</td>
+
+											<td className={tdClassName}>
+												{entry.url}
+											</td>
+
+											<td className={tdClassName}>
+												{
+													entry.isClient
+														? 'Yes'
+														: 'No'
+												}
+											</td>
+
+											<td className={tdClassName}>
+												{entry.status ?? '-'}
+											</td>
+
+											<td className={tdClassName}>
+												{entry.statusText ?? '-'}
+											</td>
+
+											<td className={tdClassName}>
+												{entry.errorMessage ?? '-'}
+											</td>
+
+											<td className={tdClassName}>
+												{entry.errorCause ?? '-'}
+											</td>
+
+											<td
+												rowSpan={2}
+												className={
+													clsx(
+														tdClassName,
+														'w-px border-b-4'
+													)
+												}
 											>
-												{entry.id}
-											</A>
+												<TrashcanIcon onClick={() => void del(entry.id)} />
+											</td>
 
-										</td>
+										</tr>
 
-										<td className={tdClassName}>
-											{defaultFormatDateTimeString(new Date(entry.createdAt))}
-										</td>
-
-										<td className={tdClassName}>
-											<A
-												className={'underline'}
-												href={`/admin/submission/build/${entry.buildNumber}/${getPrevUrlQuery()}}`}
+										<tr>
+											<td
+												colSpan={9}
+												className={'border p-2 border-b-4 text-center'}
 											>
-												{entry.buildNumber}
-											</A>
-										</td>
+												{
+													entry.errorStack
+														? isErrorExapanded
+															? entry.errorStack
+															: entry.errorStack.slice(
+																0,
+																30
+															)
+														: '-'
+												}
 
-										<td className={tdClassName}>
-											{entry.url}
-										</td>
+												{
+													entry.errorStack && (
+														<A
+															className={'font-bold'}
+															onClick={toggleIsErrorExpanded}
+														>
+															{
+																isErrorExapanded
+																	? '  <-'
+																	: '  ...'
+															}
+														</A>
+													)
+												}
+											</td>
+										</tr>
+									</React.Fragment>
+								);
 
-										<td className={tdClassName}>
-											{
-												entry.isClient
-													? 'Yes'
-													: 'No'
-											}
-										</td>
-
-										<td className={tdClassName}>
-											{entry.status ?? '-'}
-										</td>
-
-										<td className={tdClassName}>
-											{entry.statusText ?? '-'}
-										</td>
-
-										<td className={tdClassName}>
-											{entry.errorMessage ?? '-'}
-										</td>
-
-										<td className={tdClassName}>
-											{entry.errorCause ?? '-'}
-										</td>
-
-										<td
-											rowSpan={2}
-											className={
-												clsx(
-													tdClassName,
-													'w-px border-b-4'
-												)
-											}
-										>
-											<TrashcanIcon onClick={() => void del(entry.id)} />
-										</td>
-
-									</tr>
-
-									<tr>
-										<td
-											colSpan={9}
-											className={'border p-2 border-b-4 text-center'}
-										>
-											{
-												entry.errorStack
-													? isErrorExapanded
-														? entry.errorStack
-														: entry.errorStack.slice(
-															0,
-															30
-														)
-													: '-'
-											}
-
-											{
-												entry.errorStack && (
-													<A
-														className={'font-bold'}
-														onClick={toggleIsErrorExpanded}
-													>
-														{
-															isErrorExapanded
-																? '  <-'
-																: '  ...'
-														}
-													</A>
-												)
-											}
-										</td>
-									</tr>
-								</React.Fragment>
-							);
-
-						})
+							}
+						)
 					}
 				</tbody>
 			</table>

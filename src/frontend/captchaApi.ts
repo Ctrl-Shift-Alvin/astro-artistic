@@ -87,8 +87,6 @@ export const addCaptchaAttempt = () => {
 
 	const newValue = (lsGetCurrentCaptchaAttempts() ?? 0) + 1;
 
-	console.log(newValue);
-
 	if (newValue >= CaptchaConfig.maxTriesPerToken) {
 
 		void fetchNewCaptcha();

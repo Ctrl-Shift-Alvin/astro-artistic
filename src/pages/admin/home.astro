@@ -14,19 +14,38 @@ import { AdminBlogTable } from '@/components/partials/admin/AdminBlogTable';
 		description: 'Admin page'
 	}}
 >
-	<Section center title="Contact Form Submissions">
+	<Section
+		center
+		title="Contact Form Submissions"
+	>
 		<AdminContactTable client:only="react" />
 	</Section>
-	<Section center title="Manage Events">
+
+	<Section
+		center
+		title="Manage Events"
+	>
 		<AdminEventTable client:only="react" />
 	</Section>
-	<Section center title="Manage Blog">
+
+	<Section
+		center
+		title="Manage Blog"
+	>
 		<AdminBlogTable client:only="react" />
 	</Section>
-	<Section center title="Manage Builds">
+
+	<Section
+		center
+		title="Manage Builds"
+	>
 		<AdminBuildTable client:only="react" />
 	</Section>
-	<Section center title="Manage Errors">
+
+	<Section
+		center
+		title="Manage Errors"
+	>
 		<AdminErrorTable client:only="react" />
 	</Section>
 </BaseAdmin>

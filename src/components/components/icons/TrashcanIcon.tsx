@@ -1,5 +1,6 @@
 import {
-	A, type IAProps
+	A,
+	type IAProps
 } from '@/components/elements/A';
 
 /**

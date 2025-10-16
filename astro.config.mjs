@@ -3,11 +3,16 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import robotsTxt from 'astro-robots-txt';
-import { defineConfig, envField } from 'astro/config';
+import {
+	defineConfig,
+	envField
+} from 'astro/config';
 import mkcert from 'vite-plugin-mkcert';
 
 // https://astro.build/config
+// eslint-disable-next-line import-x/no-default-export
 export default defineConfig({
+
 	// Base: '.', // Set a path prefix.
 	site: 'http://maxmaxwell.com/',
 	trailingSlash: 'always',
@@ -81,8 +86,11 @@ export default defineConfig({
 	},
 	markdown: {
 		shikiConfig: {
-			// Choose from Shiki's built-in themes (or add your own)
-			// https://github.com/shikijs/shiki/blob/main/docs/themes.md
+
+			/*
+			 * Choose from Shiki's built-in themes (or add your own)
+			 * https://github.com/shikijs/shiki/blob/main/docs/themes.md
+			 */
 			theme: 'monokai'
 		}
 	}

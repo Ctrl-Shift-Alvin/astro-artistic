@@ -33,74 +33,82 @@ const noCacheResponse = (response: Response) => {
 
 };
 
-export const onRequest = defineMiddleware(async(
-	context,
-	next
-) => {
+export const onRequest = defineMiddleware(
+	async(
+		context,
+		next
+	) => {
 
-	const lang = cGetUserLanguage(context);
-	const translation = lang
-		? getTranslation(lang) ?? getDefaultTranslation()
-		: getDefaultTranslation();
+		const lang = cGetUserLanguage(context);
+		const translation = lang
+			? getTranslation(lang) ?? getDefaultTranslation()
+			: getDefaultTranslation();
 
-	context.locals.translation = translation;
+		context.locals.translation = translation;
 
-	if (context.url.pathname.startsWith('/admin/')) {
+		if (context
+			.url
+			.pathname
+			.startsWith('/admin/')) {
 
-		if (!isAdminSetup) {
+			if (!isAdminSetup) {
 
-			return noCacheResponse(context.redirect('/'));
-
-		}
-
-		const token = cGetAuthToken(context);
-		const isLoginPage = context.url.pathname === '/admin/login/';
-
-		if (token) {
-
-			const tokenExpiry = (decode(token) as JwtPayload | null)?.exp;
-			if (tokenExpiry && Date.now() - tokenExpiry * 1000 < 0) {
-
-				if (isLoginPage) {
-
-					return noCacheResponse(context.redirect('/admin/home/'));
-
-				}
-
-				return noCacheResponse(await next());
+				return noCacheResponse(context.redirect('/'));
 
 			}
 
+			const token = cGetAuthToken(context);
+			const isLoginPage = context.url.pathname === '/admin/login/';
+
+			if (token) {
+
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+				const tokenExpiry = (decode(token) as JwtPayload | null)?.exp;
+				if (tokenExpiry && Date.now() - (tokenExpiry * 1000) < 0) {
+
+					if (isLoginPage) {
+
+						return noCacheResponse(context.redirect('/admin/home/'));
+
+					}
+
+					return noCacheResponse(await next());
+
+				}
+
+			}
+
+			if (!isLoginPage) {
+
+				return noCacheResponse(context.redirect('/admin/login/'));
+
+			}
+
+			return noCacheResponse(await next());
+
 		}
 
-		if (!isLoginPage) {
+		const response = await next();
 
-			return noCacheResponse(context.redirect('/admin/login/'));
+		void new Promise(
+			() => {
 
-		}
+				if (
+					ErrorsConfig.enableResponseLogging
+					&& ErrorsConfig.responseLoggingStatusCodes.includes(response.status)
+				) {
 
-		return noCacheResponse(await next());
+					submitErrorResponse(
+						context.url.href,
+						response.clone()
+					);
+
+				}
+
+			}
+		);
+
+		return response;
 
 	}
-
-	const response = await next();
-
-	void new Promise(() => {
-
-		if (
-			ErrorsConfig.enableResponseLogging
-			&& ErrorsConfig.responseLoggingStatusCodes.includes(response.status)
-		) {
-
-			submitErrorResponse(
-				context.url.href,
-				response.clone()
-			);
-
-		}
-
-	});
-
-	return response;
-
-});
+);

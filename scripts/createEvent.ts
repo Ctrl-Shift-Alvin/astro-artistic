@@ -62,6 +62,10 @@ writeFileSync(
 	filePath,
 	frontmatter
 );
-console.log(`Created post at '${filePath}'${title
-	? ` titled '${title}`
-	: ''}'`);
+console.log(
+	`Created post at '${filePath}'${
+		title.length > 0
+			? ` titled '${title}`
+			: ''
+	}'`
+);

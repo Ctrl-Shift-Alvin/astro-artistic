@@ -3,27 +3,31 @@ export interface Props {
 	title?: string;
 	imageUrl: string;
 }
-
 const {
 	title,
 	imageUrl
 } = Astro.props;
+
 ---
 
 <section class="relative h-dvh w-full overflow-hidden">
 	<div class="absolute inset-0 flex items-start justify-center pt-[30vh]">
 		<div
 			class="absolute bottom-0 z-10 h-2/5 w-full bg-gradient-to-b from-black/0 to-black/100 align-bottom"
-		>
-		</div>
+		/>
+
 		<img
 			src={imageUrl}
 			alt="Banner Image"
 			class="absolute inset-0 z-0 size-full object-cover brightness-75"
 		/>
+
 		{
 			title && (
-				<h1 class="w-full z-10 px-5 text-center font-bold break-words" style="font-size: clamp(2.5rem, 5vh + 3vw, 6rem)">
+				<h1
+					class="w-full z-10 px-5 text-center font-bold break-words"
+					style="font-size: clamp(2.5rem, 5vh + 3vw, 6rem)"
+				>
 					{title}
 				</h1>
 			)
@@ -34,7 +38,7 @@ const {
 		<div
 			id="banner-scroll-btn"
 			class="animate-bounce cursor-pointer rounded-full border-2 border-white p-2"
-    >
+		>
 			<svg
 				class="size-6 text-white"
 				xmlns="http://www.w3.org/2000/svg"
@@ -43,10 +47,15 @@ const {
 				stroke="currentColor"
 				stroke-width="2"
 			>
-				<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M19 9l-7 7-7-7"
+				/>
 			</svg>
 		</div>
 	</div>
+
 	<script>
 		import {
 			isWindowDefined,

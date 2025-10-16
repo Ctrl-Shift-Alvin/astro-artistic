@@ -14,14 +14,13 @@ import {
 }
 	from '@/components/types';
 
+const db = new Database(ErrorsConfig.dbPath);
+const CURRENT_VERSION = 0;
+const updateQueries: string[][] = []; // updateQueries[0] updates to 1, updateQueries[1] updates to 2, etc.
 process.on(
 	'exit',
 	() => db.close()
 );
-
-const db = new Database(ErrorsConfig.dbPath);
-const CURRENT_VERSION = 0;
-const updateQueries: string[][] = []; // updateQueries[0] updates to 1, updateQueries[1] updates to 2, etc.
 
 /**
  * Create the database if it doesn't exist, and initialize it.
@@ -81,9 +80,7 @@ const errors_createDbIfNotExists = (): boolean => {
 
 		const dbVersionQuery = `user_version = ${CURRENT_VERSION};`;
 		db.pragma('foreign_keys = 1');
-		db
-			.exec(dbSetupQuery)
-			.pragma(dbVersionQuery);
+		db.exec(dbSetupQuery).pragma(dbVersionQuery);
 
 		return true;
 
@@ -102,43 +99,48 @@ const errors_createDbIfNotExists = (): boolean => {
  * Applies the update operations from `updateQueries` sequentially, based on the DB's version
  * compared to `CURRENT_VERSION`.
  *
- * E.g. updating from version 5 to latest version 10 applies `updateQueries[5-9][...]` sequentially.
+ * E.g. Updating from version 5 to latest version 10 applies `updateQueries[5-9][...]` sequentially.
  * @returns `true` if any update operations were applied successfully. Otherwise `false`.
  * @throws if any update operations should be applied but fail. The transaction is reversed and the DB is unchanged.
  */
 const errors_updateDb = () => {
 
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	const result = db.pragma('user_version') as [{ user_version: number }];
-	const startDbVersion = result[0].user_version;
+	// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unsafe-type-assertion
+	const result = db.pragma('user_version') as [{ user_version: number }] | undefined;
+	if (!result) {
 
-	if (startDbVersion == CURRENT_VERSION) {
+		throw new Error('Could not read pragma \'user_version\' of errors database.');
+
+	}
+	const startDbVersion = result[0].user_version;
+	if (startDbVersion === CURRENT_VERSION) {
 
 		return false;
 
 	}
-
 	if (startDbVersion > CURRENT_VERSION) {
 
-		throw new Error('Contact submissions database version is larger than the CURRENT_VERSION.');
+		throw new Error('Errors database version is larger than the CURRENT_VERSION.');
 
 	}
 
-	console.log(`Updating contact submissions database from version '${startDbVersion}' to '${CURRENT_VERSION}'!`);
+	console.log(`Updating errors database from version '${startDbVersion}' to '${CURRENT_VERSION}'!`);
 
 	try {
 
-		db.transaction(() => {
+		db.transaction(
+			() => {
 
-			for (let i = startDbVersion; i < CURRENT_VERSION; i++) {
+				for (let i = startDbVersion; i < CURRENT_VERSION; i++) {
 
-				updateQueries[i]?.forEach((q) => db.exec(q));
-				db.pragma(`user_version = ${i + 1}`);
+					updateQueries[i]?.forEach((q) => db.exec(q));
+					db.pragma(`user_version = ${i + 1}`);
+
+				}
+				return true;
 
 			}
-			return true;
-
-		});
+		);
 
 		return true;
 
@@ -166,9 +168,7 @@ export const errors_dbRun = (
 
 	try {
 
-		return db
-			.prepare(query)
-			.run(params);
+		return db.prepare(query).run(params);
 
 	} catch(err: any) {
 
@@ -202,12 +202,8 @@ export const errors_dbGetBuild = (
 
 	try {
 
-		const result = db
-			.prepare(query)
-			.get(params);
-		const parsed = ZBuild
-			.optional()
-			.parse(result);
+		const result = db.prepare(query).get(params);
+		const parsed = ZBuild.optional().parse(result);
 		return parsed;
 
 	} catch(err: any) {
@@ -242,12 +238,8 @@ export const errors_dbAllBuild = (
 
 	try {
 
-		const result = db
-			.prepare(query)
-			.all(params);
-		const parsed = ZBuild
-			.array()
-			.parse(result);
+		const result = db.prepare(query).all(params);
+		const parsed = ZBuild.array().parse(result);
 		return parsed;
 
 	} catch(err: any) {
@@ -282,12 +274,8 @@ export const errors_dbGetError = (
 
 	try {
 
-		const result = db
-			.prepare(query)
-			.get(params);
-		const parsed = ZError
-			.optional()
-			.parse(result);
+		const result = db.prepare(query).get(params);
+		const parsed = ZError.optional().parse(result);
 		return parsed;
 
 	} catch(err: any) {
@@ -322,12 +310,8 @@ export const errors_dbAllError = (
 
 	try {
 
-		const result = db
-			.prepare(query)
-			.all(params);
-		const parsed = ZError
-			.array()
-			.parse(result);
+		const result = db.prepare(query).all(params);
+		const parsed = ZError.array().parse(result);
 		return parsed;
 
 	} catch(err: any) {
@@ -522,17 +506,14 @@ export const errors_countBuilds = (): number => {
 
 	try {
 
-		const result = db
-			.prepare('SELECT COUNT(*) AS count FROM builds')
-			.get();
+		const result = db.prepare('SELECT COUNT(*) AS count FROM builds').get();
 
-		const parsedResult = z
-			.object({
-				count: z.coerce
-					.number()
-					.default(0)
-			})
-			.parse(result);
+		const parsedResult = z.object({
+			count: z
+				.coerce
+				.number()
+				.default(0)
+		}).parse(result);
 
 		return parsedResult.count;
 
@@ -595,7 +576,7 @@ export const errors_isDuplicateError = (submission: TErrorSubmission): boolean =
 
 	try {
 
-		const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+		const twentyFourHoursAgo = new Date(Date.now() - (24 * 60 * 60 * 1000)).toISOString();
 
 		const result = errors_dbGetError(
 			'SELECT * FROM errors WHERE '
@@ -784,17 +765,14 @@ export const errors_countErrors = (): number => {
 
 	try {
 
-		const result = db
-			.prepare('SELECT COUNT(*) AS count FROM errors')
-			.get();
+		const result = db.prepare('SELECT COUNT(*) AS count FROM errors').get();
 
-		const parsedResult = z
-			.object({
-				count: z.coerce
-					.number()
-					.default(0)
-			})
-			.parse(result);
+		const parsedResult = z.object({
+			count: z
+				.coerce
+				.number()
+				.default(0)
+		}).parse(result);
 
 		return parsedResult.count;
 
@@ -818,17 +796,14 @@ export const errors_countErrorsByBuild = (buildNumber: number): number => {
 
 	try {
 
-		const result = db
-			.prepare('SELECT COUNT(*) AS count FROM errors WHERE buildNumber=?')
-			.get(buildNumber);
+		const result = db.prepare('SELECT COUNT(*) AS count FROM errors WHERE buildNumber=?').get(buildNumber);
 
-		const parsedResult = z
-			.object({
-				count: z.coerce
-					.number()
-					.default(0)
-			})
-			.parse(result);
+		const parsedResult = z.object({
+			count: z
+				.coerce
+				.number()
+				.default(0)
+		}).parse(result);
 		return parsedResult.count;
 
 	} catch(err: any) {

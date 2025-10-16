@@ -19,7 +19,7 @@ export const LanguageSelect = ({
 }) => (
 	<div className={`flex flex-row items-center justify-center ${className}`}>
 		<select
-			value={selectedLanguageCode || defaultLanguageCode}
+			value={selectedLanguageCode ?? defaultLanguageCode}
 			className={
 				clsx(
 					'rounded border border-gray-300 bg-transparent px-4 py-2 text-white',
@@ -30,15 +30,17 @@ export const LanguageSelect = ({
 			onChange={onLanguageChange}
 		>
 			{
-				availableLanguages.map((lang: ILocale) => (
-					<option
-						key={lang.code}
-						value={lang.code}
-						className={'border-gray-800 bg-black text-white'}
-					>
-						{lang.name}
-					</option>
-				))
+				availableLanguages.map(
+					(lang: ILocale) => (
+						<option
+							key={lang.code}
+							value={lang.code}
+							className={'border-gray-800 bg-black text-white'}
+						>
+							{lang.name}
+						</option>
+					)
+				)
 			}
 		</select>
 

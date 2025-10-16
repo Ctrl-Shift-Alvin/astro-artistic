@@ -19,24 +19,33 @@ const translation = Astro.locals.translation;
 		<Card title={translation.siteInfo.title}>
 			<p class="mt-6 text-justify text-xl leading-9">
 				{translation.siteInfo.madeUsing[0]}
+
 				<A
 					href="https://astro.build/"
 					target="_blank"
 					className="text-xl underline decoration-1"
-					client:only="react">Astro</A
+					client:only="react"
+				>Astro
+				</A
 				>{translation.siteInfo.madeUsing[1]}
 			</p>
+
 			<p class="mt-6 text-justify text-xl leading-9">
 				{translation.siteInfo.basedOn[0]}
+
 				<A
 					href="https://github.com/Ctrl-Shift-Alvin/astro-artistic/"
 					target="_blank"
 					className="text-xl underline decoration-1"
-					client:only="react">astro-artistic</A
+					client:only="react"
+				>astro-artistic
+				</A
 				>
+
 				{translation.siteInfo.basedOn[1]}
 				<A>Alvin Raul Szöke</A>
 			</p>
+
 			<p class="mt-6 text-justify text-xl leading-9">
 				{translation.siteInfo.madeBy[0]}{GlobalTranslation.author}{
 					translation.siteInfo.madeBy[1]

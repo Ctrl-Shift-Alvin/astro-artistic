@@ -64,10 +64,12 @@ export const AdminBlogTable = () => {
 			// If count decreased, just slice the builds index
 			if (blogIndex.length >= count) {
 
-				setBlogIndex((prev) => prev.slice(
-					0,
-					count
-				));
+				setBlogIndex(
+					(prev) => prev.slice(
+						0,
+						count
+					)
+				);
 				return;
 
 			}
@@ -80,13 +82,15 @@ export const AdminBlogTable = () => {
 			if (result === null)
 				return;
 
-			setBlogIndex((prev) => [
-				...prev,
-				...result
-			].slice(
-				0,
-				blogCount
-			));
+			setBlogIndex(
+				(prev) => [
+					...prev,
+					...result
+				].slice(
+					0,
+					blogCount
+				)
+			);
 
 		},
 		[
@@ -143,7 +147,13 @@ export const AdminBlogTable = () => {
 
 				} else {
 
-					switch (parsed.error.issues[0]?.code) {
+					switch (
+						// eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+						parsed
+							.error
+							.issues[0]
+							?.code
+					) {
 
 						case 'invalid_format':
 							Monolog.show({
@@ -171,7 +181,7 @@ export const AdminBlogTable = () => {
 			const form = (
 				formValues: IFormValues,
 				setFormValues: (newValues: IFormValues)=> void,
-				onSubmit: (event: React.SyntheticEvent)=> void
+				onSubmit: (ev: React.SyntheticEvent)=> void
 			) => (
 
 				/*
@@ -279,29 +289,29 @@ export const AdminBlogTable = () => {
 
 				<tbody>
 					{
-						blogIndex.map((entry) => {
+						blogIndex.map(
+							(entry) => {
 
-							const tdClassName = clsx('border p-2');
-							return (
-								<tr key={entry.fileName}>
+								const tdClassName = clsx('border p-2');
+								return (
+									<tr key={entry.fileName}>
 
-									<td className={tdClassName}>
-										<A
-											href={`/admin/blogs/${entry.fileName}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
-											className={'underline'}
-										>
-											{entry.fileName}
-										</A>
-									</td>
+										<td className={tdClassName}>
+											<A
+												href={`/admin/blogs/${entry.fileName}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
+												className={'underline'}
+											>
+												{entry.fileName}
+											</A>
+										</td>
 
-									<td className={tdClassName}>
-										{entry.frontmatter.title}
-									</td>
+										<td className={tdClassName}>
+											{entry.frontmatter.title}
+										</td>
 
-									<td className={tdClassName}>
-										{
-											Intl
-												.DateTimeFormat(
+										<td className={tdClassName}>
+											{
+												Intl.DateTimeFormat(
 													cGetUserLanguage() ?? defaultLanguageCode,
 													{
 														year: 'numeric',
@@ -310,25 +320,25 @@ export const AdminBlogTable = () => {
 														hour: 'numeric',
 														minute: 'numeric'
 													}
+												).format(new Date(entry.frontmatter.pubDate))
+											}
+										</td>
+
+										<td
+											className={
+												clsx(
+													tdClassName,
+													'w-px'
 												)
-												.format(new Date(entry.frontmatter.pubDate))
-										}
-									</td>
+											}
+										>
+											<TrashcanIcon onClick={() => void remove(entry.fileName)} />
+										</td>
+									</tr>
+								);
 
-									<td
-										className={
-											clsx(
-												tdClassName,
-												'w-px'
-											)
-										}
-									>
-										<TrashcanIcon onClick={() => void remove(entry.fileName)} />
-									</td>
-								</tr>
-							);
-
-						})
+							}
+						)
 					}
 				</tbody>
 			</table>

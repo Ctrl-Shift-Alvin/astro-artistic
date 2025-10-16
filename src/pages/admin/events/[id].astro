@@ -6,35 +6,37 @@ import BaseAdmin from '@/templates/BaseAdmin.astro';
 const { id = 'none' } = Astro.params;
 
 // Check if the 'id' is set to 'new', in which case we are creating a new entry
-let idOrNew: number | true =
-	id === 'new'
+let idOrNew: number | true
+	= id === 'new'
 		? true
 		: -1;
 
 if (idOrNew !== true) {
+
 	try {
 
 		idOrNew = parseInt(id);
 		if (!idOrNew)
 			throw new Error();
 
-	} catch {		
+	} catch {
 
 		return Astro.rewrite('/404/');
 
 	}
+
 }
 ---
 <BaseAdmin
 	head={{
-		title: 
+		title:
 			idOrNew === true
 				? 'Creating New Event'
 				: `Event with ID '${id}'`,
 		description:
 			idOrNew === true
 				? 'Creating a new event entry'
-				: `Viewing the event entry with ID '${id}'`,
+				: `Viewing the event entry with ID '${id}'`
 	}}
 >
 	<Section

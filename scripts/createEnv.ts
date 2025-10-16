@@ -1,7 +1,8 @@
 // Npm run createEnv <ADMIN_PASSWORD> [JWT_LENGTH]
 import { randomBytes } from 'node:crypto';
 import {
-	existsSync, writeFileSync
+	existsSync,
+	writeFileSync
 } from 'node:fs';
 import bcrypt from 'bcrypt';
 
@@ -42,6 +43,8 @@ function parseDurationToSeconds(duration?: string): number {
 			case 'd':
 				total += value * 86400;
 				break;
+			case undefined:
+				throw new Error('Couldn\'t parse duration');
 
 		}
 
@@ -127,16 +130,18 @@ async function main() {
 		adminPassword,
 		generateJwtKey(),
 		jwtLength
-	).then((envContent) => {
+	).then(
+		(envContent) => {
 
-		writeFileSync(
-			'.env',
-			envContent,
-			{ encoding: 'utf8' }
-		);
-		console.log('.env file created successfully.');
+			writeFileSync(
+				'.env',
+				envContent,
+				{ encoding: 'utf8' }
+			);
+			console.log('.env file created successfully.');
 
-	});
+		}
+	);
 
 }
 

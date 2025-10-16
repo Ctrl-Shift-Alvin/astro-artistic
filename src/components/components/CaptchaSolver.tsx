@@ -31,22 +31,6 @@ export const CaptchaSolver = ({
 		setCaptchaId
 	] = useState<string | null>(null);
 
-	const loadCaptcha = useCallback(
-		async() => {
-
-			const captcha = await getCaptcha();
-			if (captcha) {
-
-				setCaptchaSvg(captcha.svgData);
-				setCaptchaId(captcha.id);
-				setValue('');
-
-			}
-
-		},
-		[]
-	);
-
 	const handleRefresh = useCallback(
 		async() => {
 
@@ -66,6 +50,19 @@ export const CaptchaSolver = ({
 	useEffect(
 		() => {
 
+			const loadCaptcha = async() => {
+
+				const captcha = await getCaptcha();
+				if (captcha) {
+
+					setCaptchaSvg(captcha.svgData);
+					setCaptchaId(captcha.id);
+					setValue('');
+
+				}
+
+			};
+
 			void loadCaptcha();
 			const subId = captchaChangeEmitter.subscribe(() => void loadCaptcha());
 			return () => {
@@ -75,13 +72,16 @@ export const CaptchaSolver = ({
 			};
 
 		},
-		[ loadCaptcha ]
+		[ setValue ]
 	);
 
 	return (
 		<div>
 			<h1 className={'block text-sm/8 font-medium text-white'}>
-				{window.__TRANSLATION__.captcha.title}
+				{window
+					.__TRANSLATION__
+					.captcha
+					.title}
 			</h1>
 
 			<div className={'flex items-center'}>
@@ -109,7 +109,10 @@ export const CaptchaSolver = ({
 					}
 				}
 			>
-				{window.__TRANSLATION__.captcha.solveField}
+				{window
+					.__TRANSLATION__
+					.captcha
+					.solveField}
 			</LabeledInput>
 
 			{

@@ -63,15 +63,9 @@ export const ZTranslation = z.object({
 	}),
 	siteInfo: z.object({
 		title: z.string(),
-		madeUsing: z
-			.string()
-			.array(),
-		basedOn: z
-			.string()
-			.array(),
-		madeBy: z
-			.string()
-			.array()
+		madeUsing: z.string().array(),
+		basedOn: z.string().array(),
+		madeBy: z.string().array()
 	}),
 	blog: z.object({
 		title: z.string(),
@@ -98,9 +92,7 @@ export const ZTranslation = z.object({
 		}),
 		card4: z.object({
 			title: z.string(),
-			points: z
-				.string()
-				.array()
+			points: z.string().array()
 		})
 	}),
 	events: z.object({

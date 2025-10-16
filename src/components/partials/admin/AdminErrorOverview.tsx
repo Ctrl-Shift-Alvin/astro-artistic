@@ -37,38 +37,34 @@ export const AdminErrorOverview = ({ submissionId }: { submissionId: number | st
 		[ isStackExpanded ]
 	);
 
-	const get = useCallback(
-		async() => {
-
-			const result = await fetchError(
-				submissionId,
-				true
-			);
-			if (result) {
-
-				setSubmission(result);
-
-			} else {
-
-				Monolog.show({
-					text: 'Failed to fetch the submission!',
-					durationMs: 5000
-				});
-
-			}
-			return null;
-
-		},
-		[ submissionId ]
-	);
-
 	useLayoutEffect(
 		() => {
 
-			void get();
+			void fetchError(
+				submissionId,
+				true
+			).then(
+				(result) => {
+
+					if (result) {
+
+						setSubmission(result);
+
+					} else {
+
+						Monolog.show({
+							text: 'Failed to fetch the submission!',
+							durationMs: 5000
+						});
+
+					}
+					return null;
+
+				}
+			);
 
 		},
-		[ get ]
+		[ submissionId ]
 	);
 
 	useLayoutEffect(
@@ -141,7 +137,7 @@ export const AdminErrorOverview = ({ submissionId }: { submissionId: number | st
 
 					<p>
 						{
-							submission?.isClient
+							submission?.isClient ?? false
 								? 'Yes'
 								: 'No'
 						}
@@ -195,12 +191,13 @@ export const AdminErrorOverview = ({ submissionId }: { submissionId: number | st
 
 					<p>
 						{
-							(isStackExpanded
-								? submission?.errorStack
-								: submission?.errorStack?.slice(
-									0,
-									20
-								)
+							(
+								isStackExpanded
+									? submission?.errorStack
+									: submission?.errorStack?.slice(
+										0,
+										20
+									)
 							) ?? '-'
 						}
 

@@ -21,23 +21,6 @@ export const AdminContactOverview = ({ submissionId }: { submissionId: number | 
 		setSubmission
 	] = useState<TContactFormEntry>();
 
-	const get = useCallback(
-		async() => {
-
-			const result = await fetchContactEntry(
-				submissionId,
-				true
-			);
-			if (result) {
-
-				setSubmission(result);
-
-			}
-
-		},
-		[ submissionId ]
-	);
-
 	const remove = useCallback(
 		async() => {
 
@@ -53,10 +36,23 @@ export const AdminContactOverview = ({ submissionId }: { submissionId: number | 
 	useLayoutEffect(
 		() => {
 
-			void get();
+			void fetchContactEntry(
+				submissionId,
+				true
+			).then(
+				(result) => {
+
+					if (result) {
+
+						setSubmission(result);
+
+					}
+
+				}
+			);
 
 		},
-		[ get ]
+		[ submissionId ]
 	);
 
 	useLayoutEffect(

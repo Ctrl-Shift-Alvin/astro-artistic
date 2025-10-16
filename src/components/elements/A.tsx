@@ -1,5 +1,6 @@
 import {
-	useCallback, type ReactNode
+	useCallback,
+	type ReactNode
 } from 'react';
 import clsx from 'clsx/lite';
 import {
@@ -54,26 +55,28 @@ export const A = (props: IAProps) => {
 				// Prevent default anchor behavior if we're handling navigation with fades
 				clickEvent.preventDefault();
 
-				void windowFadeOut().then(() => {
+				void windowFadeOut().then(
+					() => {
 
-					if (props.target === '_blank') {
+						if (props.target === '_blank') {
 
-						window.open(
-							props.href,
-							'_blank'
-						);
+							window.open(
+								props.href,
+								'_blank'
+							);
 
-						// Fade the current window back in after opening a new tab
-						windowFadeIn();
+							// Fade the current window back in after opening a new tab
+							windowFadeIn();
 
-					} else {
+						} else {
 
-						// Let the browser navigate, the fade out provides a nice transition
-						window.location.href = props.href || '';
+							// Let the browser navigate, the fade out provides a nice transition
+							window.location.href = props.href ?? '';
+
+						}
 
 					}
-
-				});
+				);
 
 			}
 

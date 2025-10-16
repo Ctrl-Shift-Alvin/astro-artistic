@@ -1,24 +1,29 @@
 ---
+import { A } from '../elements/A';
 import { type TTranslation } from '@/locales/global';
 import { events_getAllRelevantEntries } from '@/backend/database/events';
-import { A } from '../elements/A';
 import { EventsConfig } from '@/backend/config/events';
 import { defaultFormatDateTimeString } from '@/shared/time';
 
-export interface Props {
-	translation: TTranslation;
-}
+export interface Props { translation: TTranslation }
 const { translation } = Astro.props;
 
-const eventEntries = events_getAllRelevantEntries().map((item) => {
+const eventEntries = events_getAllRelevantEntries().map(
+	(item) => {
 
-	const date = new Date(item.dateTime);
-	const datePassed = date.getTime() - Date.now() < 0;
-	return { data: item, date, datePassed };
+		const date = new Date(item.dateTime);
+		const datePassed = date.getTime() - Date.now() < 0;
+		return {
+			data: item,
+			date,
+			datePassed
+		};
 
-});
+	}
+);
 
-const eventPagesUrl = EventsConfig.pagesPath
+const eventPagesUrl = EventsConfig
+	.pagesPath
 	.split(/src[/\\]pages/)[1]!
 	.replace(
 		/\\/g,
@@ -27,48 +32,86 @@ const eventPagesUrl = EventsConfig.pagesPath
 
 ---
 
-
-<h1 class="mb-10 text-4xl font-bold">{translation.events.title}</h1>
+<h1 class:list={'mb-10 text-4xl font-bold'}>
+	{translation.events.title}
+</h1>
 {
-	eventEntries && eventEntries.length > 0
-		? <table class="w-full">
-				<thead>
-					<tr>
-						<td class="w-1/3 pb-8 px-2 font-bold text-2xl text-center">{translation.events.dateRow}</td>
-						<td class="w-1/3 pb-8 px-2 font-bold text-2xl text-center">{translation.events.titleRow}</td>
-						<td class="w-1/3 pb-8 font-bold text-2xl text-center">{translation.events.locationRow}</td>
-					</tr>
-				</thead>
-				<tbody>
-					{eventEntries
-						.sort((a, b) => a.date.getTime() - b.date.getTime())
-						.map((entry) => (
+	eventEntries.length > 0
+		? (<table class:list={'w-full'}>
+			<thead>
+				<tr>
+					<td class:list={'w-1/3 pb-8 px-2 font-bold text-2xl text-center'}>
+						{translation.events.dateRow}
+					</td>
+
+					<td class:list={'w-1/3 pb-8 px-2 font-bold text-2xl text-center'}>
+						{translation.events.titleRow}
+					</td>
+
+					<td class:list={'w-1/3 pb-8 font-bold text-2xl text-center'}>
+						{translation.events.locationRow}
+					</td>
+				</tr>
+			</thead>
+
+			<tbody>
+				{
+					eventEntries.sort(
+						(
+							a, b
+						) => a.date.getTime() - b.date.getTime()
+					).map(
+						(entry) => (
 							<tr>
 
-								<td class:list={[ "py-3 px-2 text-center", { "line-through": entry.datePassed } ]}>
+								<td
+									class:list={[
+										'py-3 px-2 text-center',
+										{ 'line-through': entry.datePassed }
+									]}
+								>
 									{defaultFormatDateTimeString(entry.date)}
 								</td>
-								<td class:list={[ "py-3 px-2 text-center",{ "line-through": entry.datePassed } ]}>
 
-									{entry.data.enablePage
-										? (
-											<A href={`${eventPagesUrl}${entry.data.id}/`} className={'underline'} client:only="react">
-												{entry.data.title}
-											</A>
-										)
-										: entry.data.title}
+								<td
+									class:list={[
+										'py-3 px-2 text-center',
+										{ 'line-through': entry.datePassed }
+									]}
+								>
+
+									{
+										entry.data.enablePage
+											? (
+												<A
+													href={`${eventPagesUrl}${entry.data.id}/`}
+													className={'underline'}
+													client:only={'react'}
+												>
+													{entry.data.title}
+												</A>
+											)
+											: entry.data.title
+									}
 
 								</td>
-								<td class:list={[ "py-3 px-2 text-center", { "line-through": entry.datePassed } ]}>
+
+								<td
+									class:list={[
+										'py-3 px-2 text-center',
+										{ 'line-through': entry.datePassed }
+									]}
+								>
 									{entry.data.location}
 								</td>
 
 							</tr>
 						)
-					)}
-				</tbody>
-			</table>
-		: <p class="w-full text-center text-lg">
+					)
+				}
+			</tbody>
+		</table>)
+		: (<p class:list={'w-full text-center text-lg'}>
 			{translation.events.noEvents}
-		</p>
+		</p>)
 }

@@ -1,35 +1,39 @@
 ---
+import { type MarkdownLayoutProps } from 'astro';
 import { GlobalTranslation } from '@/locales/global';
 import Base from '@/templates/Base.astro';
 import { events_getEntry } from '@/backend/database/events';
-import { events_getEventContent } from '@/backend/events';
-import { marked } from 'marked';
 import Section from '@/components/astro-components/Section.astro';
 import { EventPost } from '@/components/partials/EventPost';
+import { type TEventFrontmatter } from '@/components/types';
 
-const { content: frontmatter } = Astro.props;
+export type Props = MarkdownLayoutProps<TEventFrontmatter>;
 
 // Fetch blog and parse to html
-const eventId = Astro.originPathname.split('/').at(-2);
+const eventId = Astro
+	.originPathname
+	.split('/')
+	.at(-2);
 if (!eventId)
-throw new Error("Couldn't fetch event page URL!");
+	throw new Error('Couldn\'t fetch event page URL!');
 
 const eventEntry = events_getEntry(eventId);
 if (!eventEntry)
-	throw new Error('Couldn\'t fetch event entry from database!')
-const eventPage = events_getEventContent(eventId);
-if (!eventPage)
-throw new Error('Couldn\'t fetch event page contents!');
-
-const parsedContent = marked.parse(eventPage.content);
+	throw new Error('Couldn\'t fetch event entry from database!');
 
 const title = `${eventEntry.title} - ${GlobalTranslation.siteName}`;
+const description = `'${eventEntry.title}'`;
 ---
 
-<Base head={{ title, description: frontmatter.description }}>
+<Base
+	head={{
+		title,
+		description
+	}}
+>
 	<Section>
 		<EventPost eventEntry={eventEntry}>
-			<article set:html={parsedContent} />
+			<slot />
 		</EventPost>
 	</Section>
 </Base>

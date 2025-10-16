@@ -1,4 +1,5 @@
-/* eslint-disable @stylistic/max-len */
+/* eslint-disable custom/max-chain-per-line, @stylistic/max-len */
+
 import { ZTranslation } from '@/locales/global';
 import { ContactConfig } from '@/shared/config/contact';
 import {

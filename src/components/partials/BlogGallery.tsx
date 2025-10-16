@@ -106,18 +106,23 @@ export const BlogGallery = ({
 				}
 			>
 				{
-					blogFileListProcessed.map((instance) => (
-						<BlogCard
-							key={instance.url}
-							blogFile={instance}
-						/>
-					))
+					blogFileListProcessed.map(
+						(instance) => (
+							<BlogCard
+								key={instance.url}
+								blogFile={instance}
+							/>
+						)
+					)
 				}
 			</div>
 		)
 		: (
 			<p className={'w-full text-center text-lg'}>
-				{window.__TRANSLATION__.blog.noPosts}
+				{window
+					.__TRANSLATION__
+					.blog
+					.noPosts}
 			</p>
 		);
 

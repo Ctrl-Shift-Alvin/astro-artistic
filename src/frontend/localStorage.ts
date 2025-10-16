@@ -109,6 +109,7 @@ export function lsGetCurrentCaptcha(): {
 	const storedCaptcha = getLocalStorage('currentCaptcha');
 
 	return storedCaptcha
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
 		? JSON.parse(storedCaptcha) as {
 			id: string;
 			expiry: number;

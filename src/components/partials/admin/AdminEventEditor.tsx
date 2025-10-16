@@ -31,7 +31,6 @@ import { LabeledInput } from '@/components/elements/LabeledInput';
 import { LabeledCheckbox } from '@/components/elements/LabeledCheckbox';
 import { LabeledDateTimePicker } from '@/components/elements/LabeledDateTimePicker';
 
-// eslint-disable-next-line import-x/no-unassigned-import
 import 'react-datepicker/dist/react-datepicker.css';
 
 /**
@@ -50,17 +49,19 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 	const setEventEntry = useCallback(
 		(value: typeof eventEntry) => {
 
-			_setEventEntry((prev) => {
+			_setEventEntry(
+				(prev) => {
 
-				if (prev) {
+					if (prev) {
 
-					setEventEntryChanged(true);
+						setEventEntryChanged(true);
+
+					}
+
+					return value;
 
 				}
-
-				return value;
-
-			});
+			);
 
 		},
 		[]
@@ -77,16 +78,18 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 	const setFileContent = useCallback(
 		(value: typeof fileContent) => {
 
-			_setFileContent((prev) => {
+			_setFileContent(
+				(prev) => {
 
-				if (prev) {
+					if (prev) {
 
-					setFileContentChanged(true);
+						setFileContentChanged(true);
+
+					}
+					return value;
 
 				}
-				return value;
-
-			});
+			);
 
 		},
 		[]
@@ -111,45 +114,6 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 		() => eventId === undefined,
 		[ eventId ]
 	);
-
-	const get = useCallback(
-		async() => {
-
-			if (isNewEntry) {
-
-				setEventEntry({
-					id: -1,
-					createdAt: 'To Be Determined',
-					title: '',
-					dateTime: new Date().toISOString(),
-					location: '',
-					enablePage: true
-				});
-				return;
-
-			}
-
-			const result = await fetchEvent(
-				eventId as number, // isNewEntry being false means eventId is a number!
-				true
-			);
-			if (result) {
-
-				setEventEntry(result.data);
-
-				if (result.file)
-					setFileContent(result.file);
-
-			}
-
-		},
-		[
-			eventId,
-			isNewEntry,
-			setEventEntry,
-			setFileContent
-		]
-	);
 	const edit = useCallback(
 		async() => {
 
@@ -162,7 +126,10 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 
 				Monolog.show({
 					text: `Empty/Invalid value for '${
-						result.error.issues[0]?.path
+						result
+							.error
+							.issues[0]
+							?.path
 							.toString()
 							.capitalize()
 					}'!`,
@@ -181,13 +148,12 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 
 			if (
 				await editEvent(
-					eventId as number, // isNewEntry being false means eventId is a number!
+					eventId!, // isNewEntry being false means eventId is a number!
 					eventEntry
 				)
 			) {
 
 				setEventEntryChanged(false);
-				void get();
 
 			}
 			return true;
@@ -196,7 +162,6 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 		[
 			eventEntry,
 			eventId,
-			get,
 			isNewEntry
 		]
 	);
@@ -228,7 +193,7 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 
 			if (eventEntryChanged || isNewEntry) {
 
-				if (!await edit())
+				if (!(await edit() ?? false))
 					return;
 
 			}
@@ -250,11 +215,12 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 
 				}
 
-				const newId = newIndex
-					.toSorted((
+				const newId = newIndex.toSorted(
+					(
 						a,
 						b
-					) => b.createdAt.localeCompare(a.createdAt))[0]!.id;
+					) => b.createdAt.localeCompare(a.createdAt)
+				)[0]!.id;
 				goto(`/admin/events/${newId.toString()}/${location.search}`);
 				return;
 
@@ -308,10 +274,50 @@ export const AdminEventsEditorOverview = ({ eventId }: { eventId?: number }) => 
 	useEffect(
 		() => {
 
-			void get();
+			const loadData = async() => {
+
+				if (isNewEntry) {
+
+					// For a new entry, create a default object without marking it as "changed".
+					_setEventEntry({
+						id: -1,
+						createdAt: 'To Be Determined',
+						title: '',
+						dateTime: new Date().toISOString(),
+						location: '',
+						enablePage: true
+					});
+					return;
+
+				}
+
+				const result = await fetchEvent(
+					eventId!, // isNewEntry being false means eventId is a number!
+					true
+				);
+				if (result) {
+
+					_setEventEntry(result.data);
+					setEventEntryChanged(false); // Explicitly set to not changed
+
+					if (result.file) {
+
+						_setFileContent(result.file);
+						setFileContentChanged(false); // Explicitly set to not changed
+
+					}
+
+				}
+
+			};
+
+			void loadData();
 
 		},
-		[ get ]
+		[
+			eventId,
+			isNewEntry
+		]
 	);
 
 	const divClassName = clsx('w-full');

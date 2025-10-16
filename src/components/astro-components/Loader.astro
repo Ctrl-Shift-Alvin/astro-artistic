@@ -6,6 +6,7 @@
 		import { getFadeInOffsetMs } from '@/frontend/windowTools';
 		document.getElementById('loader')?.classList.add(`duration-${getFadeInOffsetMs() ?? 1000}`);
 	</script>
+
 	<svg
 		class="animate-spin"
 		xmlns="http://www.w3.org/2000/svg"
@@ -24,12 +25,16 @@
 			cy="12"
 			r="10"
 			stroke="currentColor"
-			stroke-width="4"></circle>
+			stroke-width="4"
+		/>
+
 		<path
 			class="opacity-75"
 			fill="currentColor"
-			d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+			d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+		/>
 	</svg>
+
 	<script> // Removes loader when the page is loaded
 
 		import { getFadeInOffsetMs } from '@/frontend/windowTools';

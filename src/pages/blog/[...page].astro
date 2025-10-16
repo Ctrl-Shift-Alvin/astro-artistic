@@ -34,17 +34,17 @@ const nextUrl: string | undefined =
 		getPageUrl(Number(page) + 1) // This as well
 	:	undefined;
 
-const title = `${BlogConfig.title}${
+const title = `${translation.blog.title}${
 	Number(page) > 1
 		? ` ${translation.pagination.pageWord} ${page}`
 		: ''
 	} - ${GlobalTranslation.siteName
 }`;
-const description = BlogConfig.description;
+const description = translation.blog.description;
 ---
 
 <Base head={{ title, description }}>
-	<Section title={BlogConfig.title}>
+	<Section title={translation.blog.title}>
 		<div class="w-full text-center mt-2">
 			{description}
 		</div>

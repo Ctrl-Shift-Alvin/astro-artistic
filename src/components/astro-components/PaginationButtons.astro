@@ -15,12 +15,29 @@ const {
 } = Astro.props;
 ---
 
-<div class:list={["flex justify-center gap-25", className]}>
-	<A href={prevHref} className={prevHref ? '' : 'invisible'}
-		>← Newer Posts</A
+<div
+	class:list={[
+		'flex justify-center gap-25',
+		className
+	]}
+>
+	<A
+		href={prevHref}
+		className={prevHref
+			? ''
+			: 'invisible'}
+	>← Newer Posts
+	</A
 	>
+
 	<p>{currentPageText}</p>
-	<A href={nextHref} className={nextHref ? '' : 'invisible'}
-		>Older Posts →</A
+
+	<A
+		href={nextHref}
+		className={nextHref
+			? ''
+			: 'invisible'}
+	>Older Posts →
+	</A
 	>
 </div>

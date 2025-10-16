@@ -1,27 +1,27 @@
 ---
-import { type TTranslation } from '@/locales/global';
 import { Button } from '../elements/Button';
+import { type TTranslation } from '@/locales/global';
 
-export interface Props {
-	translation: TTranslation;
-}
+export interface Props { translation: TTranslation }
 
 const { translation } = Astro.props;
 ---
 
 <div class="flex w-full flex-col items-center">
 	<p class="mb-5 text-center text-lg">{translation.sizeError.body}</p>
+
 	<Button
-		actionPayload={{ action: "sizeErrorIgnore" }}
+		actionPayload={{ action: 'sizeErrorIgnore' }}
 		client:only="react"
 	>
 		{translation.sizeError.ignoreButton}
 	</Button>
+
 	<script>
 		import { cGetIgnoreSizeError } from '@/shared/cookies';
 
 		if (cGetIgnoreSizeError()) {
-			
+
 			// Make size-error-div invisible
 			const errorDiv = document.getElementById('size-error-div');
 			if (!errorDiv) throw new Error(`Cannot find 'size-error-div' in DOM!`);

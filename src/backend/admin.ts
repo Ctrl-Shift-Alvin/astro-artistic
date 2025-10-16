@@ -1,4 +1,3 @@
-
 /**
  * `true` if `ADMIN_PASSWORD_HASH`, `JWT_KEY` and `JWT_LENGTH` are set in the .env. Otherwise, `false`.
  */

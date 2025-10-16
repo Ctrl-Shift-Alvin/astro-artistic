@@ -33,7 +33,7 @@ const date = new Date().toISOString();
 
 const frontmatter = `---
 layout: '${layout}'
-title: ${title || 'Title'}
+title: ${title ?? 'Title'}
 description: Description
 pubDate: ${date}
 imgSrc: '${imgSrc}'
@@ -63,8 +63,10 @@ writeFileSync(
 	filePath,
 	frontmatter
 );
-console.log(`Created post at '${filePath}' ${
-	title
-		? `titled '${title}'`
-		: ''
-}`);
+console.log(
+	`Created post at '${filePath}'${
+		title
+			? ` titled '${title}'`
+			: ''
+	}`
+);

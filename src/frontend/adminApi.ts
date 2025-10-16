@@ -7,7 +7,8 @@ import {
 } from './windowTools';
 import { Dialog } from '@/components/components/DialogProvider';
 import {
-	Monolog, MonologProvider
+	Monolog,
+	MonologProvider
 } from '@/components/components/MonologProvider';
 import {
 	ZAuthPostApiRequest,
@@ -70,79 +71,6 @@ export const checkLogin = (): boolean => {
 };
 
 /**
- * Try to authenticate to the protected admin API using a password.
- *
- * Uses the auth admin API, and shows the result (if necessary) using a Monolog.
- *
- * @param password The password to use for authentication.
- * @returns A promise that resolves to `true` if the authentication was successful, or `false` if it wasn't.
- */
-export const login = async(password: string): Promise<boolean> => {
-
-	const authRequestBody = ZAuthPostApiRequest.parse({ password });
-	const authResponse = await fetch(
-		'/api/auth/',
-		{
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(authRequestBody),
-			credentials: 'include'
-		}
-	);
-
-	if (!authResponse.ok) {
-
-		Monolog.show({
-			text: `Error: Could not authenticate (${authResponse.status})!`,
-			durationMs: 2000
-		});
-		return false;
-
-	}
-
-	const testResponse = await fetch(
-		'/api/protected/',
-		{
-			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
-			credentials: 'include'
-		}
-	);
-
-	const {
-		success: testResponseSuccess,
-		data: testResponseData
-	} = await ZProtectedGetApiResponse.safeParseAsync(await testResponse.json());
-
-	if (!testResponseSuccess || 'error' in testResponseData) {
-
-		Monolog.show({
-			text: 'Error: Incorrect password!',
-			durationMs: 2000
-		});
-		return false;
-
-	} else {
-
-		void Monolog
-			.showAsync({
-				text: 'Success: Logged in!',
-				durationMs: 1500
-			})
-			.then(() => {
-
-				gotoPrevOrHome();
-
-			});
-		lsSetAuthTokenExpiry(testResponseData.expiry);
-		setLogoutTimeout();
-		return true;
-
-	}
-
-};
-
-/**
  * Logout from the protected admin API.
  *
  * Uses the auth admin API, and shows the result (if necessary) using a Monolog.
@@ -168,11 +96,13 @@ export const logout = async(timeout: boolean = false) => {
 	// Aggressively delete document immediately
 	if (contentDiv) {
 
-		contentDiv.childNodes.forEach((n) => {
+		contentDiv.childNodes.forEach(
+			(n) => {
 
-			n.remove();
+				n.remove();
 
-		});
+			}
+		);
 
 		const h1 = document.createElement('h1');
 		h1.textContent = 'Logged out!';
@@ -198,41 +128,43 @@ export const logout = async(timeout: boolean = false) => {
 
 			if (response.ok) {
 
-				void Monolog
-					.showAsync({
-						text: clsx(
-							timeout && 'Token timeout: ',
-							'Successfully logged out!'
-						),
-						durationMs: 2000,
-						fadeDurationMs: 500
-					})
-					.then(() => {
+				void Monolog.showAsync({
+					text: clsx(
+						timeout && 'Token timeout: ',
+						'Successfully logged out!'
+					),
+					durationMs: 2000,
+					fadeDurationMs: 500
+				}).then(
+					() => {
 
-						goto(`/admin/login/${
-							timeout
-								? getPrevUrlQuery()
-								: ''
-						}`);
+						goto(
+							`/admin/login/${
+								timeout
+									? getPrevUrlQuery()
+									: ''
+							}`
+						);
 
-					});
+					}
+				);
 
 			} else {
 
-				void Monolog
-					.showAsync({
-						text: clsx(
-							timeout && 'Token timeout: ',
-							'Partially successfully logged out! (Auth API Endpoint error)'
-						),
-						durationMs: 2000,
-						fadeDurationMs: 500
-					})
-					.then(() => {
+				void Monolog.showAsync({
+					text: clsx(
+						timeout && 'Token timeout: ',
+						'Partially successfully logged out! (Auth API Endpoint error)'
+					),
+					durationMs: 2000,
+					fadeDurationMs: 500
+				}).then(
+					() => {
 
 						goto('/admin/login/');
 
-					});
+					}
+				);
 
 			}
 
@@ -252,10 +184,12 @@ export const logout = async(timeout: boolean = false) => {
 			return React.createElement(MonologProvider);
 
 		};
-		createRoot(newMonologContainer).render(React.createElement(
-			MonologProviderWrapper,
-			{ onReady: callback }
-		));
+		createRoot(newMonologContainer).render(
+			React.createElement(
+				MonologProviderWrapper,
+				{ onReady: callback }
+			)
+		);
 
 		setTimeout(
 			() => {
@@ -267,11 +201,13 @@ export const logout = async(timeout: boolean = false) => {
 
 				if (response.ok) {
 
-					goto(`/admin/login/${
-						timeout
-							? getPrevUrlQuery()
-							: ''
-					}`);
+					goto(
+						`/admin/login/${
+							timeout
+								? getPrevUrlQuery()
+								: ''
+						}`
+					);
 
 				} else {
 
@@ -329,6 +265,79 @@ export const setLogoutTimeout = (callback?: ()=> void) => {
 
 };
 
+/**
+ * Try to authenticate to the protected admin API using a password.
+ *
+ * Uses the auth admin API, and shows the result (if necessary) using a Monolog.
+ *
+ * @param password The password to use for authentication.
+ * @returns A promise that resolves to `true` if the authentication was successful, or `false` if it wasn't.
+ */
+export const login = async(password: string): Promise<boolean> => {
+
+	const authRequestBody = ZAuthPostApiRequest.parse({ password });
+	const authResponse = await fetch(
+		'/api/auth/',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(authRequestBody),
+			credentials: 'include'
+		}
+	);
+
+	if (!authResponse.ok) {
+
+		Monolog.show({
+			text: `Error: Could not authenticate (${authResponse.status})!`,
+			durationMs: 2000
+		});
+		return false;
+
+	}
+
+	const testResponse = await fetch(
+		'/api/protected/',
+		{
+			method: 'GET',
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'include'
+		}
+	);
+
+	const {
+		success: testResponseSuccess,
+		data: testResponseData
+	} = await ZProtectedGetApiResponse.safeParseAsync(await testResponse.json());
+
+	if (!testResponseSuccess || 'error' in testResponseData) {
+
+		Monolog.show({
+			text: 'Error: Incorrect password!',
+			durationMs: 2000
+		});
+		return false;
+
+	} else {
+
+		void Monolog.showAsync({
+			text: 'Success: Logged in!',
+			durationMs: 1500
+		}).then(
+			() => {
+
+				gotoPrevOrHome();
+
+			}
+		);
+		lsSetAuthTokenExpiry(testResponseData.expiry);
+		setLogoutTimeout();
+		return true;
+
+	}
+
+};
+
 // #endregion
 
 // #region Blog
@@ -369,7 +378,7 @@ export const fetchBlogIndex = async(
 
 		Monolog.show({
 			text: `Failed to fetch blog index with count '${count}'${
-				offset
+				offset !== undefined
 					? ` and offset '${offset}'`
 					: ''
 			}!`,
@@ -443,17 +452,17 @@ export const fetchBlogFile = async(
 	const parsedResponse = await ZProtectedPostApiResponseMap['blog/get'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
-		void Monolog
-			.showAsync({
-				text: `Failed to fetch a blog file named '${fileName}'!`,
-				durationMs: 3000
-			})
-			.then(() => {
+		void Monolog.showAsync({
+			text: `Failed to fetch a blog file named '${fileName}'!`,
+			durationMs: 3000
+		}).then(
+			() => {
 
 				if (gotoPrevUrl)
 					gotoPrevOrHome();
 
-			});
+			}
+		);
 		return null;
 
 	}
@@ -610,14 +619,14 @@ export const removeBlogFile = async(
 
 	}
 
-	void Monolog
-		.showAsync({ text: `Successfully removed the blog file named '${fileName}'!` })
-		.then(() => {
+	void Monolog.showAsync({ text: `Successfully removed the blog file named '${fileName}'!` }).then(
+		() => {
 
 			if (gotoPrevUrl)
 				gotoPrevOrHome();
 
-		});
+		}
+	);
 	return true;
 
 };
@@ -661,7 +670,7 @@ export const fetchContactEntryIndex = async(
 
 		Monolog.show({
 			text: `Failed to fetch contact submission index with count '${count}'${
-				offset
+				offset !== undefined
 					? ` and offset '${offset}'`
 					: ''
 			}!`,
@@ -735,17 +744,17 @@ export const fetchContactEntry = async(
 	const parsedResponse = await ZProtectedPostApiResponseMap['contact/get'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
-		void Monolog
-			.showAsync({
-				text: `Failed to get a contact form submission with the ID '${id}'!`,
-				durationMs: 3000
-			})
-			.then(() => {
+		void Monolog.showAsync({
+			text: `Failed to get a contact form submission with the ID '${id}'!`,
+			durationMs: 3000
+		}).then(
+			() => {
 
 				if (gotoPrevUrl)
 					gotoPrevOrHome();
 
-			});
+			}
+		);
 		return null;
 
 	}
@@ -803,14 +812,14 @@ export const deleteContactEntry = async(
 
 	}
 
-	void Monolog
-		.showAsync({ text: `Successfully deleted the contact form submission with the ID '${id}'!` })
-		.then(() => {
+	void Monolog.showAsync({ text: `Successfully deleted the contact form submission with the ID '${id}'!` }).then(
+		() => {
 
 			if (gotoPrevUrl)
 				gotoPrevOrHome();
 
-		});
+		}
+	);
 	return true;
 
 };
@@ -884,17 +893,17 @@ export const fetchEvent = async(
 	const parsedResponse = await ZProtectedPostApiResponseMap['events/get'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
-		void Monolog
-			.showAsync({
-				text: `Failed to fetch an event entry with the ID '${id}'!`,
-				durationMs: 3000
-			})
-			.then(() => {
+		void Monolog.showAsync({
+			text: `Failed to fetch an event entry with the ID '${id}'!`,
+			durationMs: 3000
+		}).then(
+			() => {
 
 				if (gotoPrevUrl)
 					gotoPrevOrHome();
 
-			});
+			}
+		);
 		return null;
 
 	}
@@ -989,14 +998,14 @@ export const deleteEvent = async(
 		return false;
 
 	}
-	void Monolog
-		.showAsync({ text: `Successfully deleted the event entry with the ID '${id}'!` })
-		.then(() => {
+	void Monolog.showAsync({ text: `Successfully deleted the event entry with the ID '${id}'!` }).then(
+		() => {
 
 			if (gotoPrevUrl)
 				gotoPrevOrHome();
 
-		});
+		}
+	);
 	return true;
 
 };
@@ -1134,7 +1143,7 @@ export const fetchBuildIndex = async(
 
 		Monolog.show({
 			text: `Failed to fetch build index with count '${count}'${
-				offset
+				offset !== undefined
 					? ` and offset '${offset}'`
 					: ''
 			}!`,
@@ -1175,17 +1184,17 @@ export const fetchBuild = async(
 	const parsedResponse = await ZProtectedPostApiResponseMap['builds/get'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
-		void Monolog
-			.showAsync({
-				text: `Failed to fetch a build with the build number '${buildNumber}'!`,
-				durationMs: 3000
-			})
-			.then(() => {
+		void Monolog.showAsync({
+			text: `Failed to fetch a build with the build number '${buildNumber}'!`,
+			durationMs: 3000
+		}).then(
+			() => {
 
 				if (gotoPrevUrl)
 					gotoPrevOrHome();
 
-			});
+			}
+		);
 		return null;
 
 	}
@@ -1267,14 +1276,14 @@ export const deleteBuild = async(
 		return false;
 
 	}
-	void Monolog
-		.showAsync({ text: `Successfully deleted the build with the build number '${buildNumber}' and its errors!` })
-		.then(() => {
+	void Monolog.showAsync({ text: `Successfully deleted the build with the build number '${buildNumber}' and its errors!` }).then(
+		() => {
 
 			if (gotoPrevUrl)
 				gotoPrevOrHome();
 
-		});
+		}
+	);
 	return true;
 
 };
@@ -1314,7 +1323,7 @@ export const fetchErrorIndex = async(
 
 		Monolog.show({
 			text: `Failed to fetch the error index with count '${count}'${
-				offset
+				offset !== undefined
 					? ` and offset '${offset}'`
 					: ''
 			}!`,
@@ -1396,7 +1405,7 @@ export const fetchErrorIndexByBuild = async(
 
 		Monolog.show({
 			text: `Failed to fetch the build index for the build number '${buildNumber}', with count '${count}'${
-				offset
+				offset !== undefined
 					? ` and offset '${offset}'`
 					: ''
 			}!`,
@@ -1474,17 +1483,17 @@ export const fetchError = async(
 	const parsedResponse = await ZProtectedPostApiResponseMap['errors/get'].safeParseAsync(await response.json());
 	if (!parsedResponse.success || 'error' in parsedResponse.data) {
 
-		void Monolog
-			.showAsync({
-				text: `Failed to fetch an error with ID '${id}'!`,
-				durationMs: 3000
-			})
-			.then(() => {
+		void Monolog.showAsync({
+			text: `Failed to fetch an error with ID '${id}'!`,
+			durationMs: 3000
+		}).then(
+			() => {
 
 				if (gotoPrevUrl)
 					gotoPrevOrHome();
 
-			});
+			}
+		);
 		return null;
 
 	}
@@ -1535,14 +1544,14 @@ export const deleteError = async(
 		return false;
 
 	}
-	void Monolog
-		.showAsync({ text: `Successfully deleted the error with ID '${id}'!` })
-		.then(() => {
+	void Monolog.showAsync({ text: `Successfully deleted the error with ID '${id}'!` }).then(
+		() => {
 
 			if (gotoPrevUrl)
 				gotoPrevOrHome();
 
-		});
+		}
+	);
 	return true;
 
 };

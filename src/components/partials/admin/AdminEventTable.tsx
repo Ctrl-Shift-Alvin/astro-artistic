@@ -26,9 +26,10 @@ export const AdminEventTable = () => {
 		setEventEntries
 	] = useState<TEventEntry[]>([]);
 
-	const index = useCallback(
-		async() => {
+	const remove = useCallback(
+		async(id: string | number) => {
 
+			await deleteEvent(id);
 			const result = await fetchEventIndex();
 			if (result) {
 
@@ -39,19 +40,22 @@ export const AdminEventTable = () => {
 		},
 		[]
 	);
-	const remove = useCallback(
-		async(id: string | number) => {
-
-			await deleteEvent(id);
-			void index();
-
-		},
-		[ index ]
-	);
 
 	useLayoutEffect(
-		() => void index(),
-		[ index ]
+		() => {
+
+			const loadData = async() => {
+
+				const result = await fetchEventIndex();
+				if (result)
+					setEventEntries(result);
+
+			};
+
+			void loadData();
+
+		},
+		[]
 	);
 
 	const tdClassName = clsx('border p-2');
@@ -88,12 +92,13 @@ export const AdminEventTable = () => {
 
 				<tbody>
 					{
-						eventEntries
-							.sort((
+						eventEntries.sort(
+							(
 								a,
 								b
-							) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())
-							.map((entry) => {
+							) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
+						).map(
+							(entry) => {
 
 								return (
 									<tr key={entry.id}>
@@ -117,18 +122,16 @@ export const AdminEventTable = () => {
 
 										<td className={tdClassName}>
 											{
-												Intl
-													.DateTimeFormat(
-														cGetUserLanguage() ?? defaultLanguageCode,
-														{
-															year: 'numeric',
-															month: 'numeric',
-															day: 'numeric',
-															hour: 'numeric',
-															minute: 'numeric'
-														}
-													)
-													.format(new Date(entry.dateTime))
+												Intl.DateTimeFormat(
+													cGetUserLanguage() ?? defaultLanguageCode,
+													{
+														year: 'numeric',
+														month: 'numeric',
+														day: 'numeric',
+														hour: 'numeric',
+														minute: 'numeric'
+													}
+												).format(new Date(entry.dateTime))
 											}
 										</td>
 
@@ -164,7 +167,8 @@ export const AdminEventTable = () => {
 									</tr>
 								);
 
-							})
+							}
+						)
 					}
 				</tbody>
 			</table>

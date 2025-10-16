@@ -1,15 +1,18 @@
 ---
 import BaseLight from '@/templates/BaseLight.astro';
-import { DEFAULT_ANIMATION_DURATION_MS } from '@/frontend/windowTools';
 
 const translation = Astro.locals.translation;
 ---
-<BaseLight head={{
-	title: translation.offline.title,
-	description: translation.offline.description
-}}>
+<BaseLight
+	head={{
+		title: translation.offline.title,
+		description: translation.offline.description
+	}}
+>
 
-	<script is:inline define:vars={{ animDuration: DEFAULT_ANIMATION_DURATION_MS }}>
+	<script>
+
+		import { getAnimationDurationMs } from '@/frontend/windowTools';
 
 		const tryRedirect = async () => {
 
@@ -20,7 +23,7 @@ const translation = Astro.locals.translation;
 
 					// Transition
 					document.body.classList.replace('opacity-100', 'opacity-0');
-					await new Promise((res) => setTimeout(res, animDuration));
+					await new Promise((res) => setTimeout(res, getAnimationDurationMs()));
 					window.location.href = '/';
 					return true;
 
@@ -48,6 +51,7 @@ const translation = Astro.locals.translation;
 	<h1 class="mt-15 w-10/12 text-center text-4xl font-bold">
 		{translation.fiveOThree.title}
 	</h1>
+
 	<p class="newlines mt-3 w-10/12 text-center text-lg">
 		{translation.fiveOThree.body}
 	</p>

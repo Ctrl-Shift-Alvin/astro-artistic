@@ -28,12 +28,17 @@ const recentBlogs = getSortedBlogsSliced(
 	}}
 	noTopPadding={true}
 >
-	<Banner title={GlobalTranslation.siteName} imageUrl="/images/banner.png" />
+	<Banner
+		title={GlobalTranslation.siteName}
+		imageUrl="/images/banner.png"
+	/>
+
 	<Section
 		className="flex flex-col items-center lg:flex-row lg:justify-between lg:gap-x-24"
 	>
 		<Hero translation={translation} />
 	</Section>
+
 	<Section>
 		<Card
 			title={translation.card1.title}
@@ -44,6 +49,7 @@ const recentBlogs = getSortedBlogsSliced(
 			buttonUrl="/button/"
 		/>
 	</Section>
+
 	<Section>
 		<Card
 			title={translation.card2.title}
@@ -53,10 +59,18 @@ const recentBlogs = getSortedBlogsSliced(
 			buttonUrl="/others/"
 		/>
 	</Section>
-	{recentBlogs.length > 0 && <Section title={translation.blog.recentPosts}>
-		<RecentBlogs recentBlogFiles={recentBlogs} client:only="react" />
-	</Section>}
+
+	{recentBlogs.length > 0 && (<Section title={translation.blog.recentPosts}>
+		<RecentBlogs
+			recentBlogFiles={recentBlogs}
+			client:only="react"
+		/>
+	</Section>)}
+
 	<Section title={translation.contact.title}>
-		<ContactCard contactData={ContactConfig.contacts.default!} client:only="react" />
+		<ContactCard
+			contactData={ContactConfig.contacts.default!}
+			client:only="react"
+		/>
 	</Section>
 </Base>

@@ -48,10 +48,12 @@ export const AdminContactTable = () => {
 			// If count decreased, just slice the errors index
 			if (contactEntryIndex.length >= count) {
 
-				setContactEntryIndex((prev) => prev.slice(
-					0,
-					count
-				));
+				setContactEntryIndex(
+					(prev) => prev.slice(
+						0,
+						count
+					)
+				);
 				return;
 
 			}
@@ -65,32 +67,21 @@ export const AdminContactTable = () => {
 			if (result == null)
 				return;
 
-			setContactEntryIndex((prev) => [
-				...prev,
-				...result
-			].slice(
-				0,
-				contactEntryCount
-			));
+			setContactEntryIndex(
+				(prev) => [
+					...prev,
+					...result
+				].slice(
+					0,
+					contactEntryCount
+				)
+			);
 
 		},
 		[
 			contactEntryCount,
 			contactEntryIndex.length
 		]
-	);
-
-	const count = useCallback(
-		async() => {
-
-			const result = await fetchContactEntryCount();
-			if (result === null)
-				return;
-
-			setFullIndexCount(result);
-
-		},
-		[]
 	);
 
 	const del = useCallback(
@@ -128,14 +119,24 @@ export const AdminContactTable = () => {
 	useLayoutEffect(
 		() => {
 
-			void count();
-			void index(contactEntryCount);
+			const loadData = async() => {
+
+				const result = await fetchContactEntryCount();
+				if (result !== null) {
+
+					setFullIndexCount(result);
+
+				}
+				await index(contactEntryCount);
+
+			};
+
+			void loadData();
 
 		},
 		[
 			contactEntryCount,
-			index,
-			count
+			index
 		]
 	);
 
@@ -166,54 +167,56 @@ export const AdminContactTable = () => {
 
 				<tbody>
 					{
-						contactEntryIndex.map((entry) => {
+						contactEntryIndex.map(
+							(entry) => {
 
-							const tdClassName = clsx('border p-2');
-							return (
-								<tr key={entry.id}>
+								const tdClassName = clsx('border p-2');
+								return (
+									<tr key={entry.id}>
 
-									<td className={tdClassName}>
-										<A
-											href={`/admin/submission/contact/${entry.id}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
-											className={'underline'}
+										<td className={tdClassName}>
+											<A
+												href={`/admin/submission/contact/${entry.id}/?prevUrl=${encodeURIComponent(window.location.pathname)}`}
+												className={'underline'}
+											>
+												{entry.id}
+											</A>
+										</td>
+
+										<td className={tdClassName}>
+											{entry.firstName}
+										</td>
+
+										<td className={tdClassName}>
+											{entry.lastName}
+										</td>
+
+										<td
+											className={
+												clsx(
+													tdClassName,
+													'max-w-44 truncate overflow-ellipsis'
+												)
+											}
 										>
-											{entry.id}
-										</A>
-									</td>
+											{entry.message}
+										</td>
 
-									<td className={tdClassName}>
-										{entry.firstName}
-									</td>
+										<td
+											className={
+												clsx(
+													tdClassName,
+													'w-px'
+												)
+											}
+										>
+											<TrashcanIcon onClick={() => void del(entry.id)} />
+										</td>
+									</tr>
+								);
 
-									<td className={tdClassName}>
-										{entry.lastName}
-									</td>
-
-									<td
-										className={
-											clsx(
-												tdClassName,
-												'max-w-44 truncate overflow-ellipsis'
-											)
-										}
-									>
-										{entry.message}
-									</td>
-
-									<td
-										className={
-											clsx(
-												tdClassName,
-												'w-px'
-											)
-										}
-									>
-										<TrashcanIcon onClick={() => void del(entry.id)} />
-									</td>
-								</tr>
-							);
-
-						})
+							}
+						)
 					}
 				</tbody>
 			</table>

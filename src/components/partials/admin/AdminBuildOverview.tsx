@@ -1,6 +1,5 @@
 import {
 	useState,
-	useCallback,
 	useLayoutEffect
 } from 'react';
 import { addAdminButton } from './AdminButtonContainer';
@@ -34,30 +33,26 @@ export const AdminBuildOverview = ({ buildNumber }: { buildNumber: number | stri
 
 	};
 
-	const get = useCallback(
-		async() => {
-
-			const result = await fetchBuild(
-				buildNumber,
-				true
-			);
-			if (result) {
-
-				setBuild(result);
-
-			}
-
-		},
-		[ buildNumber ]
-	);
-
 	useLayoutEffect(
 		() => {
 
-			void get();
+			void fetchBuild(
+				buildNumber,
+				true
+			).then(
+				(result) => {
+
+					if (result) {
+
+						setBuild(result);
+
+					}
+
+				}
+			);
 
 		},
-		[ get ]
+		[ buildNumber ]
 	);
 
 	useLayoutEffect(
@@ -143,7 +138,7 @@ export const AdminBuildOverview = ({ buildNumber }: { buildNumber: number | stri
 
 					<p>
 						{
-							build?.isGitDirty
+							build?.isGitDirty ?? false
 								? 'Yes'
 								: 'No'
 						}
