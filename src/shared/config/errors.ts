@@ -2,6 +2,6 @@ import { ZErrorsConfig } from './configTypes';
 
 export const ErrorsConfig = ZErrorsConfig.parse({
 	enableJsLogging: true,
-	tableInitialBuildCount: 2,
-	tableInitialErrorCount: 2
+	tableInitialBuildCount: 5,
+	tableInitialErrorCount: 5
 });
